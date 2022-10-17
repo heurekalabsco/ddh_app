@@ -1,0 +1,66 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,wght@0,400;0,600;1,400;1,600&display=swap');
+
+body{
+  font-family: 'Nunito Sans', sans-serif;
+  font-size: 12pt;
+}
+
+h1,h2,h3,h4 {
+  font-family: 'Roboto Slab', serif;
+  font-weight: 500;
+}
+
+a{
+  color: #00919f;
+}
+
+/*NAVBAR*/
+.navbar-brand{
+  /*font-family: 'Nunito Sans', sans-serif;*/
+  font-family: 'Roboto Slab', serif;
+  font-size: 17pt;
+  font-weight: 400;
+}
+
+.navbar-nav{
+  font-size: 10pt;
+}
+
+.navbar-default {
+    background-color: #fff;
+    border-color: #00919f;
+    border-width: 0px 0px 2px 0px;
+}
+
+/* align navbar form (search input) vertically with main_title and horizontally right */
+.navbar-form-panel {
+  float: right;
+  margin-top: 7px;
+  margin-bottom: 7px;
+}
+
+/* aligned logout button vertically with main_title */
+.logout-image {
+  margin-top: 15px;
+}
+
+/* Adjust search panel to live in the top right corner */
+.ddh-nav-form {
+    margin-top: 8px;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+}
+
+/* hide navigation search form on mobile */
+@media (max-width: 767px) {
+   .ddh-nav-form {
+      display: none;
+   }
+}
+
+/* prevent navigation from moving to the top row and clashing with ddh-nav-form  */
+.navbar-header {
+  float: none;
+}
