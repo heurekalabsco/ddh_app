@@ -1,0 +1,20 @@
+# project files
+.Renviron
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+.DS_Store
+*.Rproj
+config.sh
+token.R
+#directories
+data/
+tmp/
+tests/data/
+logs
+venv
+#quarto
+*.zip
+code/www/methods/
+*.html
