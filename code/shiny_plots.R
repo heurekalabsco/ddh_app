@@ -24,7 +24,7 @@ ideogramPlotServer <- function (id, data) {
           need(data()$content %in% gene_location$approved_symbol, 
                "No data found for this gene."))
         #check to see if image exists
-        img_path <- ddh::load_image(input = data(), fun_name =  "make_ideogram", card = FALSE)
+        img_path <- ddh::load_image(input = data(), fun_name = "make_ideogram", card = FALSE)
         if(!is.null(img_path)) {
           uiOutput(outputId = session$ns("ideogram_plot_image"), width = "100%")
         } else {
@@ -38,7 +38,7 @@ ideogramPlotServer <- function (id, data) {
                      width = "100%"))
       })
       output$ideogram_plot_render <- renderPlot({
-        make_ideogram(location_data = gene_location, chromosome_data = chromosome, input = data())
+        make_ideogram(input = data())
       })
     }
   )
@@ -66,7 +66,7 @@ proteinSizePlotServer <- function (id, data) {
         shiny::validate(
           need(data()$content %in% proteins$gene_name, "No protein mass found"))
         #check to see if image exists
-        img_path <- ddh::load_image(input = data(), fun_name =  "make_proteinsize", card = FALSE)
+        img_path <- ddh::load_image(input = data(), fun_name = "make_proteinsize", card = FALSE)
         if(!is.null(img_path)) {
           uiOutput(outputId = session$ns("protein_size_plot_image"), width = "100%")
         } else {
@@ -669,7 +669,7 @@ pubmedPlotServer <- function (id, data, session) {
         shiny::validate(
           need(data()$content %in% pubmed$name, "No literature found"))
         #check to see if image exists
-        img_path <- ddh::load_image(input = data(), fun_name =  "make_pubmed", card = FALSE)
+        img_path <- ddh::load_image(input = data(), fun_name = "make_pubmed", card = FALSE)
         if(!is.null(img_path)) {
           uiOutput(outputId = session$ns("pubmed_plot_image"), width = "100%")
         } else {
@@ -713,7 +713,7 @@ pubmedCompoundPlotServer <- function (id, data) {
         shiny::validate(
           need(data()$content %in% pubmed$name, "No literature found"))
         #check to see if image exists
-        img_path <- ddh::load_image(input = data(), fun_name =  "make_pubmed", card = FALSE)
+        img_path <- ddh::load_image(input = data(), fun_name = "make_pubmed", card = FALSE)
         if(!is.null(img_path)) {
           uiOutput(outputId = session$ns("pubmed_compound_plot_image"), width = "100%")
         } else {
@@ -757,7 +757,7 @@ pubmedCellLinePlotServer <- function (id, data) {
         shiny::validate(
           need(data()$content %in% pubmed$name, "No literature found"))
         #check to see if image exists
-        img_path <- ddh::load_image(input = data(), fun_name =  "make_pubmed", card = FALSE)
+        img_path <- ddh::load_image(input = data(), fun_name = "make_pubmed", card = FALSE)
         if(!is.null(img_path)) {
           uiOutput(outputId = session$ns("pubmed_cell_plot_image"), width = "100%")
         } else {
@@ -800,7 +800,7 @@ cellAnatogramPlotServer <- function(id, data) {
         shiny::validate(
           need(data()$content %in% subcell$gene_name, "No subcellular location data for this gene."))
         #check to see if image exists
-        img_path <- ddh::load_image(input = data(), fun_name =  "make_cellanatogram", card = FALSE)
+        img_path <- ddh::load_image(input = data(), fun_name = "make_cellanatogram", card = FALSE)
         if(!is.null(img_path)) {
           uiOutput(outputId = session$ns("cell_anatogram_gene_plot_image"), width = "100%")
         } else {
@@ -860,7 +860,7 @@ maleAnatogramPlotServer <- function(id, data) {
         shiny::validate(
           need(data()$content %in% tissue$gene_name, "No Tissue-specific expression data for this gene."))
         #check to see if image exists
-        img_path <- ddh::load_image(input = data(), fun_name =  "make_male_anatogram", card = FALSE)
+        img_path <- ddh::load_image(input = data(), fun_name = "make_male_anatogram", card = FALSE)
         if(!is.null(img_path)) {
           uiOutput(outputId = session$ns("male_anatogram_gene_plot_image"), width = "100%")
         } else {
@@ -894,7 +894,7 @@ femaleAnatogramPlotServer <- function(id, data) {
         shiny::validate(
           need(data()$content %in% tissue$gene_name, "No Tissue-specific expression data for this gene."))
         #check to see if image exists
-        img_path <- ddh::load_image(input = data(), fun_name =  "make_female_anatogram", card = FALSE)
+        img_path <- ddh::load_image(input = data(), fun_name = "make_female_anatogram", card = FALSE)
         if(!is.null(img_path)) {
           uiOutput(outputId = session$ns("female_anatogram_gene_plot_image"), width = "100%")
         } else {
@@ -932,7 +932,7 @@ tissuePlotServer <- function(id, data) {
         shiny::validate(
           need(data()$content %in% tissue$gene_name, "No Tissue-specific expression data for this gene."))
         #check to see if image exists
-        img_path <- ddh::load_image(input = data(), fun_name =  "make_tissue", card = FALSE)
+        img_path <- ddh::load_image(input = data(), fun_name = "make_tissue", card = FALSE)
         if(!is.null(img_path)) {
           uiOutput(outputId = session$ns("tissue_gene_plot_image"), width = "100%")
         } else {
@@ -946,7 +946,7 @@ tissuePlotServer <- function(id, data) {
                      width = "100%"))
       })
       output$tissue_gene_plot_render <- renderPlot({
-        make_tissue(tissue, input = data())
+        make_tissue(input = data())
       }, height = 1000)
     }
   )
@@ -987,7 +987,7 @@ cellGeneExpressionPlotServer <- function(id, data) {
           )
         }
         #check to see if image exists
-        img_path <- ddh::load_image(input = data(), fun_name =  "make_cellexpression", card = FALSE)
+        img_path <- ddh::load_image(input = data(), fun_name = "make_cellexpression", card = FALSE)
         if(!is.null(img_path)) {
           uiOutput(outputId = session$ns("expression_gene_plot_image"), width = "100%")
         } else {
@@ -1154,7 +1154,7 @@ cellDependenciesPlotServer <- function (id, data) {
                  data()$content %in% expression_meta$cell_line, 
                "No data found for this query."))
         #check to see if image exists
-        img_path <- ddh::load_image(input = data(), fun_name =  "make_celldeps", card = FALSE)
+        img_path <- ddh::load_image(input = data(), fun_name = "make_celldeps", card = FALSE)
         if(!is.null(img_path)) {
           uiOutput(outputId = session$ns("cell_deps_plot_image"), width = "100%")
         } else {
@@ -1331,7 +1331,7 @@ cellDependenciesCorrPlotServer <- function (id, data) {
         shiny::validate(
           need(data()$content %in% achilles_cor_nest$fav_gene, "No data found for this gene."))
         #check to see if image exists
-        img_path <- ddh::load_image(input = data(), fun_name =  "make_correlation", card = FALSE)
+        img_path <- ddh::load_image(input = data(), fun_name = "make_correlation", card = FALSE)
         if(!is.null(img_path)) {
           uiOutput(outputId = session$ns("gene_correlation_plot_image"), width = "100%")
         } else {
@@ -1614,7 +1614,7 @@ compoundStructureServer <- function (id, data) {
         shiny::validate(
           need(is.array(make_molecule_structure(input = data())), "No structure found for this compound."))
         #check to see if image exists
-        img_path <- ddh::load_image(input = data(), fun_name =  "make_molecule_structure", card = FALSE)
+        img_path <- ddh::load_image(input = data(), fun_name = "make_molecule_structure", card = FALSE)
         if(!is.null(img_path)) {
           uiOutput(outputId = session$ns("compound_structure_image"), width = "100%")
         } else {

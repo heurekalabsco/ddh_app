@@ -5,11 +5,6 @@ notZeroConditionalPanel <- function(fieldname, ...) {
   conditionalPanel(condition = condition_str, ...)  
 }
 
-# toggleConditionPanel <- function(fieldname, ...) {
-#   condition_str <- paste0("input['", fieldname, "'] %% 2 != 0")
-#   conditionalPanel(condition = condition_str, ...)
-# }
-
 # dynamicSwitch <- function(fieldname, ...) {
 #   prettySwitch(
 #     inputId = fieldname,

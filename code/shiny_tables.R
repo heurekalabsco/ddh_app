@@ -58,7 +58,7 @@ pathwayListServer <- function(id, data) {
         shiny::validate(
           need(data()$content %in% unique(unlist(pathways$data, use.names = FALSE)), "Not found in any pathways")
         )
-        DT::datatable(make_pathway_list(table_name = pathways, input = data()) %>% 
+        DT::datatable(make_pathway_list(input = data()) %>% 
                         dplyr::mutate(go = map_chr(go, internal_link))  %>% #from fun_helper.R
                         dplyr::select(Pathway = pathway, GO = go),
                       escape = FALSE,
@@ -85,7 +85,7 @@ pathwayGeneListServer <- function(id, data) {
       output$pathway_gene_list <- DT::renderDataTable({
         shiny::validate(
           need(data()$query %in% pathways$go, "Not found in any pathways"))
-        DT::datatable(make_pathway_genes(table_name = pathways, table_join = gene_summary, go_id = data()$query) %>% 
+        DT::datatable(make_pathway_genes(go_id = data()$query) %>% 
                         dplyr::mutate(gene = map_chr(gene, internal_link))  %>% #from fun_helper.R
                         dplyr::select(Gene = gene, Name = approved_name, AKA = aka),
                       escape = FALSE,
@@ -257,7 +257,7 @@ pubmedTableServer <- function(id, data) {
         shiny::validate(
           need(data()$content %in% pubmed$name, "No data found for this query"))
         withProgress(message = 'Building a smart table...', {
-          DT::datatable(make_pubmed_table(pubmed, input = data()) %>% 
+          DT::datatable(make_pubmed_table(input = data()) %>% 
                           dplyr::mutate(pmid = map_chr(pmid, pubmed_linkr, number_only = TRUE) #from fun_helper.R
                           ) %>% 
                           dplyr::mutate(pmcid = map_chr(pmcid, pmc_linkr) #from fun_helper.R
@@ -287,7 +287,7 @@ cellAnatogramTableServer <- function(id, data) {
         shiny::validate(
           need(data()$content %in% subcell$gene_name, 
                "No data for this gene"))
-        DT::datatable(make_cellanatogram_table(subcell, input = data()) %>% 
+        DT::datatable(make_cellanatogram_table(input = data()) %>% 
                         dplyr::select(Gene, gene, Reliability, Location) %>% 
                         dplyr::rename(`ENSEMBL ID` = gene),
                       options = list(pageLength = 10))
@@ -311,7 +311,7 @@ tissueTableServer <- function(id, data) {
       output$tissueanatogram_table <- DT::renderDataTable({
         shiny::validate(
           need(data()$content %in% tissue$gene_name, "No Tissue Expression Data Found"))
-        DT::datatable(make_humananatogram_table(tissue, input = data()),
+        DT::datatable(make_humananatogram_table(input = data()),
                       filter = if(input$tissue_filter_click == FALSE) {'none'} else {'top'},
                       options = list(pageLength = 10))
       })
@@ -622,7 +622,7 @@ similarPathwaysTableServer <- function (id, data) {
         shiny::validate(
           need(data()$content %in% master_positive$fav_gene, "No data found for this gene."))
         DT::datatable(
-          make_enrichment_top(master_positive, input = data()) %>% 
+          make_enrichment_top(input = data()) %>% 
             dplyr::mutate_if(is.numeric, ~ signif(., digits = 3)),
           options = list(pageLength = 25))
       })  
@@ -914,7 +914,7 @@ dissimilarPathwaysTableServer <- function (id, data) {
         shiny::validate(
           need(data()$content %in% master_negative$fav_gene, "No data found for this gene."))
         DT::datatable(
-          make_enrichment_bottom(master_negative, input = data()) %>% 
+          make_enrichment_bottom(input = data()) %>% 
             dplyr::mutate_if(is.numeric, ~ signif(., digits = 3)),
           options = list(pageLength = 25))
       })      
@@ -1163,7 +1163,7 @@ pubmedCompoundTableServer <- function(id, data) {
         shiny::validate(
           need(data()$content %in% pubmed$name, ""))
         withProgress(message = 'Building a smart table...', {
-          DT::datatable(make_pubmed_table(pubmed, input = data()) %>% 
+          DT::datatable(make_pubmed_table(input = data()) %>% 
                           dplyr::mutate(pmid = map_chr(pmid, pubmed_linkr, number_only = TRUE) #from fun_helper.R
                           ) %>% 
                           dplyr::mutate(pmcid = map_chr(pmcid, pmc_linkr) #from fun_helper.R
@@ -1190,7 +1190,7 @@ pubmedCellLineTableServer <- function(id, data) {
         shiny::validate(
           need(data()$content %in% pubmed$name, ""))
         withProgress(message = 'Building a smart table...', {
-          DT::datatable(make_pubmed_table(pubmed, input = data()) %>% 
+          DT::datatable(make_pubmed_table(input = data()) %>% 
                           dplyr::mutate(pmid = map_chr(pmid, pubmed_linkr, number_only = TRUE) #from fun_helper.R
                           ) %>% 
                           dplyr::mutate(pmcid = map_chr(pmcid, pmc_linkr) #from fun_helper.R
@@ -1225,7 +1225,7 @@ drugGenesTableServer <- function (id, data) {
       output$drug_genes_table <- DT::renderDataTable({
         shiny::validate(
           need(data()$content %in% drug_genes_table$fav_drug, "No gene data found for this compound."))
-        DT::datatable(make_drug_genes_table(drug = data()$content) %>% 
+        DT::datatable(make_drug_genes_table(data()$content) %>% 
                         dplyr::mutate(fav_gene = map_chr(fav_gene, internal_link)) %>% #from fun_helper.R
                         dplyr::rename(Drug = fav_drug, Gene = fav_gene, Name = approved_name), 
                       escape = FALSE)
@@ -1261,7 +1261,7 @@ drugGenesCorTableServer <- function (id, data) {
         #drug_gene_list will grab a char vec of genes known to be targeted compound, so we can check if corr's are known; added ifelse logic so index grab doesn't break
         drug_gene_tibble <- drug_genes_table %>% filter(fav_drug %in% data()$content)
         drug_gene_list <- ifelse(nrow(drug_gene_tibble) != 0, drug_gene_tibble %>% unnest(data) %>% pull(fav_gene), "")
-        DT::datatable(make_drug_genes_cor_table(drug = data()$content) %>% 
+        DT::datatable(make_drug_genes_cor_table(data()$content) %>% 
                         dplyr::mutate(
                           known = case_when(
                             gene %in% drug_gene_list ~ "TRUE", 
