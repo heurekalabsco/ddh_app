@@ -105,7 +105,7 @@ ideogramPlotDashServer <- function (id, data) {
                  height = card_contents_height)
       })
       output$ideogram_card_render <- renderPlot({
-        make_ideogram(location_data = gene_location, chromosome_data = chromosome, input = data(), card = TRUE)
+        make_ideogram(input = data(), card = TRUE)
       })
     })
 }
@@ -152,7 +152,7 @@ pubmedPlotDashServer <- function (id, data) {
         shiny::validate(
           need(data()$content %in% pubmed$name, "No literature found"))
         #check to see if image exists
-        img_path <- ddh::load_image(input = data(), fun_name =  "make_pubmed", card = TRUE)
+        img_path <- ddh::load_image(input = data(), fun_name = "make_pubmed", card = TRUE)
         if(!is.null(img_path)) {
           uiOutput(outputId = session$ns("pubmed_gene_card_image"))
         } else {
@@ -206,7 +206,7 @@ cellExpressionPlotDashServer <- function (id, data) {
           )
         }
         #check to see if image exists
-        img_path <- ddh::load_image(input = data(), fun_name =  "make_cellexpression", card = TRUE)
+        img_path <- ddh::load_image(input = data(), fun_name = "make_cellexpression", card = TRUE)
         if(!is.null(img_path)) {
           uiOutput(outputId = session$ns("expression_gene_card_image"))
         } else {
@@ -248,7 +248,7 @@ cellAnatogramPlotDashServer <- function (id, data) {
           need(data()$content %in% subcell$gene_name, "No subcellular location data for this gene.")
         )
         #check to see if image exists
-        img_path <- ddh::load_image(input = data(), fun_name =  "make_cellanatogram", card = TRUE)
+        img_path <- ddh::load_image(input = data(), fun_name = "make_cellanatogram", card = TRUE)
         if(!is.null(img_path)) {
           uiOutput(outputId = session$ns("cell_anatogram_gene_card_image"))
         } else {
@@ -290,7 +290,7 @@ tissueAnatogramPlotDashServer <- function (id, data) {
           need(data()$content %in% tissue$gene_name, "No data found for this gene.")
         )
         #check to see if image exists
-        img_path <- ddh::load_image(input = data(), fun_name =  "make_female_anatogram", card = TRUE)
+        img_path <- ddh::load_image(input = data(), fun_name = "make_female_anatogram", card = TRUE)
         if(!is.null(img_path)) {
           uiOutput(outputId = session$ns("tissue_anatogram_gene_card_image"))
         } else {
@@ -748,7 +748,7 @@ pubmedCompoundPlotDashServer <- function (id, data) {
         shiny::validate(
           need(data()$content %in% pubmed$name, "No literature found"))
         #check to see if image exists
-        img_path <- ddh::load_image(input = data(), fun_name =  "make_pubmed", card = TRUE)
+        img_path <- ddh::load_image(input = data(), fun_name = "make_pubmed", card = TRUE)
         if(!is.null(img_path)) {
           uiOutput(outputId = session$ns("pubmed_compound_card_image"))
         } else {
@@ -782,7 +782,7 @@ drugGenesCorTableDashServer <- function (id, data) {
       output$druggenescortabledash <- render_gt({
         shiny::validate(
           need(data()$content %in% drug_genes_cor_table$fav_drug, "No gene data found for this compound."))
-        gt::gt(make_drug_genes_cor_table(drug = data()$content) %>% 
+        gt::gt(make_drug_genes_cor_table(data()$content) %>% 
                  dplyr::mutate("Rank" = row_number()) %>% 
                  dplyr::select(Rank, Gene = gene, 'R^2'=r2) %>% 
                  dplyr::slice(1:5))
@@ -812,7 +812,7 @@ geneGoTableTabServer <- function (id, data) {
         shiny::validate(
           need(data()$content %in% unique(unlist(pathways$data, use.names = FALSE)), "GO Term pathways")
         )
-        gt::gt(make_pathway_list(table_name = pathways, input = data()) %>% 
+        gt::gt(make_pathway_list(input = data()) %>% 
                  #dplyr::mutate(go = map_chr(go, internal_link))  %>% #from fun_helper.R
                  dplyr::select(Pathway = pathway, GO = go) %>%
                  dplyr::slice(1))
@@ -1339,8 +1339,8 @@ cellDependenciesDensityPlotTabServer <- function (id, data) {
         #check to see if data are there
         shiny::validate(
           need(data()$content %in% achilles_long$gene |
-                               data()$content %in% expression_meta$cell_line, 
-                             "No data found for this query."))
+                 data()$content %in% expression_meta$cell_line, 
+               "No data found for this query."))
         #check to see if image exists
         img_path <- ddh::load_image(input = data(), fun_name = "make_cellbins", card = TRUE)
         if(!is.null(img_path)) {
@@ -1441,7 +1441,7 @@ cellDepsSubLinPlotTabServer <- function (id, data) {
       })
       output$cell_dependencies_sublineageplot_tab_render <- renderPlot({
         make_sublineage(input = data(),
-                     card = TRUE)
+                        card = TRUE)
       })
     }
   )
@@ -1463,8 +1463,8 @@ expdepPlotTabServer <- function (id, data) {
         #check to see if data are there
         shiny::validate(
           need(data()$content %in% achilles_long$gene |
-                               data()$content %in% expression_meta$cell_line, 
-                             "No data found for this query."))
+                 data()$content %in% expression_meta$cell_line, 
+               "No data found for this query."))
         #check to see if image exists
         img_path <- ddh::load_image(input = data(), fun_name = "make_expdep", card = TRUE)
         if(!is.null(img_path)) {

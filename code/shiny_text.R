@@ -75,7 +75,7 @@ summaryListTextServer <- function(id, data) {
     id,
     function(input, output, session) {
       output$query_list_summary <- renderText({
-        summary_list(input = data()) %>% 
+        make_summary_list(input = data()) %>% 
           lit_linkr(summary_table = gene_summary) # see fun_helper.R
       })
     }
@@ -95,7 +95,7 @@ geneTitleServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$gene_summary_title <- renderText({paste0(summary_gene(summary_table = gene_summary, input = data(), var = "approved_symbol"), ": ", summary_gene(summary_table = gene_summary, input = data(), var = "approved_name"))})
+      output$gene_summary_title <- renderText({paste0(make_summary_gene(input = data(), var = "approved_symbol"), ": ", make_summary_gene(input = data(), var = "approved_name"))})
     }
   )
 }
@@ -110,7 +110,7 @@ pathwayTitleServer <- function(id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$pathway_title <- renderText({paste0("Pathway: ", summary_pathway(summary_table = pathways, input = data(), var = "pathway"), " (GO:", summary_pathway(summary_table = pathways, input = data(), var = "go"), ")")})
+      output$pathway_title <- renderText({paste0("Pathway: ", make_summary_pathway(input = data(), var = "pathway"), " (GO:", make_summary_pathway(input = data(), var = "go"), ")")})
     }
   )
 }
@@ -133,20 +133,20 @@ geneTextServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$gene_summary_title <- renderText({paste0(summary_gene(summary_table = gene_summary, input = data(), var = "approved_symbol"), ": ", summary_gene(summary_table = gene_summary, input = data(), var = "approved_name"))})
-      output$gene_summary_approved_symbol <- renderText(summary_gene(summary_table = gene_summary, input = data(), var = "approved_symbol"))
-      output$gene_summary_approved_name <- renderText(summary_gene(summary_table = gene_summary, input = data(), var = "approved_name"))
-      output$gene_summary_aka <- renderText(summary_gene(summary_table = gene_summary, input = data(), var = "aka"))
-      output$gene_length <- renderText(paste0(summary_gene(summary_table = gene_location, input = data(), var = "cds_length"), " bp"))
+      output$gene_summary_title <- renderText({paste0(make_summary_gene(input = data(), var = "approved_symbol"), ": ", make_summary_gene(input = data(), var = "approved_name"))})
+      output$gene_summary_approved_symbol <- renderText(make_summary_gene(input = data(), var = "approved_symbol"))
+      output$gene_summary_approved_name <- renderText(make_summary_gene(input = data(), var = "approved_name"))
+      output$gene_summary_aka <- renderText(make_summary_gene(input = data(), var = "aka"))
+      output$gene_length <- renderText(paste0(make_summary_gene(data_gene_summary = gene_location, input = data(), var = "cds_length"), " bp"))
       output$gene_summary_entrez_summary <- renderText({
         shiny::validate(
-          need(!is.na(summary_gene(summary_table = gene_summary, input = data(), var = "entrez_summary")), "No data found for this gene."))
-        summary_gene(summary_table = gene_summary, input = data(), var = "entrez_summary") %>% 
+          need(!is.na(make_summary_gene(input = data(), var = "entrez_summary")), "No data found for this gene."))
+        make_summary_gene(input = data(), var = "entrez_summary") %>% 
           lit_linkr(summary_table = gene_summary)})
       output$ncbi_link <- renderText(paste0('<a href="https://www.ncbi.nlm.nih.gov/gene/?term=', 
-                                            summary_gene(summary_table = gene_summary, input = data(), var = "ncbi_gene_id"),
+                                            make_summary_gene(input = data(), var = "ncbi_gene_id"),
                                             '" target="_blank">', 
-                                            summary_gene(summary_table = gene_summary, input = data(), var = "ncbi_gene_id"),
+                                            make_summary_gene(input = data(), var = "ncbi_gene_id"),
                                             '</a>'))
     }
   )
@@ -168,9 +168,9 @@ pathwayTextServer <- function(id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$pathway_title <- renderText({paste0("Pathway: ", summary_pathway(summary_table = pathways, input = data(), var = "pathway"), " (GO:", summary_pathway(summary_table = pathways, input = data(), var = "go"), ")")})
-      output$pathway_gene_symbols <- renderText({summary_pathway(summary_table = pathways, input = data(), var = "data") %>% internal_link()})
-      output$pathway_def <- renderText({summary_pathway(summary_table = pathways, input = data(), var = "def")})
+      output$pathway_title <- renderText({paste0("Pathway: ", make_summary_pathway(input = data(), var = "pathway"), " (GO:", make_summary_pathway(input = data(), var = "go"), ")")})
+      output$pathway_gene_symbols <- renderText({make_summary_pathway(input = data(), var = "data") %>% internal_link()})
+      output$pathway_def <- renderText({make_summary_pathway(input = data(), var = "def")})
     }
   )
 }
@@ -194,18 +194,18 @@ proteinTextServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$protein_summary_title <- renderText({paste0(summary_protein(summary_table = proteins, input = data(), var = "gene_name"), ": ", summary_protein(summary_table = proteins, input = data(), var = "protein_name"))})
+      output$protein_summary_title <- renderText({paste0(make_summary_protein(input = data(), var = "gene_name"), ": ", make_summary_protein(input = data(), var = "protein_name"))})
       output$ec_link <- renderText(
-        if (is.na(summary_protein(summary_table = proteins, input = data(), var = "ec"))) {paste0('<a href="https://enzyme.expasy.org" target="_blank">', summary_protein(summary_table = proteins, input = data(), var = "ec"),'</a>')
-        } else {paste0('<a href="https://enzyme.expasy.org/EC/', summary_protein(summary_table = proteins, input = data(), var = "ec"), '">', summary_protein(summary_table = proteins, input = data(), var = "ec"),'</a>')
+        if (is.na(make_summary_protein(input = data(), var = "ec"))) {paste0('<a href="https://enzyme.expasy.org" target="_blank">', make_summary_protein(input = data(), var = "ec"),'</a>')
+        } else {paste0('<a href="https://enzyme.expasy.org/EC/', make_summary_protein(input = data(), var = "ec"), '">', make_summary_protein(input = data(), var = "ec"),'</a>')
         })
       output$protein_summary_uniprot_summary <- renderText({
         shiny::validate(
-          need(!is.na(summary_protein(summary_table = proteins, input = data(), var = "function_cc")), "No data found for this protein"))
-        summary_protein(summary_table = proteins, input = data(), var = "function_cc") %>% 
+          need(!is.na(make_summary_protein(input = data(), var = "function_cc")), "No data found for this protein"))
+        make_summary_protein(input = data(), var = "function_cc") %>% 
           lit_linkr(summary_table = gene_summary)})
-      output$uniprot_link <- renderText(paste0('<a href="https://www.uniprot.org/uniprot/', summary_protein(summary_table = proteins, input = data(), var = "uniprot_id"), '" target="_blank">', summary_protein(summary_table = proteins, input = data(), var = "uniprot_id"),'</a>'))
-      output$protein_summary_mass <- renderText(paste0(summary_protein(summary_table = proteins, input = data(), var = "mass"), " kDa"))
+      output$uniprot_link <- renderText(paste0('<a href="https://www.uniprot.org/uniprot/', make_summary_protein(input = data(), var = "uniprot_id"), '" target="_blank">', make_summary_protein(input = data(), var = "uniprot_id"),'</a>'))
+      output$protein_summary_mass <- renderText(paste0(make_summary_protein(input = data(), var = "mass"), " kDa"))
     }
   )
 }
@@ -224,8 +224,8 @@ proteinSeqServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$protein_summary_seq <- renderText(summary_protein(summary_table = proteins, input = data(), var = "sequence"))
-      output$protein_length <- renderText(glue::glue('{stringr::str_length(summary_protein(summary_table = proteins, input = data(), var = "sequence"))} AA'))
+      output$protein_summary_seq <- renderText(make_summary_protein(input = data(), var = "sequence"))
+      output$protein_length <- renderText(glue::glue('{stringr::str_length(make_summary_protein(input = data(), var = "sequence"))} AA'))
           }
   )
 }
@@ -243,7 +243,7 @@ cellTitleServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$cell_summary_title <- renderText({paste0(summary_cell(input = data(), var = "cell_line"), ": ", summary_cell(input = data(), var = "lineage_subtype"))})
+      output$cell_summary_title <- renderText({paste0(make_summary_cell(input = data(), var = "cell_line"), ": ", make_summary_cell(input = data(), var = "lineage_subtype"))})
     }
   )
 }
@@ -258,7 +258,7 @@ lineageTitleServer <- function(id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$lineage_title <- renderText({paste0("Lineage: ", summary_cell(input = data(), var = "lineage"))})
+      output$lineage_title <- renderText({paste0("Lineage: ", make_summary_cell(input = data(), var = "lineage"))})
     }
   )
 }
@@ -273,7 +273,7 @@ lineageSubtypeTitleServer <- function(id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$lineage_subtype_title <- renderText({paste0("Lineage: ", summary_cell(input = data(), var = "lineage_subtype"))})
+      output$lineage_subtype_title <- renderText({paste0("Lineage: ", make_summary_cell(input = data(), var = "lineage_subtype"))})
     }
   )
 }
@@ -319,22 +319,22 @@ cellSummaryTextServer <- function(id, data) {
         data()$query
       })
       output$cell_summary_lineage <- renderText({
-        summary_cell(input = data(), var = "lineage") %>% 
+        make_summary_cell(input = data(), var = "lineage") %>% 
           map_chr(cell_linkr, type = "lineage")
       })
       output$cell_summary_lineage_subtype <- renderText({
-        summary_cell(input = data(), var = "lineage_subtype") %>% 
+        make_summary_cell(input = data(), var = "lineage_subtype") %>% 
           map_chr(cell_linkr, type = "lineage_subtype")
       })
       output$cell_description <- renderText({
-        summary_cellosaurus(input = data(), var = "CC") %>% 
+        make_summary_cellosaurus(input = data(), var = "CC") %>% 
           lit_linkr(summary_table = gene_summary)
       })
       output$cell_age <- renderText({
-        summary_cellosaurus(input = data(), var = "AG")
+        make_summary_cellosaurus(input = data(), var = "AG")
       })
       output$cell_sex <- renderText({
-        summary_cellosaurus(input = data(), var = "SX")
+        make_summary_cellosaurus(input = data(), var = "SX")
       })
     })
 }
@@ -421,9 +421,9 @@ compoundTitleServer <- function (id, data) {
     id,
     function(input, output, session) {
       output$compound_title <- renderText({
-        paste0(summary_compound(summary_table = prism_meta, input = data(), var = "name") %>% stringr::str_to_title(), 
+        paste0(make_summary_compound(input = data(), var = "name") %>% stringr::str_to_title(), 
                ": ", 
-               summary_compound(summary_table = prism_meta, input = data(), var = "moa") %>% stringr::str_to_title())
+               make_summary_compound(input = data(), var = "moa") %>% stringr::str_to_title())
       })
     }
   )
@@ -441,9 +441,9 @@ metaboliteTitleServer <- function (id, data) {
     id,
     function(input, output, session) {
       output$metabolite_title <- renderText({
-        paste0(summary_metabolite(summary_table = hmdb_names, input = data(), var = "name") %>% stringr::str_to_title(),
+        paste0(make_summary_metabolite(input = data(), var = "name") %>% stringr::str_to_title(),
                ": ",
-               summary_metabolite(summary_table = hmdb_names, input = data(), var = "class") %>% stringr::str_to_title())
+               make_summary_metabolite(input = data(), var = "class") %>% stringr::str_to_title())
       })
     }
   )
@@ -462,7 +462,7 @@ moaTitleServer <- function(id, data) {
     function(input, output, session) {
       output$moa_title <- renderText({
         paste0("MOA: ", 
-               summary_compound(summary_table = prism_meta, input = data(), var = "moa") %>% stringr::str_to_title())
+               make_summary_compound(input = data(), var = "moa") %>% stringr::str_to_title())
       })
     }
   )
@@ -479,7 +479,7 @@ compoundListTitleServer <- function(id, data) {
     id,
     function(input, output, session) {
       output$custom_compound_list <- renderText({paste0("Custom Compound List: ", 
-                                                        summary_compound_list(summary_table = prism_meta, input = data())  %>% stringr::str_to_title())
+                                                        make_summary_compound_list(input = data())  %>% stringr::str_to_title())
       })
     }
   )
@@ -512,39 +512,38 @@ compoundSummaryTextServer <- function(id, data) {
           stringr::str_to_title()
       })
       output$compound_summary_description <- renderText({
-        summary_compound(prism_meta, input = data(), var = "description") %>% 
+        make_summary_compound(input = data(), var = "description") %>% 
           stringr::str_to_sentence()
       })
       output$compound_summary_moa <- renderText({
-        summary_compound(prism_meta, input = data(), var = "moa") %>% 
+        make_summary_compound(input = data(), var = "moa") %>% 
           map_chr(moa_linkr)
       })
       output$compound_summary_phase <- renderText({
-        summary_compound(prism_meta, input = data(), var = "phase") %>% 
+        make_summary_compound(input = data(), var = "phase") %>% 
           stringr::str_to_title()
       })
       output$compound_summary_diseasearea <- renderText({
-        summary_compound(prism_meta, input = data(), var = "disease_area") %>% 
+        make_summary_compound(input = data(), var = "disease_area") %>% 
           stringr::str_to_title()
       })
       output$compound_summary_indication <- renderText({
-        summary_compound(prism_meta, input = data(), var = "indication") %>% 
+        make_summary_compound(input = data(), var = "indication") %>% 
           stringr::str_to_title()
       })
       output$compound_summary_targets <- renderText({
-        summary_compound(prism_meta, input = data(), var = "target") %>% 
+        make_summary_compound(input = data(), var = "target") %>% 
           stringr::str_to_upper() %>% 
           map_chr(internal_link)
       })
       output$compound_summary_cid <- renderText({
-        summary_compound(prism_meta, input = data(), var = "cid")
+        make_summary_compound(input = data(), var = "cid")
       })
       output$cid_link <- renderText(paste0('<a href="https://pubchem.ncbi.nlm.nih.gov/compound/', 
-                                           summary_compound(summary_table = prism_meta, input = data(), var = "cid"),
+                                           make_summary_compound(input = data(), var = "cid"),
                                            '" target="_blank">', 
-                                           summary_compound(summary_table = prism_meta, input = data(), var = "cid"),
-                                           '</a>')
-      )
+                                           make_summary_compound(input = data(), var = "cid"),
+                                           '</a>'))
     })
 }
 
@@ -604,7 +603,7 @@ geneGoTableTextServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$go_table_title <- renderText({glue::glue('GO pathways for {summary_protein(summary_table = proteins, input = data(), var = "gene_name")}')})
+      output$go_table_title <- renderText({glue::glue('GO pathways for {make_summary_protein(input = data(), var = "gene_name")}')})
     }
   )
 }
@@ -622,7 +621,7 @@ proteinSizeTextServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$protein_size_title <- renderText({glue::glue('Size Information for {summary_protein(summary_table = proteins, input = data(), var = "gene_name")}')})
+      output$protein_size_title <- renderText({glue::glue('Size Information for {make_summary_protein(input = data(), var = "gene_name")}')})
     }
   )
 }
@@ -641,7 +640,7 @@ proteinSeqTextServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$protein_seq_title <- renderText({glue::glue('Sequence Information for {summary_protein(summary_table = proteins, input = data(), var = "gene_name")}')})
+      output$protein_seq_title <- renderText({glue::glue('Sequence Information for {make_summary_protein(input = data(), var = "gene_name")}')})
     }
   )
 }
@@ -657,7 +656,7 @@ proteinSignatureTextServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$protein_signature_title <- renderText({glue::glue('Signature Information for {summary_protein(summary_table = proteins, input = data(), var = "gene_name")}')})
+      output$protein_signature_title <- renderText({glue::glue('Signature Information for {make_summary_protein(input = data(), var = "gene_name")}')})
     }
   )
 }
@@ -673,7 +672,7 @@ proteinStructureTextServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$protein_structure_title <- renderText({glue::glue('Structural Information for {summary_protein(summary_table = proteins, input = data(), var = "gene_name")}')})
+      output$protein_structure_title <- renderText({glue::glue('Structural Information for {make_summary_protein(input = data(), var = "gene_name")}')})
     }
   )
 }
@@ -691,7 +690,7 @@ cellGeneExpressionTableTextServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$cell_gene_table_text <- renderText({glue::glue('Gene expression table for {summary_protein(summary_table = proteins, input = data(), var = "gene_name")}')})
+      output$cell_gene_table_text <- renderText({glue::glue('Gene expression table for {make_summary_protein(input = data(), var = "gene_name")}')})
     }
   )
 }
@@ -707,7 +706,7 @@ cellProteinExpressionPlotTextServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$cell_protein_text <- renderText({glue::glue('Protein expression plot for {summary_protein(summary_table = proteins, input = data(), var = "gene_name")}')})
+      output$cell_protein_text <- renderText({glue::glue('Protein expression plot for {make_summary_protein(input = data(), var = "gene_name")}')})
     }
   )
 }
@@ -723,7 +722,7 @@ tissuePlotTextServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$tissueplot_text <- renderText({glue::glue('Human tissue expression plot for {summary_protein(summary_table = proteins, input = data(), var = "gene_name")}')})
+      output$tissueplot_text <- renderText({glue::glue('Human tissue expression plot for {make_summary_protein(input = data(), var = "gene_name")}')})
     }
   )
 }
@@ -739,7 +738,7 @@ tissueTableTextServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$tissuetable_text <- renderText({glue::glue('Human tissue expression table for {summary_protein(summary_table = proteins, input = data(), var = "gene_name")}')})
+      output$tissuetable_text <- renderText({glue::glue('Human tissue expression table for {make_summary_protein(input = data(), var = "gene_name")}')})
     }
   )
 }
@@ -756,7 +755,7 @@ cellDepsLinPlotTextServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$dep_lin_title <- renderText({glue::glue('Dependency lineage plot for {summary_protein(summary_table = proteins, input = data(), var = "gene_name")}')})
+      output$dep_lin_title <- renderText({glue::glue('Dependency lineage plot for {make_summary_protein(input = data(), var = "gene_name")}')})
     }
   )
 }
@@ -772,7 +771,7 @@ cellDepsSubLinPlotTextServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$dep_sublin_title <- renderText({glue::glue('Dependency sublineage plot for {summary_protein(summary_table = proteins, input = data(), var = "gene_name")}')})
+      output$dep_sublin_title <- renderText({glue::glue('Dependency sublineage plot for {make_summary_protein(input = data(), var = "gene_name")}')})
     }
   )
 }
@@ -790,7 +789,7 @@ cellDependenciesTableTextServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$dep_table_title <- renderText({glue::glue('Dependency table for {summary_protein(summary_table = proteins, input = data(), var = "gene_name")}')})
+      output$dep_table_title <- renderText({glue::glue('Dependency table for {make_summary_protein(input = data(), var = "gene_name")}')})
     }
   )
 }
@@ -807,7 +806,7 @@ similarGenesTableTextServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$sim_text_title <- renderText({glue::glue('Similar gene table for {summary_protein(summary_table = proteins, input = data(), var = "gene_name")}')})
+      output$sim_text_title <- renderText({glue::glue('Similar gene table for {make_summary_protein(input = data(), var = "gene_name")}')})
     }
   )
 }
@@ -823,7 +822,7 @@ similarPathwaysTableTextServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$sim_pathways_text_title <- renderText({glue::glue('Similar pathway table for {summary_protein(summary_table = proteins, input = data(), var = "gene_name")}')})
+      output$sim_pathways_text_title <- renderText({glue::glue('Similar pathway table for {make_summary_protein(input = data(), var = "gene_name")}')})
     }
   )
 }
@@ -839,7 +838,7 @@ dissimilarGenesTableTextServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$dsim_text_title <- renderText({glue::glue('Inverse gene table for {summary_protein(summary_table = proteins, input = data(), var = "gene_name")}')})
+      output$dsim_text_title <- renderText({glue::glue('Inverse gene table for {make_summary_protein(input = data(), var = "gene_name")}')})
     }
   )
 }
@@ -855,7 +854,7 @@ dissimilarPathwaysTableTextServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$dsim_pathways_text_title <- renderText({glue::glue('Inverse pathway table for {summary_protein(summary_table = proteins, input = data(), var = "gene_name")}')})
+      output$dsim_pathways_text_title <- renderText({glue::glue('Inverse pathway table for {make_summary_protein(input = data(), var = "gene_name")}')})
     }
   )
 }
