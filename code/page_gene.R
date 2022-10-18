@@ -163,11 +163,7 @@ genePage <- function (id, subtype) {
       navbarMenu(title = "EXPRESSION",
                  tabPanel("Sub-cellular", value = "expression_sub",
                           cellAnatogramPlot(ns("exp")),
-                          fluidRow(actionLink(inputId = ns("anato_facet_click"), "View detailed cell anatograms below")), # conditional panel for raw data
-                          tags$br(), 
-                          conditionalPanel(condition = paste0("input['", ns("anato_facet_click"), "'] != 0"), 
-                                           cellAnatogramFacetPlot(ns("exp"))),
-                          tags$br(),
+                          cellAnatogramFacetPlot(ns("exp")),
                           cellAnatogramTable(ns("exp"))
                  ), 
                  tabPanel("Cell Line", value = "expression_cell", 

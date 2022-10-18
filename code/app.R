@@ -29,7 +29,7 @@ source(here::here("code", "shiny_cards.R"), local = TRUE)
 source(here::here("code", "shiny_download.R"), local = TRUE)
 
 # HEAD----
-head_tags <- tags$head(includeHTML("gtag.html"), includeCSS("styles.css"))
+head_tags <- tags$head(includeCSS("styles.css")) # includeHTML("gtag.html") 
 
 ### universal elements
 main_title <- HTML('<a href="." style="color:black;">DATA-DRIVEN HYPOTHESIS</a>')
