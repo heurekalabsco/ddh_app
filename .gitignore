@@ -7,7 +7,6 @@
 .DS_Store
 *.Rproj
 config.sh
-token.R
 #directories
 data/
 tmp/

@@ -535,7 +535,7 @@ similarGenesTable <- function(id) {
                                    selected = c("R^2", "Co-publication Count"), # "GLS p-value"
                                    inline = TRUE)),
       column(6, fluidRow(sliderInput(inputId = ns("num_sim_genes"),
-                                     "Remove genes with <n associations:",
+                                     "Remove genes with >n associations:",
                                      min = 100,
                                      max = 1000,
                                      value = 1000,
