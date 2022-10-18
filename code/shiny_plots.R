@@ -823,8 +823,12 @@ cellAnatogramPlotServer <- function(id, data) {
 cellAnatogramFacetPlot <- function(id) {
   ns <- NS(id)
   tagList(
-    uiOutput(outputId = ns("cell_anatogram_gene_facet"), height = "auto"),
-    tags$br())
+    fluidRow(actionLink(inputId = ns("anato_facet_click"), "View detailed cell anatograms below")),
+    tags$br(),
+    conditionalPanel(condition = paste0("input['", ns("anato_facet_click"), "'] != 0"),
+                     plotOutput(ns("cell_anatogram_gene_facet"))),
+    tags$br(),
+    )
 }
 
 cellAnatogramFacetPlotServer <- function(id, data) {
@@ -832,9 +836,11 @@ cellAnatogramFacetPlotServer <- function(id, data) {
     id,
     function(input, output, session) {
       output$cell_anatogram_gene_facet <- renderPlot({
+        #check to see if data are there
         shiny::validate(
           need(data()$content %in% subcell$gene_name, "No subcellular location data for this gene."))
-        make_cellanatogramfacet(subcell, data())
+        #render plot
+        make_cellanatogramfacet(input = data())
       })
     }
   )
@@ -968,7 +974,7 @@ cellGeneExpressionPlotServer <- function(id, data) {
           shiny::validate(
             need(expression_long %>% 
                    drop_na(protein_expression) %>% 
-                   filter(data()$content %in% gene) %>% 
+                   filter(gene %in% data()$content) %>% 
                    nrow() > 0, "No protein data found for this gene.")
           )
         } else if(data()$type == "cell") {
@@ -976,7 +982,7 @@ cellGeneExpressionPlotServer <- function(id, data) {
             need(expression_long %>% 
                    drop_na(protein_expression) %>% 
                    left_join(expression_names, by = "X1") %>% 
-                   filter(data()$content %in% cell_line) %>% 
+                   filter(cell_line %in% data()$content) %>% 
                    nrow() > 0, "No protein data found for this cell line.")
           )
         }

@@ -264,8 +264,8 @@ cellAnatogramPlotDashServer <- function (id, data) {
                  height = card_contents_height)
       })
       output$cell_anatogram_gene_card_render <- renderPlot({
-        make_cellexpression(input = data(), 
-                            card = TRUE)
+        make_cellanatogram(input = data(), 
+                           card = TRUE)
       })
     }
   )
