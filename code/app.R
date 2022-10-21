@@ -101,7 +101,7 @@ querySearchInput <- function(id) {
   searchInput(
     inputId = ns("gene_or_pathway"),
     placeholder = "genes, pathways, or GO number", #change to genes, cells, or compounds
-    btnSearch = icon("magnifying-glass")
+    btnSearch = icon("search")
   )
 }
 
