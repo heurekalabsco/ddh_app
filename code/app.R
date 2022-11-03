@@ -166,8 +166,8 @@ getLuckyLink <- function(id) {
   htmlOutput(ns("get_lucky"), inline = TRUE)
 }
 
-surprise <- function(surprise_vec) {
-  gene_symbol <- sample(surprise_vec, 1)
+surprise <- function(data_gene_surprise) {
+  gene_symbol <- sample(data_gene_surprise[[1]], 1)
   gene_symbol_url <- paste0("?show=gene&query=", gene_symbol)
   return(gene_symbol_url)
 }
@@ -177,7 +177,7 @@ getLuckyServer <- function(id) {
     id,
     function(input, output, session) {
       output$get_lucky <- renderUI({
-        tags$a(href = surprise(surprise_genes), "get lucky")
+        tags$a(href = surprise(gene_surprise), "get lucky")
       })
     }
   )
