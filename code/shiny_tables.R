@@ -29,7 +29,7 @@ browsePathwaysPanelServer <- function(id) {
     id,
     function(input, output, session) {
       output$pathway_table <- DT::renderDataTable({
-        DT::datatable(make_pathway_table(pathways) %>% 
+        DT::datatable(make_pathway_table(gene_pathways) %>% 
                         dplyr::mutate(go = map_chr(go, internal_link)) %>% #from fun_helper.R
                         dplyr::rename(Pathway = pathway, GO = go, Genes = genes), 
                       escape = FALSE,
@@ -56,7 +56,7 @@ pathwayListServer <- function(id, data) {
       output$text_pathway_list <- renderText({paste0("GO Biological Processes for ", str_c(data()$content, collapse = ", "))})
       output$pathway_list <- DT::renderDataTable({
         shiny::validate(
-          need(data()$content %in% unique(unlist(pathways$data, use.names = FALSE)), "Not found in any pathways")
+          need(data()$content %in% unique(unlist(gene_pathways$data, use.names = FALSE)), "Not found in any pathways")
         )
         DT::datatable(make_pathway_list(input = data()) %>% 
                         dplyr::mutate(go = map_chr(go, internal_link))  %>% #from fun_helper.R
@@ -84,7 +84,7 @@ pathwayGeneListServer <- function(id, data) {
       output$text_pathway_gene_list <- renderText({paste0("Genes for GO Biological Processes ", data()$query)})
       output$pathway_gene_list <- DT::renderDataTable({
         shiny::validate(
-          need(data()$query %in% pathways$go, "Not found in any pathways"))
+          need(data()$query %in% gene_pathways$go, "Not found in any pathways"))
         DT::datatable(make_pathway_genes(go_id = data()$query) %>% 
                         dplyr::mutate(gene = map_chr(gene, internal_link))  %>% #from fun_helper.R
                         dplyr::select(Gene = gene, Name = approved_name, AKA = aka),
@@ -118,7 +118,7 @@ proteinClusterTableServer <- function(id, data) {
       output$text_cluster_table <- renderText({paste0("Amino Acid Signature Clusters for ", str_c(data()$content, collapse = ", "))})
       output$prot_clust_table <- DT::renderDataTable({
         shiny::validate(
-          need(data()$content %in% proteins$gene_name, "Protein not found"))
+          need(data()$content %in% universal_proteins$gene_name, "Protein not found"))
         withProgress(message = 'Building a smart clustering table...', {
           DT::datatable(make_clustering_table(input = data(),
                                               cluster = input$show_all_clusters_tab,

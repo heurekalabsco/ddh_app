@@ -8,9 +8,9 @@ source(here::here("code", "install_libraries.R"))
 source(here::here("code", "private.R"))
 
 #DOWNLOAD/LOAD DATA-----
-# ddh::download_ddh_data(app_data_dir = app_data_dir,
-#                        test = testMode,
-#                        overwrite = TRUE)
+ddh::download_ddh_data(app_data_dir = app_data_dir,
+                       test = testMode,
+                       overwrite = FALSE)
 
 ddh::load_ddh_data(app_data_dir = app_data_dir)
 
@@ -213,7 +213,7 @@ searchPageServer <- function(id) {
       })
       output$genes_search_result <- renderUI({
         query_string <- getQueryString()
-        query_results_table <- search_tables(gene_summary, pathways, expression_names, prism_names, hmdb_names, query_string$query)
+        query_results_table <- search_tables(universal_gene_summary, gene_pathways, expression_names, prism_names, hmdb_names, query_string$query)
         if (nrow(query_results_table) > 0) {
           apply(query_results_table, 1, query_result_row)
         }
