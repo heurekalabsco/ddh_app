@@ -10,7 +10,7 @@ source(here::here("code", "private.R"))
 #DOWNLOAD/LOAD DATA-----
 ddh::download_ddh_data(app_data_dir = app_data_dir,
                        test = testMode,
-                       overwrite = FALSE)
+                       overwrite = TRUE)
 
 ddh::load_ddh_data(app_data_dir = app_data_dir)
 
