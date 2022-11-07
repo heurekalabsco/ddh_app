@@ -213,7 +213,12 @@ searchPageServer <- function(id) {
       })
       output$genes_search_result <- renderUI({
         query_string <- getQueryString()
-        query_results_table <- search_tables(universal_gene_summary, gene_pathways, expression_names, prism_names, hmdb_names, query_string$query)
+        query_results_table <- search_tables(universal_gene_summary, 
+                                             gene_pathways, 
+                                             cell_expression_names, 
+                                             compound_prism_names, 
+                                             compound_hmdb_names, 
+                                             query_string$query)
         if (nrow(query_results_table) > 0) {
           apply(query_results_table, 1, query_result_row)
         }

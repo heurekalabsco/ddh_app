@@ -12,26 +12,26 @@ calc_rank <- function(query_str, value) {
   return (str_length(query_str) / str_length(value))
 }
 
-search_tables <- function(universal_gene_summary, gene_pathways, universal_expression_names, compound_prism_names, hmdb_names, query_str) {
+search_tables <- function(universal_gene_summary, gene_pathways, cell_expression_names, compound_prism_names, compound_hmdb_names, query_str) {
   if (grepl(',', query_str)) {
-    custom_list_search_tables(universal_gene_summary, universal_expression_names, compound_prism_names, query_str)
+    custom_list_search_tables(universal_gene_summary, cell_expression_names, compound_prism_names, query_str)
   } else {
-    regular_search_tables(universal_gene_summary, gene_pathways, universal_expression_names, compound_prism_names, hmdb_names, query_str)
+    regular_search_tables(universal_gene_summary, gene_pathways, cell_expression_names, compound_prism_names, compound_hmdb_names, query_str)
   }
 }
 
-custom_list_search_tables <- function(universal_gene_summary, universal_expression_names, compound_prism_names, query_str) {
+custom_list_search_tables <- function(universal_gene_summary, cell_expression_names, compound_prism_names, query_str) {
   bind_rows(
     custom_gene_list_search_tables(universal_gene_summary, query_str),
-    custom_cell_line_list_search_tables(universal_expression_names, query_str),
+    custom_cell_line_list_search_tables(cell_expression_names, query_str),
     custom_compound_list_search_tables(compound_prism_names, query_str)
   )
 }
 
-regular_search_tables <- function(universal_gene_summary, gene_pathways, universal_expression_names, compound_prism_names, hmdb_names, query_str, limit_rows=10) {
+regular_search_tables <- function(universal_gene_summary, gene_pathways, cell_expression_names, compound_prism_names, compound_hmdb_names, query_str, limit_rows=10) {
   gene_data_search_result <- search_gene_data(universal_gene_summary, gene_pathways, query_str, limit_rows)
-  cell_line_search_result <- search_cell_line_data(universal_expression_names, query_str, limit_rows)
-  drug_search_result <- search_drug_data(compound_prism_names, hmdb_names, query_str, limit_rows)
+  cell_line_search_result <- search_cell_line_data(cell_expression_names, query_str, limit_rows)
+  drug_search_result <- search_drug_data(compound_prism_names, compound_hmdb_names, query_str, limit_rows)
   bind_rows(gene_data_search_result, cell_line_search_result, drug_search_result) %>%
     arrange(desc(rank))
 }
@@ -43,11 +43,11 @@ sort_dedup_and_limit <- function(df, limit_rows) {
     head(limit_rows)
 }
 
-search_cell_line_data <- function(universal_expression_names, query_str, limit_rows) {
+search_cell_line_data <- function(cell_expression_names, query_str, limit_rows) {
   word_starts_with_query_str <- word_starts_with_regex(query_str)
   
   # find cell lines that start with query_str
-  cell_line_rows <- universal_expression_names %>%
+  cell_line_rows <- cell_expression_names %>%
     filter(str_detect(cell_line, word_starts_with_query_str)) %>%
     mutate(key = cell_line,
            title = cell_line,
@@ -61,7 +61,7 @@ search_cell_line_data <- function(universal_expression_names, query_str, limit_r
     nest()
   
   # find lineage that start with query_str
-  lineage_rows <- universal_expression_names %>%
+  lineage_rows <- cell_expression_names %>%
     filter(str_detect(lineage, word_starts_with_query_str)) %>%
     group_by(lineage) %>%
     group_nest() %>%
@@ -77,7 +77,7 @@ search_cell_line_data <- function(universal_expression_names, query_str, limit_r
     nest()
   
   # find lineage subtype that start with query_str
-  lineage_subtype_rows <- universal_expression_names %>%
+  lineage_subtype_rows <- cell_expression_names %>%
     filter(str_detect(lineage_subtype, word_starts_with_query_str)) %>%
     group_by(lineage_subtype) %>%
     group_nest() %>%
@@ -95,7 +95,7 @@ search_cell_line_data <- function(universal_expression_names, query_str, limit_r
   bind_rows(cell_line_data, lineage_data, lineage_subtype_data)
 }
 
-search_drug_data <- function(compound_prism_names, hmdb_names, query_str, limit_rows) {
+search_drug_data <- function(compound_prism_names, compound_hmdb_names, query_str, limit_rows) {
   word_starts_with_query_str <- word_starts_with_regex(query_str)
   
   prism_name_rows <- compound_prism_names %>%
@@ -127,14 +127,14 @@ search_drug_data <- function(compound_prism_names, hmdb_names, query_str, limit_
     group_by(key, title, subtype, rank) %>%
     nest()
   
-  hmdb_name_rows <- hmdb_names %>%
+  hmdb_name_rows <- compound_hmdb_names %>%
     filter(str_detect(name, word_starts_with_query_str)) %>%
     mutate(
       key = cid,
       title = name,
       rank=calc_rank(query_str, name))
   
-  hmdb_synonyms_rows <- hmdb_names %>%
+  hmdb_synonyms_rows <- compound_hmdb_names %>%
     filter(str_detect(synonyms, word_starts_with_query_str)) %>%
     filter(!cid %in% hmdb_name_rows$cid) %>% # skip hmdb_names items already found by name
     mutate(
@@ -232,10 +232,10 @@ query_symbol_in_gene_summary <- function(gene_symbol, universal_gene_summary) {
   }
 }
 
-custom_cell_line_list_search_tables <- function(universal_expression_names, query_str) {
+custom_cell_line_list_search_tables <- function(cell_expression_names, query_str) {
   cell_line_symbols <- c(str_split(query_str, "\\s*,\\s*", simplify = TRUE))
   cell_line_symbols_with_known <- cell_line_symbols %>%
-    map_dfr(query_cell_line_in_expression_names, expression_names=universal_expression_names)
+    map_dfr(query_cell_line_in_expression_names, expression_names=cell_expression_names)
   if(any(cell_line_symbols_with_known$known)) {
     cell_line_symbols_with_known %>%
       add_column(key=query_str) %>%
@@ -247,9 +247,9 @@ custom_cell_line_list_search_tables <- function(universal_expression_names, quer
   }
 }
 
-query_cell_line_in_expression_names <- function(cell_line, universal_expression_names) {
+query_cell_line_in_expression_names <- function(cell_line, cell_expression_names) {
   matches_cell_line_ignore_case <- regex(paste0('^', cell_line, '$'), ignore_case = TRUE)
-  expression_names_row <- universal_expression_names %>%
+  expression_names_row <- cell_expression_names %>%
     dplyr::filter(str_detect(cell_line, matches_cell_line_ignore_case))
   if (nrow(expression_names_row) > 0) {
     expression_names_row  %>%
