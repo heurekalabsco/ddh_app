@@ -207,7 +207,7 @@ custom_gene_list_search_tables <- function(universal_gene_summary, query_str) {
   # create a df containing valid gene summary rows and just the approved_symbol filled in for unknown gene symbols
   query_gene_symbols <- c(str_split(query_str, "\\s*,\\s*", simplify = TRUE))
   gene_symbol_with_known <- query_gene_symbols %>%
-    map_dfr(query_symbol_in_gene_summary, gene_summary=universal_gene_summary)
+    map_dfr(query_symbol_in_gene_summary, gene_summary = universal_gene_summary)
   if(any(gene_symbol_with_known$known)) {
     gene_symbol_with_known %>%
       add_column(key=query_str) %>%

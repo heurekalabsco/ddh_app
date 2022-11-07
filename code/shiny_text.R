@@ -76,7 +76,7 @@ summaryListTextServer <- function(id, data) {
     function(input, output, session) {
       output$query_list_summary <- renderText({
         make_summary_list(input = data()) %>% 
-          lit_linkr(summary_table = gene_summary) # see fun_helper.R
+          lit_linkr(summary_table = universal_gene_summary) # see fun_helper.R
       })
     }
   )
@@ -142,7 +142,7 @@ geneTextServer <- function (id, data) {
         shiny::validate(
           need(!is.na(make_summary_gene(input = data(), var = "entrez_summary")), "No data found for this gene."))
         make_summary_gene(input = data(), var = "entrez_summary") %>% 
-          lit_linkr(summary_table = gene_summary)})
+          lit_linkr(summary_table = universal_gene_summary)})
       output$ncbi_link <- renderText(paste0('<a href="https://www.ncbi.nlm.nih.gov/gene/?term=', 
                                             make_summary_gene(input = data(), var = "ncbi_gene_id"),
                                             '" target="_blank">', 
@@ -203,7 +203,7 @@ proteinTextServer <- function (id, data) {
         shiny::validate(
           need(!is.na(make_summary_protein(input = data(), var = "function_cc")), "No data found for this protein"))
         make_summary_protein(input = data(), var = "function_cc") %>% 
-          lit_linkr(summary_table = gene_summary)})
+          lit_linkr(summary_table = universal_gene_summary)})
       output$uniprot_link <- renderText(paste0('<a href="https://www.uniprot.org/uniprot/', make_summary_protein(input = data(), var = "uniprot_id"), '" target="_blank">', make_summary_protein(input = data(), var = "uniprot_id"),'</a>'))
       output$protein_summary_mass <- renderText(paste0(make_summary_protein(input = data(), var = "mass"), " kDa"))
     }
@@ -328,7 +328,7 @@ cellSummaryTextServer <- function(id, data) {
       })
       output$cell_description <- renderText({
         make_summary_cellosaurus(input = data(), var = "CC") %>% 
-          lit_linkr(summary_table = gene_summary)
+          lit_linkr(summary_table = universal_gene_summary)
       })
       output$cell_age <- renderText({
         make_summary_cellosaurus(input = data(), var = "AG")

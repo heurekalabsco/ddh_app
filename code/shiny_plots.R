@@ -591,7 +591,7 @@ proteinDomainPlotServer <- function (id, data) {
       output$text_protein_domain_plot <- renderText({paste0("Protein Domain Plot for ", str_c(data()$content, collapse = ", "))})
       output$dom_choice <- renderUI({
         
-        protein_domain_data <- protein_domains %>%
+        protein_domain_data <- gene_protein_domains %>%
           dplyr::filter(gene_name %in% data()$content)
         
         prots_dr <- protein_domain_data %>%
@@ -611,7 +611,7 @@ proteinDomainPlotServer <- function (id, data) {
       })
       output$ptm_choice <- renderUI({
         
-        protein_domain_data <- protein_domains %>%
+        protein_domain_data <- gene_protein_domains %>%
           dplyr::filter(gene_name %in% data()$content)
         
         prots_ptm <- protein_domain_data %>%
@@ -875,7 +875,7 @@ maleAnatogramPlotServer <- function(id, data) {
                      width = "100%"))
       })
       output$male_anatogram_gene_plot_render <- renderPlot({
-        make_male_anatogram(input = data())
+        make_male_anatogram(input = data(), anatogram = "male")
       })
     }
   )
