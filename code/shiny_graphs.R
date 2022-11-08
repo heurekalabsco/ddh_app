@@ -64,13 +64,13 @@ geneNetworkGraphServer <- function(id, data) {
       output$graph <- renderVisNetwork({
         if(data()$type == "gene") {
           shiny::validate(
-            need(data()$content %in% master_top_table$fav_gene | 
-                   data()$content %in% master_bottom_table$fav_gene,
+            need(data()$content %in% gene_master_top_table$fav_gene | 
+                   data()$content %in% gene_master_bottom_table$fav_gene,
                  "Not enough data to make a graph.")
           )
         } else if(data()$type == "cell") {
           shiny::validate(
-            need(data()$content %in% unique(cell_line_dep_sim$cell1_name),
+            need(data()$content %in% unique(cell_dependency_sim$cell1_name),
                  "Not enough data to make a graph.")
           )
         }
@@ -146,13 +146,13 @@ geneNetworkGraphExpServer <- function(id, data) {
       output$graph <- renderVisNetwork({
         if(data()$type == "gene") {
           shiny::validate(
-            need(data()$content %in% master_top_table$fav_gene | 
-                   data()$content %in% master_bottom_table$fav_gene,
+            need(data()$content %in% gene_master_top_table$fav_gene | 
+                   data()$content %in% gene_master_bottom_table$fav_gene,
                  "Not enough data to make a graph.")
           )
         } else if(data()$type == "cell") {
           shiny::validate(
-            need(data()$content %in% unique(cell_line_exp_sim$cell1_name),
+            need(data()$content %in% unique(cell_expression_sim$cell1_name),
                  "Not enough data to make a graph.")
           )
         }
@@ -221,7 +221,7 @@ compoundNetworkGraphServer <- function(id, data) {
       
       output$compound_graph <- renderVisNetwork({
         shiny::validate(
-          need(data()$content %in% prism_cor_nest$fav_drug, "No data found."))
+          need(data()$content %in% compound_prism_cor_nest$fav_drug, "No data found."))
         networkCompoundGraph()
       })
     }
@@ -296,7 +296,7 @@ geneBipartiteGraphServer <- function(id, data) {
       
       output$graph <- renderVisNetwork({
         shiny::validate(
-          need(data()$content %in% hmdb_proteins$fav_gene, "No data found."))
+          need(data()$content %in% compound_hmdb_proteins$fav_gene, "No data found."))
         bipartiteNetworkGraph()
       })
     }
@@ -327,10 +327,11 @@ compoundBipartiteGraphServer <- function(id, data) {
       
       output$graph <- renderVisNetwork({
         shiny::validate(
-          need(data()$content %in% hmdb_metabolites$fav_metabolite, "No data found."))
+          need(data()$content %in% compound_hmdb_metabolites$fav_metabolite, "No data found."))
         bipartiteNetworkGraph()
       })
     }
     
   )
 }
+

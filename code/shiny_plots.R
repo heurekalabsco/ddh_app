@@ -64,7 +64,7 @@ proteinSizePlotServer <- function (id, data) {
       output$protein_size_plot <- renderUI({
         #check to see if data are there
         shiny::validate(
-          need(data()$content %in% proteins$gene_name, "No protein mass found"))
+          need(data()$content %in% universal_proteins$gene_name, "No protein mass found"))
         #check to see if image exists
         img_path <- ddh::load_image(input = data(), fun_name = "make_proteinsize", card = FALSE)
         if(!is.null(img_path)) {
@@ -181,9 +181,9 @@ proteinStructurePlot3dServer <- function (id, data) {
       output$title_structure3d_table <- renderText({paste0("PDB table for ", str_c(input$gene3dstructure, collapse = ", "))})
       output$structure3d_table <- DT::renderDataTable({
         shiny::validate(
-          need(proteins %>% 
+          need(universal_proteins %>% 
                  filter(gene_name %in% data()$content) %>% 
-                 left_join(uniprot_pdb_table, by = c("uniprot_id" = "uniprot")) %>%
+                 left_join(gene_uniprot_pdb_table, by = c("uniprot_id" = "uniprot")) %>%
                  unnest(data) %>% 
                  nrow() > 0, 
                "No structure found for this protein/s")
@@ -247,9 +247,9 @@ proteinStructurePlot3dServer <- function (id, data) {
       output$text_protein_structure3d <- renderText({paste0("Predicted 3D Structure for ", str_c(input$gene3dstructure, collapse = ", "))})
       output$protein_structure3D <- r3dmol::renderR3dmol({
         shiny::validate(
-          need(proteins %>% 
+          need(universal_proteins %>% 
                  filter(gene_name %in% data()$content) %>% 
-                 left_join(uniprot_pdb_table, by = c("uniprot_id" = "uniprot")) %>%
+                 left_join(gene_uniprot_pdb_table, by = c("uniprot_id" = "uniprot")) %>%
                  unnest(data) %>% 
                  nrow() > 0, 
                "No structure found for this protein")
@@ -281,7 +281,7 @@ radialPlotServer <- function (id, data) {
       output$text_radial_plot <- renderText({paste0("Amino Acid Signature for ", str_c(data()$content, collapse = ", "))})
       output$radial_plot <- renderPlot({
         shiny::validate(
-          need(data()$content %in% proteins$gene_name, "Protein not found"))
+          need(data()$content %in% universal_proteins$gene_name, "Protein not found"))
         make_radial(input = data(),
                     relative = input$mean_relative,
                     cluster = FALSE,
@@ -320,7 +320,7 @@ AABarPlotServer <- function (id, data) {
       output$text_aa_bar_plot <- renderText({paste0("Amino Acid Signature for ", str_c(data()$content, collapse = ", "))})
       output$aa_bar_plot <- renderPlot({
         shiny::validate(
-          need(data()$content %in% proteins$gene_name, "Protein not found"))
+          need(data()$content %in% universal_proteins$gene_name, "Protein not found"))
         make_radial(input = data(),
                     relative = input$bar_mean_relative,
                     cluster = FALSE,
@@ -357,7 +357,7 @@ ClusterradialPlotServer <- function (id, data) {
           unique()
         
         shiny::validate(
-          need(data()$content %in% proteins$gene_name, "Protein not found"))
+          need(data()$content %in% universal_proteins$gene_name, "Protein not found"))
         
         title_text <- paste0("Amino Acid Signature for Cluster ", 
                              str_c(clust_num, collapse = ", "))
@@ -366,7 +366,7 @@ ClusterradialPlotServer <- function (id, data) {
       })
       output$cluster_radial_plot <- renderPlot({
         shiny::validate(
-          need(data()$content %in% proteins$gene_name, "Protein not found"))
+          need(data()$content %in% universal_proteins$gene_name, "Protein not found"))
         make_radial(input = data(),
                     relative = input$cluster_mean_relative,
                     cluster = TRUE,
@@ -409,7 +409,7 @@ ClusterAABarPlotServer <- function (id, data) {
           unique()
         
         shiny::validate(
-          need(data()$content %in% proteins$gene_name, "Protein not found"))
+          need(data()$content %in% universal_proteins$gene_name, "Protein not found"))
         
         title_text <- paste0("Amino Acid Signature for Cluster ", 
                              str_c(clust_num, collapse = ", "))
@@ -418,7 +418,7 @@ ClusterAABarPlotServer <- function (id, data) {
       })
       output$cluster_aa_bar_plot <- renderPlot({
         shiny::validate(
-          need(data()$content %in% proteins$gene_name, "Protein not found"))
+          need(data()$content %in% universal_proteins$gene_name, "Protein not found"))
         make_radial(input = data(),
                     relative = input$cluster_bar_mean_relative,
                     cluster = TRUE,
@@ -461,7 +461,7 @@ UMAPPlotServer <- function (id, data) {
           unique()
         
         shiny::validate(
-          need(data()$content %in% proteins$gene_name, "Protein not found"))
+          need(data()$content %in% universal_proteins$gene_name, "Protein not found"))
         
         title_text <- paste0("UMAP Embeddings for Cluster ", 
                              str_c(clust_num, collapse = ", "))
@@ -475,7 +475,7 @@ UMAPPlotServer <- function (id, data) {
           unique()
         
         shiny::validate(
-          need(data()$content %in% proteins$gene_name, "Protein not found"))
+          need(data()$content %in% universal_proteins$gene_name, "Protein not found"))
         make_umap_plot(input = data(),
                        show_subset = input$show_all_umap,
                        labels = input$labels_umap)
@@ -537,7 +537,7 @@ ClusterEnrichmentPlotServer <- function (id, data) {
           unique()
         
         shiny::validate(
-          need(data()$content %in% proteins$gene_name, "Protein not found"))
+          need(data()$content %in% universal_proteins$gene_name, "Protein not found"))
         
         if(length(clust_num) == 1) {
           title_text <- paste0("Enrichment Analysis Plot for Cluster ", 
@@ -555,7 +555,7 @@ ClusterEnrichmentPlotServer <- function (id, data) {
           unique()
         
         shiny::validate(
-          need(data()$content %in% proteins$gene_name, "Protein not found"),
+          need(data()$content %in% universal_proteins$gene_name, "Protein not found"),
           need(length(clust_num) == 1, 
                "More than one cluster identified in the table above. Cluster enrichment analysis is only available for individual gene queries or multiple gene queries belonging to the same cluster."))
         make_cluster_enrich(input = data(),
@@ -591,7 +591,7 @@ proteinDomainPlotServer <- function (id, data) {
       output$text_protein_domain_plot <- renderText({paste0("Protein Domain Plot for ", str_c(data()$content, collapse = ", "))})
       output$dom_choice <- renderUI({
         
-        protein_domain_data <- protein_domains %>%
+        protein_domain_data <- gene_protein_domains %>%
           dplyr::filter(gene_name %in% data()$content)
         
         prots_dr <- protein_domain_data %>%
@@ -611,7 +611,7 @@ proteinDomainPlotServer <- function (id, data) {
       })
       output$ptm_choice <- renderUI({
         
-        protein_domain_data <- protein_domains %>%
+        protein_domain_data <- gene_protein_domains %>%
           dplyr::filter(gene_name %in% data()$content)
         
         prots_ptm <- protein_domain_data %>%
@@ -631,7 +631,7 @@ proteinDomainPlotServer <- function (id, data) {
       })
       output$protein_domain_plot <- renderPlot({
         shiny::validate(
-          need(data()$content %in% protein_domains$gene_name, "No data found for this protein."))
+          need(data()$content %in% gene_protein_domains$gene_name, "No data found for this protein."))
         make_protein_domain(input = data(),
                             dom_var = input$dom_var,
                             ptm_var = input$ptm_var)
@@ -667,7 +667,7 @@ pubmedPlotServer <- function (id, data, session) {
       output$pubmed_plot <- renderUI({
         #check to see if data are there
         shiny::validate(
-          need(data()$content %in% pubmed$name, "No literature found"))
+          need(data()$content %in% universal_pubmed$name, "No literature found"))
         #check to see if image exists
         img_path <- ddh::load_image(input = data(), fun_name = "make_pubmed", card = FALSE)
         if(!is.null(img_path)) {
@@ -711,7 +711,7 @@ pubmedCompoundPlotServer <- function (id, data) {
       output$pubmed_compound_plot <- renderUI({
         #check to see if data are there
         shiny::validate(
-          need(data()$content %in% pubmed$name, "No literature found"))
+          need(data()$content %in% universal_pubmed$name, "No literature found"))
         #check to see if image exists
         img_path <- ddh::load_image(input = data(), fun_name = "make_pubmed", card = FALSE)
         if(!is.null(img_path)) {
@@ -755,7 +755,7 @@ pubmedCellLinePlotServer <- function (id, data) {
       output$pubmed_cell_plot <- renderUI({
         #check to see if data are there
         shiny::validate(
-          need(data()$content %in% pubmed$name, "No literature found"))
+          need(data()$content %in% universal_pubmed$name, "No literature found"))
         #check to see if image exists
         img_path <- ddh::load_image(input = data(), fun_name = "make_pubmed", card = FALSE)
         if(!is.null(img_path)) {
@@ -798,7 +798,7 @@ cellAnatogramPlotServer <- function(id, data) {
       output$cell_anatogram_gene_plot <- renderUI({
         #check to see if data are there
         shiny::validate(
-          need(data()$content %in% subcell$gene_name, "No subcellular location data for this gene."))
+          need(data()$content %in% gene_subcell$gene_name, "No subcellular location data for this gene."))
         #check to see if image exists
         img_path <- ddh::load_image(input = data(), fun_name = "make_cellanatogram", card = FALSE)
         if(!is.null(img_path)) {
@@ -838,7 +838,7 @@ cellAnatogramFacetPlotServer <- function(id, data) {
       output$cell_anatogram_gene_facet <- renderPlot({
         #check to see if data are there
         shiny::validate(
-          need(data()$content %in% subcell$gene_name, "No subcellular location data for this gene."))
+          need(data()$content %in% gene_subcell$gene_name, "No subcellular location data for this gene."))
         #render plot
         make_cellanatogramfacet(input = data())
       })
@@ -858,7 +858,8 @@ maleAnatogramPlotServer <- function(id, data) {
       output$male_anatogram_gene_plot <- renderUI({
         #check to see if data are there
         shiny::validate(
-          need(data()$content %in% tissue$gene_name, "No Tissue-specific expression data for this gene."))
+          need(data()$content %in% gene_tissue$gene_name, 
+               "No tissue-specific expression data for this gene."))
         #check to see if image exists
         img_path <- ddh::load_image(input = data(), fun_name = "make_male_anatogram", card = FALSE)
         if(!is.null(img_path)) {
@@ -874,7 +875,7 @@ maleAnatogramPlotServer <- function(id, data) {
                      width = "100%"))
       })
       output$male_anatogram_gene_plot_render <- renderPlot({
-        make_male_anatogram(input = data())
+        make_male_anatogram(input = data(), anatogram = "male")
       })
     }
   )
@@ -892,7 +893,8 @@ femaleAnatogramPlotServer <- function(id, data) {
       output$female_anatogram_gene_plot <- renderUI({
         #check to see if data are there
         shiny::validate(
-          need(data()$content %in% tissue$gene_name, "No Tissue-specific expression data for this gene."))
+          need(data()$content %in% gene_tissue$gene_name,
+               "No tissue-specific expression data for this gene."))
         #check to see if image exists
         img_path <- ddh::load_image(input = data(), fun_name = "make_female_anatogram", card = FALSE)
         if(!is.null(img_path)) {
@@ -930,7 +932,8 @@ tissuePlotServer <- function(id, data) {
       output$tissue_gene_plot <- renderUI({
         #check to see if data are there
         shiny::validate(
-          need(data()$content %in% tissue$gene_name, "No Tissue-specific expression data for this gene."))
+          need(data()$content %in% gene_tissue$gene_name, 
+               "No tissue-specific expression data for this gene."))
         #check to see if image exists
         img_path <- ddh::load_image(input = data(), fun_name = "make_tissue", card = FALSE)
         if(!is.null(img_path)) {
@@ -972,16 +975,16 @@ cellGeneExpressionPlotServer <- function(id, data) {
         #check to see if data are there
         if(data()$type == "gene") {
           shiny::validate(
-            need(expression_long %>% 
+            need(universal_expression_long %>% 
                    drop_na(protein_expression) %>% 
                    filter(gene %in% data()$content) %>% 
                    nrow() > 0, "No protein data found for this gene.")
           )
         } else if(data()$type == "cell") {
           shiny::validate(
-            need(expression_long %>% 
+            need(universal_expression_long %>% 
                    drop_na(protein_expression) %>% 
-                   left_join(expression_names, by = "X1") %>% 
+                   left_join(cell_expression_names, by = "X1") %>% 
                    filter(cell_line %in% data()$content) %>% 
                    nrow() > 0, "No protein data found for this cell line.")
           )
@@ -1027,16 +1030,16 @@ cellProteinExpressionPlotServer <- function(id, data) {
         #check to see if data are there
         if(data()$type == "gene") {
           shiny::validate(
-            need(expression_long %>% 
+            need(universal_expression_long %>% 
                    drop_na(protein_expression) %>% 
                    filter(gene %in% data()$content) %>% 
                    nrow() > 0, "No protein data found for this gene.")
           )
         } else if(data()$type == "cell") {
           shiny::validate(
-            need(expression_long %>% 
+            need(universal_expression_long %>% 
                    drop_na(protein_expression) %>% 
-                   left_join(expression_names, by = "X1") %>% 
+                   left_join(cell_expression_names, by = "X1") %>% 
                    filter(cell_line %in% data()$content) %>% 
                    nrow() > 0, "No protein data found for this cell line.")
           )
@@ -1081,8 +1084,11 @@ cellGeneProteinPlotServer <- function(id, data) {
       output$text_cell_gene_protein_plot <- renderText({paste0("Gene vs. protein expression of ", str_c(data()$content, collapse = ", "))})
       output$cell_gene_protein_plot <- renderPlot({
         shiny::validate(
-          need(expression_long %>% filter(gene %in% data()$content & !is.na(protein_expression)) %>%
-                 nrow() > 0 && expression_long %>% filter(gene %in% data()$content & !is.na(gene_expression)) %>% nrow() > 0, "Cannot make the plot without all the data."))
+          need(universal_expression_long %>% 
+                 filter(gene %in% data()$content & !is.na(protein_expression)) %>%
+                 nrow() > 0 && universal_expression_long %>%
+                 filter(gene %in% data()$content & !is.na(gene_expression)) %>% nrow() > 0,
+               "Cannot make the plot without all the data."))
         make_cellgeneprotein(input = data())
       })
     }
@@ -1150,8 +1156,8 @@ cellDependenciesPlotServer <- function (id, data) {
       output$cell_deps_plot <- renderUI({
         #check to see if data are there
         shiny::validate(
-          need(data()$content %in% achilles_long$gene |
-                 data()$content %in% expression_meta$cell_line, 
+          need(data()$content %in% universal_achilles_long$gene |
+                 data()$content %in% cell_expression_meta$cell_line, 
                "No data found for this query."))
         #check to see if image exists
         img_path <- ddh::load_image(input = data(), fun_name = "make_celldeps", card = FALSE)
@@ -1175,8 +1181,8 @@ cellDependenciesPlotServer <- function (id, data) {
       })
       #interactive
       output$cell_deps_interactive_plot <- renderPlotly({
-        shiny::validate(need(data()$content %in% achilles_long$gene |
-                               data()$content %in% expression_meta$cell_line, 
+        shiny::validate(need(data()$content %in% universal_achilles_long$gene |
+                               data()$content %in% cell_expression_meta$cell_line, 
                              "No data found for this query."))
         ggplotly(make_celldeps(input = data()), tooltip = "text" #,
                  # width = plot_size_finder("make_celldeps")$plot_width,
@@ -1209,8 +1215,8 @@ cellDependenciesDensityPlotServer <- function(id, data) {
         
       })
       output$cell_deps_density <- renderPlot({
-        shiny::validate(need(data()$content %in% achilles_long$gene |
-                               data()$content %in% expression_meta$cell_line, 
+        shiny::validate(need(data()$content %in% universal_achilles_long$gene |
+                               data()$content %in% cell_expression_meta$cell_line, 
                              "No data found for this query."))
         make_cellbins(input = data())
       },
@@ -1241,8 +1247,8 @@ cellDependenciesBarPlotServer <- function (id, data) {
         )
       })
       output$cell_bar <- renderPlotly({
-        shiny::validate(need(data()$content %in% achilles_long$gene |
-                               data()$content %in% expression_meta$cell_line, 
+        shiny::validate(need(data()$content %in% universal_achilles_long$gene |
+                               data()$content %in% cell_expression_meta$cell_line, 
                              "No data found for this query."))
         ggplotly(make_cellbar(input = data()), tooltip = "text")
       })
@@ -1270,7 +1276,7 @@ cellDepsLinPlotServer <- function(id, data) {
     function(input, output, session) {
       output$cell_deps_lin <- renderPlot({
         shiny::validate(
-          need(data()$content %in% achilles_long$gene, "No data found for this gene."))
+          need(data()$content %in% universal_achilles_long$gene, "No data found for this gene."))
         make_lineage(input = data(), 
                      highlight = input$celllin_click_high)
       },
@@ -1300,7 +1306,7 @@ cellDepsSubLinPlotServer <- function(id, data) {
     function(input, output, session) {
       output$cell_deps_sublin <- renderPlot({
         shiny::validate(
-          need(data()$content %in% achilles_long$gene, "No data found for this gene."))
+          need(data()$content %in% universal_achilles_long$gene, "No data found for this gene."))
         make_sublineage(input = data(),
                         highlight = input$cellsublin_click_high)
       },
@@ -1329,7 +1335,7 @@ cellDependenciesCorrPlotServer <- function (id, data) {
       output$gene_correlation_plot <- renderUI({
         #check to see if data are there
         shiny::validate(
-          need(data()$content %in% achilles_cor_nest$fav_gene, "No data found for this gene."))
+          need(data()$content %in% gene_achilles_cor_nest$fav_gene, "No data found for this gene."))
         #check to see if image exists
         img_path <- ddh::load_image(input = data(), fun_name = "make_correlation", card = FALSE)
         if(!is.null(img_path)) {
@@ -1371,8 +1377,8 @@ cellCoessentialityPlotServer <- function (id, data) {
       output$text_cell_coess_plot <- renderText({paste0("Cell co-essentiality plot generated for ", str_c(data()$content, collapse = ", "))})
       output$cell_coessentiality <- renderPlot({
         shiny::validate(
-          need(data()$content %in% cell_line_dep_sim$cell1_name |
-                 data()$content %in% cell_line_dep_sim$cell2_name, 
+          need(data()$content %in% cell_dependency_sim$cell1_name |
+                 data()$content %in% cell_expression_sim$cell2_name, 
                "No data found for this cell line."))
         make_cell_similarity(input = data())
       })      
@@ -1402,8 +1408,8 @@ expdepPlotServer <- function (id, data) {
         )
       })
       output$cellexpdep <- renderPlot({
-        shiny::validate(need(data()$content %in% achilles_long$gene |
-                               data()$content %in% expression_meta$cell_line, 
+        shiny::validate(need(data()$content %in% universal_achilles_long$gene |
+                               data()$content %in% cell_expression_meta$cell_line, 
                              "No data found for this query."))
         make_expdep(input = data())
       })
@@ -1469,7 +1475,7 @@ cellLineGeneProteinPlotServer <- function(id, data) {
       output$text_cellLine_gene_protein_plot <- renderText({paste0("Gene vs. protein expression of ", str_c(data()$content, collapse = ", "))})
       output$cellLine_gene_protein_plot <- renderPlot({
         shiny::validate(
-          need(expression_names$cell_line %in% data()$content, "No data found for this cell line."))
+          need(cell_expression_names$cell_line %in% data()$content, "No data found for this cell line."))
         # ggplotly(
         make_cellgeneprotein(input = data())#, tooltip = c("text")
         # )
@@ -1498,8 +1504,8 @@ cellCoexpressionPlotServer <- function (id, data) {
       output$text_cell_coexp_plot <- renderText({paste0("Cell co-expression plot generated for ", str_c(data()$content, collapse = ", "))})
       output$cell_coexpression <- renderPlot({
         shiny::validate(
-          need(data()$content %in% cell_line_exp_sim$cell1_name |
-                 data()$content %in% cell_line_exp_sim$cell2_name, 
+          need(data()$content %in% cell_expression_sim$cell1_name |
+                 data()$content %in% cell_dependency_sim$cell2_name, 
                "No data found for this cell line."))
         make_cell_similarity(input = data(), 
                              similarity = "expression")
@@ -1612,7 +1618,8 @@ compoundStructureServer <- function (id, data) {
       output$compound_structure <- renderUI({
         #check to see if data are there
         shiny::validate(
-          need(is.array(make_molecule_structure(input = data())), "No structure found for this compound."))
+          need(is.array(make_molecule_structure(input = data())),
+               "No structure found for this compound."))
         #check to see if image exists
         img_path <- ddh::load_image(input = data(), fun_name = "make_molecule_structure", card = FALSE)
         if(!is.null(img_path)) {
@@ -1657,7 +1664,7 @@ compoundDependenciesPlotServer <- function (id, data) {
         paste0("Toxic in ", get_essential(input = data()), " cell lines")})
       output$cell_deps <- renderPlotly({
         shiny::validate(
-          need(data()$content %in% prism_long$name, "No data found for this compound"))
+          need(data()$content %in% universal_prism_long$name, "No data found for this compound"))
         ggplotly(make_celldeps(input = data()), tooltip = "text")
       })      
     }
@@ -1681,7 +1688,7 @@ compoundBinsPlotServer <- function(id, data) {
     function(input, output, session) {
       output$compound_bins <- renderPlot({
         shiny::validate(
-          need(data()$content %in% prism_long$name, "")) #""left blank
+          need(data()$content %in% universal_prism_long$name, "")) #""left blank
         make_cellbins(input = data())
       },
       height = function() length(data()$content) * 90 + 80)
@@ -1707,7 +1714,7 @@ compoundLinPlotServer <- function(id, data) {
     function(input, output, session) {
       output$compound_lin <- renderPlot({
         shiny::validate(
-          need(data()$content %in% prism_long$name, "No data found for this gene."))
+          need(data()$content %in% universal_prism_long$name, "No data found for this gene."))
         make_lineage(input = data())
       },
       height = 550)
@@ -1738,7 +1745,7 @@ compoundSubLinPlotServer <- function(id, data) {
       })
       output$compound_sublin <- renderPlot({
         shiny::validate(
-          need(data()$content %in% prism_long$name, "No data found for this gene."))
+          need(data()$content %in% universal_prism_long$name, "No data found for this gene."))
         make_sublineage(input = data())
       },
       height = 1400)
@@ -1765,9 +1772,11 @@ compoundCorrelationPlotServer <- function (id, data) {
       output$text_compoundcorr_plot <- renderText({paste0("Compound correlation plot generated for ", str_c(data()$content, collapse = ", "))})
       output$compound_correlations <- renderPlot({
         shiny::validate(
-          need(data()$content %in% prism_cor_nest$fav_drug, "No data found for this compound"))
+          need(data()$content %in% compound_prism_cor_nest$fav_drug,
+               "No data found for this compound"))
         make_correlation(input = data())
       })      
     }
   )
 }
+

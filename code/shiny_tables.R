@@ -29,7 +29,7 @@ browsePathwaysPanelServer <- function(id) {
     id,
     function(input, output, session) {
       output$pathway_table <- DT::renderDataTable({
-        DT::datatable(make_pathway_table(pathways) %>% 
+        DT::datatable(make_pathway_table(gene_pathways) %>% 
                         dplyr::mutate(go = map_chr(go, internal_link)) %>% #from fun_helper.R
                         dplyr::rename(Pathway = pathway, GO = go, Genes = genes), 
                       escape = FALSE,
@@ -56,7 +56,8 @@ pathwayListServer <- function(id, data) {
       output$text_pathway_list <- renderText({paste0("GO Biological Processes for ", str_c(data()$content, collapse = ", "))})
       output$pathway_list <- DT::renderDataTable({
         shiny::validate(
-          need(data()$content %in% unique(unlist(pathways$data, use.names = FALSE)), "Not found in any pathways")
+          need(data()$content %in% unique(unlist(gene_pathways$data, use.names = FALSE)),
+               "Not found in any pathways")
         )
         DT::datatable(make_pathway_list(input = data()) %>% 
                         dplyr::mutate(go = map_chr(go, internal_link))  %>% #from fun_helper.R
@@ -84,7 +85,8 @@ pathwayGeneListServer <- function(id, data) {
       output$text_pathway_gene_list <- renderText({paste0("Genes for GO Biological Processes ", data()$query)})
       output$pathway_gene_list <- DT::renderDataTable({
         shiny::validate(
-          need(data()$query %in% pathways$go, "Not found in any pathways"))
+          need(data()$query %in% gene_pathways$go, 
+               "Not found in any pathways"))
         DT::datatable(make_pathway_genes(go_id = data()$query) %>% 
                         dplyr::mutate(gene = map_chr(gene, internal_link))  %>% #from fun_helper.R
                         dplyr::select(Gene = gene, Name = approved_name, AKA = aka),
@@ -118,7 +120,7 @@ proteinClusterTableServer <- function(id, data) {
       output$text_cluster_table <- renderText({paste0("Amino Acid Signature Clusters for ", str_c(data()$content, collapse = ", "))})
       output$prot_clust_table <- DT::renderDataTable({
         shiny::validate(
-          need(data()$content %in% proteins$gene_name, "Protein not found"))
+          need(data()$content %in% universal_proteins$gene_name, "Protein not found"))
         withProgress(message = 'Building a smart clustering table...', {
           DT::datatable(make_clustering_table(input = data(),
                                               cluster = input$show_all_clusters_tab,
@@ -198,7 +200,7 @@ proteinClusterEnrichmentTableServer <- function(id, data) {
           unique()
         
         shiny::validate(
-          need(data()$content %in% proteins$gene_name, "Protein not found"))
+          need(data()$content %in% universal_proteins$gene_name, "Protein not found"))
         
         if(length(clust_num) == 1) {
           title_text <- paste0("Enrichment Analysis for Cluster ", 
@@ -216,7 +218,7 @@ proteinClusterEnrichmentTableServer <- function(id, data) {
           unique()
         
         shiny::validate(
-          need(data()$content %in% proteins$gene_name, "Protein not found"),
+          need(data()$content %in% universal_proteins$gene_name, "Protein not found"),
           need(length(clust_num) == 1, 
                "More than one cluster identified in the table above. Cluster enrichment analysis is only available for individual gene queries or multiple gene queries belonging to the same cluster."))
         withProgress(message = 'Building a smart enrichment table...', {
@@ -255,7 +257,7 @@ pubmedTableServer <- function(id, data) {
       output$text_pubmed_table <- renderText({paste0("Publication history table for ", str_c(data()$content, collapse = ", "))})
       output$pubmed_table <- DT::renderDataTable({
         shiny::validate(
-          need(data()$content %in% pubmed$name, "No data found for this query"))
+          need(data()$content %in% universal_pubmed$name, "No data found for this query"))
         withProgress(message = 'Building a smart table...', {
           DT::datatable(make_pubmed_table(input = data()) %>% 
                           dplyr::mutate(pmid = map_chr(pmid, pubmed_linkr, number_only = TRUE) #from fun_helper.R
@@ -285,7 +287,7 @@ cellAnatogramTableServer <- function(id, data) {
     function(input, output, session) {
       output$cellanatogram_table <- DT::renderDataTable({
         shiny::validate(
-          need(data()$content %in% subcell$gene_name, 
+          need(data()$content %in% gene_subcell$gene_name, 
                "No data for this gene"))
         DT::datatable(make_cellanatogram_table(input = data()) %>% 
                         dplyr::select(Gene, gene, Reliability, Location) %>% 
@@ -310,7 +312,7 @@ tissueTableServer <- function(id, data) {
     function(input, output, session) {
       output$tissueanatogram_table <- DT::renderDataTable({
         shiny::validate(
-          need(data()$content %in% tissue$gene_name, "No Tissue Expression Data Found"))
+          need(data()$content %in% gene_tissue$gene_name, "No Tissue Expression Data Found"))
         DT::datatable(make_humananatogram_table(input = data()),
                       filter = if(input$tissue_filter_click == FALSE) {'none'} else {'top'},
                       options = list(pageLength = 10))
@@ -335,7 +337,7 @@ cellGeneExpressionTableServer <- function (id, data) {
       output$cell_gene_table <- DT::renderDataTable({
         if(data()$type == "gene") {
           shiny::validate(
-            need(expression_long %>% 
+            need(universal_expression_long %>% 
                    drop_na(protein_expression) %>% 
                    filter(gene %in% data()$content) %>% 
                    nrow() > 0, 
@@ -348,9 +350,9 @@ cellGeneExpressionTableServer <- function (id, data) {
           
         } else if(data()$type == "cell") {
           shiny::validate(
-            need(expression_long %>% 
+            need(universal_expression_long %>% 
                    drop_na(protein_expression) %>% 
-                   left_join(expression_names, by = "X1") %>% 
+                   left_join(cell_expression_names, by = "X1") %>% 
                    filter(cell_line %in% data()$content) %>% 
                    nrow() > 0,
                  "No gene expression data found for this cell line.")
@@ -380,7 +382,7 @@ cellProteinExpressionTableServer <- function (id, data) {
       output$cell_protein_table <- DT::renderDataTable({
         if(data()$type == "gene") {
           shiny::validate(
-            need(expression_long %>% 
+            need(universal_expression_long %>% 
                    drop_na(protein_expression) %>% 
                    filter( gene %in% data()$content) %>% 
                    nrow() > 0, "No protein data found for this gene.")
@@ -392,9 +394,9 @@ cellProteinExpressionTableServer <- function (id, data) {
   
         } else if(data()$type == "cell") {
           shiny::validate(
-            need(expression_long %>% 
+            need(universal_expression_long %>% 
                    drop_na(protein_expression) %>% 
-                   left_join(expression_names, by = "X1") %>% 
+                   left_join(cell_expression_names, by = "X1") %>% 
                    filter(cell_line %in% data()$content) %>% 
                    nrow() > 0, "No protein data found for this cell line.")
           )
@@ -478,7 +480,7 @@ cellLineDependenciesTableServer <- function (id, data) {
       output$text_cell_line_dep_table <- renderText({paste0("Dependency table generated for ", str_c(data()$content, collapse = ", "))})
       output$cell_line_achilles <- DT::renderDataTable({
         shiny::validate(
-          need(data()$content %in% expression_names$cell_line, "No data found for this cell line"))
+          need(data()$content %in% cell_expression_names$cell_line, "No data found for this cell line"))
         DT::datatable(make_dep_table(input = data()) %>%
                         dplyr::rename("Gene" = "gene", "Name" = "approved_name", "Unique Essential" = "unique_essential", "Pan Essential" = "common_essential") %>%
                         dplyr::mutate(Gene = map_chr(Gene, internal_link)) %>%  #from fun_helper.R
@@ -510,7 +512,7 @@ cellLineDrugDependenciesTableServer <- function (id, data) {
       output$text_cell_line_drug_dep_table <- renderText({paste0("Drug dependency table generated for ", str_c(data()$content, collapse = ", "))})
       output$cell_line_drug_prism <- DT::renderDataTable({
         shiny::validate(
-          need(data()$content %in% expression_names$cell_line, "No data found for this cell line"))
+          need(data()$content %in% cell_expression_names$cell_line, "No data found for this cell line"))
         DT::datatable(make_dep_table(input = data(), var = "drug") %>% 
                         dplyr::rename("Drug" = "name", "MOA" = "moa", "Uniquely Toxic" = "unique_toxic") %>%
                         dplyr::select("Drug", "MOA", "log2fc", input$vars_toxic_drugs), 
@@ -581,7 +583,7 @@ similarGenesTableServer <- function (id, data) {
       output$text_dep_top <- renderText({paste0(censor_status$num, " genes with similar dependencies as ", str_c(data()$content, collapse = ", "))})      
       output$dep_top <- DT::renderDataTable({
         shiny::validate(
-          need(data()$content %in% master_top_table$fav_gene, "No data found for this gene."))
+          need(data()$content %in% gene_master_top_table$fav_gene, "No data found for this gene."))
         censor_status$num <- nrow(make_top_table(input = data()#, 
                                                  # gls = input$gls_table_top
         ) %>% 
@@ -620,7 +622,7 @@ similarPathwaysTableServer <- function (id, data) {
       output$text_pos_enrich <- renderText({paste0("Pathways of genes with similar dependencies as ", str_c(data()$content, collapse = ", "))})
       output$pos_enrich <- DT::renderDataTable({
         shiny::validate(
-          need(data()$content %in% master_positive$fav_gene, "No data found for this gene."))
+          need(data()$content %in% gene_master_positive$fav_gene, "No data found for this gene."))
         DT::datatable(
           make_enrichment_top(input = data()) %>% 
             dplyr::mutate_if(is.numeric, ~ signif(., digits = 3)),
@@ -787,7 +789,7 @@ dissimilarGenesTableServer <- function (id, data) {
       ), " genes with dissimilar dependencies as ", str_c(data()$content, collapse = ", "))})      
       output$dep_bottom <- DT::renderDataTable({
         shiny::validate(
-          need(data()$content %in% master_bottom_table$fav_gene, 
+          need(data()$content %in% gene_master_bottom_table$fav_gene, 
                "No data found for this gene."))
         DT::datatable(
           make_bottom_table(input = data()#, 
@@ -912,7 +914,7 @@ dissimilarPathwaysTableServer <- function (id, data) {
       output$text_neg_enrich <- renderText({paste0("Pathways of genes with inverse dependencies as ", str_c(data()$content, collapse = ", "))})
       output$neg_enrich <- DT::renderDataTable({
         shiny::validate(
-          need(data()$content %in% master_negative$fav_gene, "No data found for this gene."))
+          need(data()$content %in% gene_master_negative$fav_gene, "No data found for this gene."))
         DT::datatable(
           make_enrichment_bottom(input = data()) %>% 
             dplyr::mutate_if(is.numeric, ~ signif(., digits = 3)),
@@ -977,7 +979,7 @@ metabolitesTableServer <- function(id, data) {
       output$metabolites_table <- DT::renderDataTable({
         if(data()$type == "gene") {
           shiny::validate(
-            need(hmdb_proteins %>% 
+            need(compound_hmdb_proteins %>% 
                    filter(fav_gene %in% data()$content) %>% 
                    nrow() > 0, 
                  "No metabolites found that associate with this gene.")
@@ -992,7 +994,7 @@ metabolitesTableServer <- function(id, data) {
         } else if(data()$type == "cell") {
           shiny::validate(
             need(cell_metabolites %>% 
-                   left_join(expression_names, by = c("DepMap_ID" = "X1")) %>% 
+                   left_join(cell_expression_names, by = c("DepMap_ID" = "X1")) %>% 
                    filter(cell_line %in% data()$content) %>% 
                    nrow() > 0, "No metabolites found that associate with this cell line.")
           )
@@ -1059,9 +1061,9 @@ cellDrugsTableServer <- function (id, data) {
       output$text_cell_drugs_table <- renderText({paste0("Drugs annotated for ", str_c(data()$content, collapse = ", "))})
       output$cell_drugs_table <- DT::renderDataTable({
         shiny::validate(
-          need(prism_long %>% 
+          need(universal_prism_long %>% 
                  dplyr::rename(X1 = 1) %>% 
-                 left_join(expression_meta, by = "X1") %>% 
+                 left_join(cell_expression_meta, by = "X1") %>% 
                  pull(cell_line) %in% data()$content,
                "No drug data found for this cell line."))
         DT::datatable(make_cell_drugs_table(input = data()) %>% 
@@ -1133,7 +1135,7 @@ cellSummaryTableServer <- function(id, data) {
       output$cell_sumary_title <- renderText({paste0("Lineage table for ", str_c(data()$content, collapse = ", "))})
       output$cell_table <- DT::renderDataTable({
         shiny::validate(
-          need(data()$content %in% expression_meta$cell_line, 
+          need(data()$content %in% cell_expression_meta$cell_line, 
           "No data found for this cell line.")
         )
         DT::datatable(
@@ -1161,7 +1163,7 @@ pubmedCompoundTableServer <- function(id, data) {
     function(input, output, session) {
       output$pubmed_compound_table <- DT::renderDataTable({
         shiny::validate(
-          need(data()$content %in% pubmed$name, ""))
+          need(data()$content %in% universal_pubmed$name, ""))
         withProgress(message = 'Building a smart table...', {
           DT::datatable(make_pubmed_table(input = data()) %>% 
                           dplyr::mutate(pmid = map_chr(pmid, pubmed_linkr, number_only = TRUE) #from fun_helper.R
@@ -1188,7 +1190,7 @@ pubmedCellLineTableServer <- function(id, data) {
     function(input, output, session) {
       output$pubmed_cell_line_table <- DT::renderDataTable({
         shiny::validate(
-          need(data()$content %in% pubmed$name, ""))
+          need(data()$content %in% universal_pubmed$name, ""))
         withProgress(message = 'Building a smart table...', {
           DT::datatable(make_pubmed_table(input = data()) %>% 
                           dplyr::mutate(pmid = map_chr(pmid, pubmed_linkr, number_only = TRUE) #from fun_helper.R
@@ -1224,7 +1226,7 @@ drugGenesTableServer <- function (id, data) {
       output$text_drug_genes_table <- renderText({glue::glue('Genes annotated to be targeted by {str_c(data()$content, collapse = ", ")}')})
       output$drug_genes_table <- DT::renderDataTable({
         shiny::validate(
-          need(data()$content %in% drug_genes_table$fav_drug, "No gene data found for this compound."))
+          need(data()$content %in% compound_genes_table$fav_drug, "No gene data found for this compound."))
         DT::datatable(make_drug_genes_table(data()$content) %>% 
                         dplyr::mutate(fav_gene = map_chr(fav_gene, internal_link)) %>% #from fun_helper.R
                         dplyr::rename(Drug = fav_drug, Gene = fav_gene, Name = approved_name), 
@@ -1257,7 +1259,7 @@ drugGenesCorTableServer <- function (id, data) {
       output$text_drug_genes_cor_table <- renderText({glue::glue('When {str_c(data()$content, collapse = ", ")} is placed on cells, a subset dies. These are the genes that show the same cell dependency profile.')})
       output$drug_genes_cor_table <- DT::renderDataTable({
         shiny::validate(
-          need(data()$content %in% drug_genes_cor_table$fav_drug, "No gene data found for this compound in this dataset."))
+          need(data()$content %in% compound_genes_cor_table$fav_drug, "No gene data found for this compound in this dataset."))
         #drug_gene_list will grab a char vec of genes known to be targeted compound, so we can check if corr's are known; added ifelse logic so index grab doesn't break
         drug_gene_tibble <- drug_genes_table %>% filter(fav_drug %in% data()$content)
         drug_gene_list <- ifelse(nrow(drug_gene_tibble) != 0, drug_gene_tibble %>% unnest(data) %>% pull(fav_gene), "")
@@ -1290,7 +1292,7 @@ metaboliteGenesTableServer <- function(id, data) {
     function(input, output, session) {
       output$metabolite_genes_table <- DT::renderDataTable({
         shiny::validate(
-          need(data()$content %in% hmdb_metabolites$fav_metabolite, 
+          need(data()$content %in% compound_hmdb_metabolites$fav_metabolite, 
                "No genes found that associate with this metabolite"))
         DT::datatable(make_metabolite_table(input = data()) %>% 
                         dplyr::mutate(gene_name = map_chr(gene_name, internal_link)) %>% 

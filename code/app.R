@@ -10,7 +10,7 @@ source(here::here("code", "private.R"))
 #DOWNLOAD/LOAD DATA-----
 # ddh::download_ddh_data(app_data_dir = app_data_dir,
 #                        test = testMode,
-#                        overwrite = TRUE)
+#                        overwrite = FALSE)
 
 ddh::load_ddh_data(app_data_dir = app_data_dir)
 
@@ -166,8 +166,8 @@ getLuckyLink <- function(id) {
   htmlOutput(ns("get_lucky"), inline = TRUE)
 }
 
-surprise <- function(surprise_vec) {
-  gene_symbol <- sample(surprise_vec, 1)
+surprise <- function(data_gene_surprise) {
+  gene_symbol <- sample(data_gene_surprise[[1]], 1)
   gene_symbol_url <- paste0("?show=gene&query=", gene_symbol)
   return(gene_symbol_url)
 }
@@ -177,7 +177,7 @@ getLuckyServer <- function(id) {
     id,
     function(input, output, session) {
       output$get_lucky <- renderUI({
-        tags$a(href = surprise(surprise_genes), "get lucky")
+        tags$a(href = surprise(gene_surprise), "get lucky")
       })
     }
   )
@@ -213,7 +213,12 @@ searchPageServer <- function(id) {
       })
       output$genes_search_result <- renderUI({
         query_string <- getQueryString()
-        query_results_table <- search_tables(gene_summary, pathways, expression_names, prism_names, hmdb_names, query_string$query)
+        query_results_table <- search_tables(universal_gene_summary, 
+                                             gene_pathways, 
+                                             cell_expression_names, 
+                                             compound_prism_names, 
+                                             compound_hmdb_names, 
+                                             query_string$query)
         if (nrow(query_results_table) > 0) {
           apply(query_results_table, 1, query_result_row)
         }
