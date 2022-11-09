@@ -194,7 +194,7 @@ cellExpressionPlotDashServer <- function (id, data) {
             need(universal_expression_long %>% 
                    drop_na(protein_expression) %>% 
                    filter(gene %in% data()$content) %>% 
-                   nrow() > 0, "No protein data found for this gene.")
+                   nrow() > 0, "No expression data found for this gene.")
           )
         } else if(data()$type == "cell") {
           shiny::validate(
@@ -202,7 +202,7 @@ cellExpressionPlotDashServer <- function (id, data) {
                    drop_na(protein_expression) %>% 
                    left_join(cell_expression_names, by = "X1") %>% 
                    filter(cell_line %in% data()$content) %>% 
-                   nrow() > 0, "No protein data found for this cell line.")
+                   nrow() > 0, "No expression data found for this cell line.")
           )
         }
         #check to see if image exists
