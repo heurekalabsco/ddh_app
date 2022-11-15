@@ -566,7 +566,7 @@ similarGenesTableServer <- function (id, data) {
         censor_status$num <- nrow(make_top_table(input = data()#, 
                                                  # gls = input$gls_table_top
         ) %>% 
-          censor(censor_genes, censor_status$choice, censor_status$num_sim_genes))
+          censor(choice = censor_status$choice, greater_than = censor_status$num_sim_genes))
       })
       
       observeEvent(input$reset, {
@@ -587,12 +587,12 @@ similarGenesTableServer <- function (id, data) {
         censor_status$num <- nrow(make_top_table(input = data()#, 
                                                  # gls = input$gls_table_top
         ) %>% 
-          censor(censor_genes, censor_status$choice, censor_status$num_sim_genes))
+          censor(choice = censor_status$choice, greater_than = censor_status$num_sim_genes))
         DT::datatable(
           make_top_table(input = data()#, 
                          # gls = input$gls_table_top
           ) %>% 
-            censor(censor_genes, censor_status$choice, censor_status$num_sim_genes) %>% 
+            censor(choice = censor_status$choice, greater_than = censor_status$num_sim_genes) %>% 
             dplyr::mutate(gene = map_chr(gene, internal_link, linkout_img = FALSE)) %>% #from fun_helper.R
             dplyr::rename("Query" = "fav_gene", "Gene" = "gene", "Name" = "name", 
                           # "GLS p-value" = "GLSpvalue", 
