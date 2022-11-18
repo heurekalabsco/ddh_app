@@ -432,7 +432,7 @@ cellExpressionGraphDashServer <- function (id, data) {
                      threshold = 10, 
                      deg = 2, 
                      corrType = "Positive", 
-                     cell_line_similarity = "expression",
+                     cell_line_var = "expression",
                      card = TRUE)
         }
       })

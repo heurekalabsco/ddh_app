@@ -28,7 +28,7 @@ geneNetworkGraphServer <- function(id, data) {
                    threshold = rv$threshold, 
                    deg = rv$degree, 
                    corrType = rv$corrType, 
-                   cell_line_similarity = "dependency",
+                   cell_line_var = "dependency",
                    displayHeight = '80vh', 
                    displayWidth = '100%', 
                    tooltipLink = TRUE) %>% 
@@ -110,7 +110,7 @@ geneNetworkGraphExpServer <- function(id, data) {
                    threshold = rv$threshold, 
                    deg = rv$degree, 
                    corrType = rv$corrType, 
-                   cell_line_similarity = "expression",
+                   cell_line_var = "expression",
                    displayHeight = '80vh', 
                    displayWidth = '100%', 
                    tooltipLink = TRUE) %>% 
