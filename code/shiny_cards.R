@@ -1609,7 +1609,7 @@ cellDependenciesNegTableTabServer <- function (id, data) {
 cellDependenciesNegPathwayTableTab <- function(id) {
   ns <- NS(id)
   divFlexAlignCenter(
-    "Negative Correlations",
+    "Negative Enrichment",
     gt_output(outputId = ns("depnegpathwaystab"))
   )
 }
@@ -1632,6 +1632,35 @@ cellDependenciesNegPathwayTableTabServer <- function (id, data) {
   )
 }
 
+cellDependenciesGenePathwayTableTab <- function(id) {
+  ns <- NS(id)
+  divFlexAlignCenter(
+    "Pathways",
+    gt_output(outputId = ns("depgenepathwaystab"))
+  )
+}
+
+cellDependenciesGenePathwayTableTabServer <- function (id, data) {
+  moduleServer(
+    id,
+    function(input, output, session) {
+      output$depgenepathwaystab <- render_gt({
+        shiny::validate(
+          need(data()$content %in% gene_pathways_components$feature1 |
+                 data()$content %in% gene_pathways_components$feature2,
+               "No data found for this gene."))
+        gt::gt(make_gene_pathways_components(input = data(),
+                                             cutoff = 0) %>%
+                 dplyr::arrange(dplyr::desc(pearson_corr)) %>% 
+                 dplyr::select(Pathway = feature2) %>%
+                 dplyr::slice(1:5))
+      },
+      height = card_contents_height,
+      width = card_contents_width
+      )
+    }
+  )
+}
 
 ## CELL -----
 # dash

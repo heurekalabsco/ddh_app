@@ -632,6 +632,33 @@ similarPathwaysTableServer <- function (id, data) {
   )
 }
 
+GenePathwaysTable <- function(id) {
+  ns <- NS(id)
+  fluidRow(DT::dataTableOutput(outputId = ns("genes_pathways")))
+}
+
+GenePathwaysTableServer <- function (id, data) {
+  moduleServer(
+    id,
+    function(input, output, session) {
+      output$genes_pathways <- DT::renderDataTable({
+        shiny::validate(
+          need(data()$content %in% gene_pathways_components$feature1 |
+                 data()$content %in% gene_pathways_components$feature2,
+               "No data found for this gene."))
+        DT::datatable(make_gene_pathways_components(input = data(),
+                                                    cutoff = 0.6) %>% # slider here!
+                        dplyr::arrange(dplyr::desc(pearson_corr)) %>% 
+                        dplyr::select("Query" = feature1,
+                                      "Pathway" = feature2,
+                                      "R^2" = pearson_corr) %>% 
+                        dplyr::mutate_if(is.numeric, ~ signif(., digits = 3)),
+                      options = list(pageLength = 25))
+      })  
+    }
+  )
+}
+
 similarCellsTable <- function(id) {
   ns <- NS(id)
   tagList(

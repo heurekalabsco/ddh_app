@@ -451,7 +451,7 @@ genePage <- function (id, subtype) {
                               div(
                                 id = ns("dep_gene_pathways_tabcard"),
                                 style = "padding-left:1%",
-                                similarGenePathwaysTable(ns("gene_paths_comps")),
+                                GenePathwaysTable(ns("gene_paths_comps")),
                                 tags$br()
                               )
                             )
@@ -975,7 +975,7 @@ genePageServer <- function(id, subtype) {
       #serves the card for the image
       cellDependenciesGenePathwayTableTabServer("dep_gene_pathways_tab", data)
       #serves the data plots
-      similarGenePathwaysTable("gene_paths_comps", data)
+      GenePathwaysTableServer("gene_paths_comps", data)
       
       #Graph
       geneNetworkGraphServer("graph", data)
