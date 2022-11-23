@@ -393,7 +393,8 @@ genePage <- function (id, subtype) {
                               actionLink(inputId = ns("dep_pos_table_click"), cellDependenciesPosTableTab(ns("dep_pos_table_tab"))), #pos table
                               actionLink(inputId = ns("dep_pos_pathways_click"), cellDependenciesPosPathwayTableTab(ns("dep_pos_pathways_tab"))), #pos pathways
                               actionLink(inputId = ns("dep_neg_table_click"), cellDependenciesNegTableTab(ns("dep_neg_table_tab"))), #neg table
-                              actionLink(inputId = ns("dep_neg_pathways_click"), cellDependenciesNegPathwayTableTab(ns("dep_neg_pathways_tab"))) #neg pathways
+                              actionLink(inputId = ns("dep_neg_pathways_click"), cellDependenciesNegPathwayTableTab(ns("dep_neg_pathways_tab"))), #neg pathways
+                              actionLink(inputId = ns("dep_gene_pathways_click"), cellDependenciesGenePathwayTableTab(ns("dep_gene_pathways_tab")))
                             )
                           ),
                           tags$br(),
@@ -439,13 +440,23 @@ genePage <- function (id, subtype) {
                               div(
                                 id = ns("dep_neg_pathways_tabcard"),
                                 style = "padding-left:1%",
-                                # dissimilarPathwaysTableText(ns("dsim_pathways_text")), 
                                 dissimilarPathwaysTable(ns("dsim_pathways")),
                                 tags$br()
                               )
                             )
-                          ) #end of fluid row
-                 ),###end of tabpanel
+                          ),
+                          #conditional for gene - pathways
+                          fluidRow(
+                            shinyjs::hidden(
+                              div(
+                                id = ns("dep_gene_pathways_tabcard"),
+                                style = "padding-left:1%",
+                                similarGenePathwaysTable(ns("gene_paths_comps")),
+                                tags$br()
+                              )
+                            )
+                          ) # end of fluid row
+                 ), ### end of tabpanel
                  tabPanel("Graph", value = "dependencies_graph", 
                           geneNetworkGraph(ns("graph"))
                  ),
@@ -899,6 +910,7 @@ genePageServer <- function(id, subtype) {
         shinyjs::hide("dep_neg_table_tabcard")
         shinyjs::hide("dep_neg_pathways_tabcard")
         shinyjs::hide("dep_corr_tabcard")
+        shinyjs::hide("dep_gene_pathways_tabcard")
       })
       #serves the card for the image
       cellDependenciesPosTableTabServer("dep_pos_table_tab", data)
@@ -913,6 +925,7 @@ genePageServer <- function(id, subtype) {
         shinyjs::hide("dep_neg_table_tabcard")
         shinyjs::hide("dep_neg_pathways_tabcard")
         shinyjs::hide("dep_corr_tabcard")
+        shinyjs::hide("dep_gene_pathways_tabcard")
       })
       #serves the card for the image
       cellDependenciesPosPathwayTableTabServer("dep_pos_pathways_tab", data)
@@ -927,6 +940,7 @@ genePageServer <- function(id, subtype) {
         shinyjs::show("dep_neg_table_tabcard")
         shinyjs::hide("dep_neg_pathways_tabcard")
         shinyjs::hide("dep_corr_tabcard")
+        shinyjs::hide("dep_gene_pathways_tabcard")
       })
       #serves the card for the image
       cellDependenciesNegTableTabServer("dep_neg_table_tab", data)
@@ -941,12 +955,27 @@ genePageServer <- function(id, subtype) {
         shinyjs::hide("dep_neg_table_tabcard")
         shinyjs::show("dep_neg_pathways_tabcard")
         shinyjs::hide("dep_corr_tabcard")
+        shinyjs::hide("dep_gene_pathways_tabcard")
       })
       #serves the card for the image
       cellDependenciesNegPathwayTableTabServer("dep_neg_pathways_tab", data)
       #serves the data plots
       dissimilarPathwaysTableTextServer("dsim_pathways_text", data)
       dissimilarPathwaysTableServer("dsim_pathways", data)
+
+      # CONDITIONAL gene pathways
+      observeEvent(input$dep_gene_pathways_click, { #store click
+        shinyjs::hide("dep_pos_table_tabcard")
+        shinyjs::hide("dep_pos_pathways_tabcard")
+        shinyjs::hide("dep_neg_table_tabcard")
+        shinyjs::hide("dep_neg_pathways_tabcard")
+        shinyjs::hide("dep_corr_tabcard")
+        shinyjs::show("dep_gene_pathways_tabcard")
+      }) 
+      #serves the card for the image
+      cellDependenciesGenePathwayTableTabServer("dep_gene_pathways_tab", data)
+      #serves the data plots
+      similarGenePathwaysTable("gene_paths_comps", data)
       
       #Graph
       geneNetworkGraphServer("graph", data)
