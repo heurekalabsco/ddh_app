@@ -634,24 +634,39 @@ similarPathwaysTableServer <- function (id, data) {
 
 GenePathwaysTable <- function(id) {
   ns <- NS(id)
-  fluidRow(DT::dataTableOutput(outputId = ns("genes_pathways")))
+  tagList(
+    fluidRow(h4(textOutput(ns("text_gene_path_coessentiality")))),
+    fluidRow(
+      column(width = 6, 
+             sliderInput(inputId = ns("corr_pathways"),
+                         "Absolute Pearson's correlation cutoff value:",
+                         min = 0.3,
+                         max = 1,
+                         value = 0.5,
+                         step = 0.05)
+             )
+    ),
+    hr(),
+    fluidRow(DT::dataTableOutput(outputId = ns("genes_pathways")))
+  )
 }
 
 GenePathwaysTableServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
+      output$text_gene_path_coessentiality <- renderText({paste0("Pathways with similar dependencies as ", str_c(data()$content, collapse = ", "))})
       output$genes_pathways <- DT::renderDataTable({
         shiny::validate(
           need(data()$content %in% gene_pathways_components$feature1 |
                  data()$content %in% gene_pathways_components$feature2,
                "No data found for this gene."))
         DT::datatable(make_gene_pathways_components(input = data(),
-                                                    cutoff = 0.6) %>% # slider here!
-                        dplyr::arrange(dplyr::desc(pearson_corr)) %>% 
+                                                    cutoff = input$corr_pathways) %>%
+                        dplyr::mutate(abs_corr = abs(pearson_corr)) %>% 
                         dplyr::select("Query" = feature1,
                                       "Pathway" = feature2,
-                                      "R^2" = pearson_corr) %>% 
+                                      "abs(R^2)" = abs_corr) %>% 
                         dplyr::mutate_if(is.numeric, ~ signif(., digits = 3)),
                       options = list(pageLength = 25))
       })  

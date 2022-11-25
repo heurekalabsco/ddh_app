@@ -1651,7 +1651,6 @@ cellDependenciesGenePathwayTableTabServer <- function (id, data) {
                "No data found for this gene."))
         gt::gt(make_gene_pathways_components(input = data(),
                                              cutoff = 0) %>%
-                 dplyr::arrange(dplyr::desc(pearson_corr)) %>% 
                  dplyr::select(Pathway = feature2) %>%
                  dplyr::slice(1:5))
       },
