@@ -1529,7 +1529,7 @@ cellDependenciesTableTabServer <- function (id, data) {
 cellDependenciesPosTableTab <- function(id) {
   ns <- NS(id)
   divFlexAlignCenter(
-    "Positive Correlations",
+    "Positive Genes",
     gt_output(outputId = ns("deppostabletab"))
   )
 }
@@ -1582,7 +1582,7 @@ cellDependenciesPosPathwayTableTabServer <- function (id, data) {
 cellDependenciesNegTableTab <- function(id) {
   ns <- NS(id)
   divFlexAlignCenter(
-    "Negative Correlations",
+    "Negative Genes",
     gt_output(outputId = ns("depnegtabletab"))
   )
 }
@@ -1646,11 +1646,9 @@ cellDependenciesGenePathwayTableTabServer <- function (id, data) {
     function(input, output, session) {
       output$depgenepathwaystab <- render_gt({
         shiny::validate(
-          need(data()$content %in% gene_pathways_components$feature1 |
-                 data()$content %in% gene_pathways_components$feature2,
+          need(nrow(make_gene_pathways_components(input = data())) > 0,
                "No data found for this gene."))
-        gt::gt(make_gene_pathways_components(input = data(),
-                                             cutoff = 0) %>%
+        gt::gt(make_gene_pathways_components(input = data()) %>%
                  dplyr::select(Pathway = feature2) %>%
                  dplyr::slice(1:5))
       },
