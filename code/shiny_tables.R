@@ -636,18 +636,9 @@ GenePathwaysTable <- function(id) {
   ns <- NS(id)
   tagList(
     fluidRow(h4(textOutput(ns("text_gene_path_coessentiality")))),
-    # fluidRow(
-    #   column(width = 6, 
-    #          sliderInput(inputId = ns("corr_pathways"),
-    #                      "Absolute Pearson's correlation cutoff value:",
-    #                      min = 0.3,
-    #                      max = 1,
-    #                      value = 0.5,
-    #                      step = 0.05)
-    #          )
-    # ),
-    # hr(),
-    fluidRow(DT::dataTableOutput(outputId = ns("genes_pathways")))
+    fluidRow(DT::dataTableOutput(outputId = ns("genes_pathways"))),
+    hr(),
+    fluidRow(plotOutput(outputId = ns("network_pathway_components"), height = "600px"))
   )
 }
 
@@ -667,7 +658,22 @@ GenePathwaysTableServer <- function (id, data) {
                                       "abs(R^2)" = abs_corr) %>% 
                         dplyr::mutate_if(is.numeric, ~ signif(., digits = 3)),
                       options = list(pageLength = 25))
-      })  
+      })
+      # CLICKABLE PLOT
+      output$network_pathway_components <- renderPlot({
+        
+        if(!is.null(input$genes_pathways_rows_selected)){
+          highlight_sel_table <- make_gene_pathways_components(input = data()) %>% 
+            dplyr::slice(input$genes_pathways_rows_selected)
+          
+          highlight_sel <- c(highlight_sel_table$feature1, highlight_sel_table$feature2)
+        } else {
+          highlight_sel <- NULL
+        }
+        
+        make_gene_pathways_components_network(input = data(), 
+                                              highlight = highlight_sel)
+      })
     }
   )
 }
