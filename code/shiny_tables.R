@@ -635,17 +635,27 @@ similarPathwaysTableServer <- function (id, data) {
 GenePathwaysTable <- function(id) {
   ns <- NS(id)
   tagList(
+    # TABLE
     fluidRow(h4(textOutput(ns("text_gene_path_coessentiality")))),
     fluidRow(DT::dataTableOutput(outputId = ns("genes_pathways"))),
-    hr(),
-    fluidRow(plotOutput(outputId = ns("network_pathway_components"), height = "600px"))
-  )
+    # PLOT
+    fluidRow(actionLink(inputId = ns("network_click"), "View network plot")),
+    tags$br(),
+    conditionalPanel(condition = paste0("input['", ns("network_click"), "'] != 0"), 
+                     fluidRow(h4(textOutput(ns("text_network_plot")))),
+                     # fluidRow(checkboxInput(inputId = ns("labels_network"), 
+                     #                        label = "Show labels", value = FALSE)),
+                     fluidRow(plotOutput(outputId = ns("network_pathway_components"), 
+                                         height = "600px"))
+                     )
+    )
 }
 
 GenePathwaysTableServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
+      # TABLE
       output$text_gene_path_coessentiality <- renderText({paste0("Pathways with similar dependencies as ", str_c(data()$content, collapse = ", "))})
       output$genes_pathways <- DT::renderDataTable({
         shiny::validate(
@@ -660,6 +670,7 @@ GenePathwaysTableServer <- function (id, data) {
                       options = list(pageLength = 25))
       })
       # CLICKABLE PLOT
+      output$text_network_plot <- renderText({paste0("Network plot of pathways with similar dependencies as ", str_c(data()$content, collapse = ", "))})
       output$network_pathway_components <- renderPlot({
         
         if(!is.null(input$genes_pathways_rows_selected)){
@@ -672,7 +683,10 @@ GenePathwaysTableServer <- function (id, data) {
         }
         
         make_gene_pathways_components_network(input = data(), 
-                                              highlight = highlight_sel)
+                                              highlight = highlight_sel #,
+                                              # show_labels = input$labels_network,
+                                              # fontsize = 3.5
+                                              )
       })
     }
   )
