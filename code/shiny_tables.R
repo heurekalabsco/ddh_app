@@ -646,7 +646,9 @@ GenePathwaysTable <- function(id) {
                      # fluidRow(checkboxInput(inputId = ns("labels_network"), 
                      #                        label = "Show labels", value = FALSE)),
                      fluidRow(plotOutput(outputId = ns("network_pathway_components"), 
-                                         height = "600px"))
+                                         height = "600px")),
+                     tags$br(),
+                     fluidRow(ddh::make_legend("make_gene_pathways_components_network"))
                      )
     )
 }
@@ -683,9 +685,9 @@ GenePathwaysTableServer <- function (id, data) {
         }
         
         make_gene_pathways_components_network(input = data(), 
-                                              highlight = highlight_sel #,
-                                              # show_labels = input$labels_network,
-                                              # fontsize = 3.5
+                                              highlight = highlight_sel,
+                                              cutoff = 0.3, # SET TO NULL AFTER NEXT DATA GENERATION
+                                              fontsize = 4
                                               )
       })
     }
