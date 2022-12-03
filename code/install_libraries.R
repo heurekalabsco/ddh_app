@@ -2,6 +2,7 @@
 
 cran_pkgs <- c(
   "DT",
+  "ggraph",
   "glue",
   "gt",
   "here",
