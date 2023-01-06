@@ -482,11 +482,13 @@ genePageServer <- function(id, subtype) {
       if(subtype == "gene"){
         data <- reactive({
           gene_symbols <- getQueryString()$query
+          validation_datasets <- make_validate(gene_symbols) #example of how to make validation_datasets
           list(
             type=type,
             subtype=subtype,
             query=gene_symbols,
-            content=gene_symbols
+            content=gene_symbols,
+            validate=validation_datasets #example of how to pass this into functions using data()
           )
         })
         title_var <- geneTitleServer("title_var", data)

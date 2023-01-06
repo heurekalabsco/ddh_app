@@ -21,7 +21,7 @@ ideogramPlotServer <- function (id, data) {
       output$ideogram_plot <- renderUI({
         #check to see if data are there
         shiny::validate(
-          need(data()$content %in% gene_location$approved_symbol, 
+          need(c("gene_location") %in% data()$validate, #example of how to check for necessary datasets in query
                "No data found for this gene."))
         #check to see if image exists
         img_path <- ddh::load_image(input = data(), fun_name = "make_ideogram", card = FALSE)
