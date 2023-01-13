@@ -142,9 +142,9 @@ exampleSearchesPanel <- function(id) {
                           tagList(
                             tags$br(),
                             h3("Examples"),
-                            HTML(examples), 
-                            browsePathwaysLink(ns("pathways")),
-                            browsePathwaysPanel(ns("pathways")) 
+                            HTML(examples)#,
+                            #browsePathwaysLink(ns("pathways")),
+                            #browsePathwaysPanel(ns("pathways"))
                           )
   )
 }
@@ -198,7 +198,8 @@ searchPage <- function (id) {
 }
 
 query_result_row <- function(row) {
-  func <- subtype_to_query_result_row[[row$subtype]]
+  subtype <- row["subtype"]
+  func <- subtype_to_query_result_row[[subtype]]
   func(row)
 }
 
@@ -213,12 +214,7 @@ searchPageServer <- function(id) {
       })
       output$genes_search_result <- renderUI({
         query_string <- getQueryString()
-        query_results_table <- search_tables(universal_gene_summary, 
-                                             gene_pathways, 
-                                             cell_expression_names, 
-                                             compound_prism_names, 
-                                             compound_hmdb_names, 
-                                             query_string$query)
+        query_results_table <- search(search_index, query_string$query)
         if (nrow(query_results_table) > 0) {
           apply(query_results_table, 1, query_result_row)
         }
@@ -233,15 +229,16 @@ searchPageServer <- function(id) {
 # SEARCH RESULT ROWS ----
 
 gene_query_result_row <- function(row) {
-  gene_summary_row <- row$data
-  title <- paste0(gene_summary_row["approved_symbol"], ": ", gene_summary_row["approved_name"])
+  gene_summary <- universal_gene_summary %>%
+    filter(approved_symbol==row["content_id"])
+  title <- paste0(gene_summary$approved_symbol, ": ", gene_summary$approved_name)
   list(
     h4(
       tags$strong("Gene:"),
-      tags$a(title, href=paste0("?show=gene&query=", gene_summary_row["approved_symbol"]))
+      tags$a(title, href=paste0("?show=gene&query=", gene_summary$approved_symbol))
     ),
-    div(tags$strong("Aka:"), gene_summary_row["aka"]),
-    div(tags$strong("Entrez ID:"), gene_summary_row["ncbi_gene_id"]),
+    div(tags$strong("Aka:"), gene_summary$aka),
+    div(tags$strong("Entrez ID:"), gene_summary$ncbi_gene_id),
     hr()
   )
 }
