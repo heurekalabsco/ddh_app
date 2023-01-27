@@ -184,17 +184,6 @@ build_search_index <- function() {
 }
 
 search_index <- build_search_index()
-print(search(search_index=search_index, query_str="A1BG"))
-print(search(search_index=search_index, query_str="Alpha-1-b"))
-print(search(search_index=search_index, query_str="cholesterol"))
-print(search(search_index=search_index, query_str="0033344"))
-print(search_custom_list(search_index=search_index, query_str="ROCK1,ROCK2,0033344,BOBX"))
-print(search(search_index=search_index, query_str="SALE"))
-print(search_custom_list(search_index=search_index, query_str="SALE,NCO2"))
-print(search(search_index=search_index, query_str="Kidney"))
-print(search(search_index=search_index, query_str="Fibroblast Soft Tissue"))
-print(search(search_index=search_index, query_str="Fibroblast"))
-print(search(search_index=search_index, query_str="cloranolol"))
-print(search(search_index=search_index, query_str="immunostimulant"))
+
 
 arrow::write_feather(search_index, "data/search_index")

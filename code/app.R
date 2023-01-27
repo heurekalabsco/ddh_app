@@ -197,6 +197,17 @@ searchPage <- function (id) {
   )
 }
 
+multi_query_result_row <- function(search_index_rows, multi_query_items) {
+  # group by search_index_rows$subtype
+  # multi_query_result_row(search_index_rows, search_result$multi_items)
+  # 
+  #  gene_list=gene_list_query_result_row,  
+  #  compound_list=compound_list_query_result_row,
+  #  cell_list=cell_list_query_result_row,
+  
+  "NO idea"
+}
+
 query_result_row <- function(row) {
   subtype <- row["subtype"]
   func <- subtype_to_query_result_row[[subtype]]
@@ -213,13 +224,19 @@ searchPageServer <- function(id) {
         paste0("Search results for '", query_string$query, "'")
       })
       output$genes_search_result <- renderUI({
-        query_string <- getQueryString()
-        query_results_table <- search(search_index, query_string$query)
-        if (nrow(query_results_table) > 0) {
-          apply(query_results_table, 1, query_result_row)
-        }
-        else {
-          "No results found."
+        query_str <- getQueryString()$query
+        search_result <- search_query(search_index, query_str)
+        search_index_rows <- search_result$rows
+        #multi_query_search <- search_result$multi_query_search
+        if (search_result$multi_query) {
+          multi_query_result_row(search_index_rows, search_result$multi_items)
+        } else {
+          if (nrow(search_index_rows) > 0) {
+            apply(search_index_rows, 1, query_result_row)
+          }
+          else {
+            "No results found."
+          }
         }
       })      
     }
@@ -244,7 +261,8 @@ gene_query_result_row <- function(row) {
 }
 
 pathway_query_result_row <- function(row) {
-  pathways_row <- row$data
+  pathways_row <- gene_pathways %>%
+    filter(go==row["content_id"])
   gene_symbols <- lapply(pathways_row$data, function(x) { paste(x$gene, collapse=', ') })
   title <- paste0(pathways_row$pathway, " (GO:", pathways_row$go, ")")
   list(
@@ -305,41 +323,46 @@ gene_list_query_result_row <- function(row) {
 }
 
 cell_query_result_row <- function(row) {
-  expression_names_row <- row$data
-  title <- paste0(expression_names_row["cell_line"])
+  cell_row <- cell_expression_names %>%
+    filter(cell_line==row["content_id"])
+  print(cell_row)
   list(
     h4(
       tags$strong("Cell:"),
-      tags$a(title, href=paste0("?show=cell&query=", expression_names_row["cell_line"]))
+      tags$a(cell_row$cell_line, href=paste0("?show=cell&query=", cell_row$cell_line))
     ),
-    div(tags$strong("Lineage:"), expression_names_row["lineage"]),
-    div(tags$strong("Sublineage:"), expression_names_row["lineage_subtype"]),
+    div(tags$strong("Lineage:"), cell_row$lineage),
+    div(tags$strong("Sublineage:"), cell_row$lineage_subtype),
     hr()
   )
 }
 
 lineage_query_result_row <- function(row) {
-  expression_names_row <- row$data$data[[1]]
-  cell_lines <- paste0(expression_names_row$cell_line, collapse=", ")
+  cell_lines <- cell_expression_names %>%
+    filter(lineage==row["content_id"]) %>%
+    pull(cell_line)
+  cell_line_str <- paste(cell_lines, collapse=", ")
   list(
     h4(
       tags$strong("Lineage:"),
-      tags$a(row$title, href=paste0("?show=lineage&query=", row$key))
+      tags$a(row["content_id"], href=paste0("?show=lineage&query=", row["content_id"]))
     ),
-    div(tags$strong("Cells:"), cell_lines),
+    div(tags$strong("Cells:"), cell_line_str),
     hr()
   )
 }
 
 lineage_subtype_query_result_row <- function(row) {
-  expression_names_row <- row$data$data[[1]]
-  cell_lines <- paste0(expression_names_row$cell_line, collapse=", ")
+  cell_lines <- cell_expression_names %>%
+    filter(lineage_subtype==row["content_id"]) %>%
+    pull(cell_line)
+  cell_line_str <- paste0(cell_lines, collapse=", ")
   list(
     h4(
       tags$strong("Sublineage:"),
-      tags$a(row$title, href=paste0("?show=lineage_subtype&query=", row$key))
+      tags$a(row["content_id"], href=paste0("?show=lineage_subtype&query=", row["content_id"]))
     ),
-    div(tags$strong("Cells:"), cell_lines),
+    div(tags$strong("Cells:"), cell_line_str),
     hr()
   )
 }
@@ -388,7 +411,8 @@ cell_list_query_result_row <- function(row) {
 }
 
 compound_query_result_row <- function(row) {
-  prism_name_row <- row$data
+  prism_name_row <- compound_prism_names %>%
+    filter(name==row["content_id"])
   list(
     h4(
       tags$strong("Compound:"),
@@ -401,12 +425,14 @@ compound_query_result_row <- function(row) {
 }
 
 moa_query_result_row <- function(row) {
-  prism_name_row <- row$data$data[[1]]
-  compounds <- paste0(prism_name_row$name, collapse=", ")
+  prism_names <- compound_prism_names %>%
+    filter(moa==row["content_id"]) %>%
+    pull(name)
+  compounds <- paste0(prism_names, collapse=", ")
   list(
     h4(
       tags$strong("Compound Mechanism of Action:"),
-      tags$a(row$title, href=paste0("?show=moa&query=", row$key))
+      tags$a(row["content_id"], href=paste0("?show=moa&query=", row["content_id"]))
     ),
     div(tags$strong("Compounds:"), compounds),
     hr()
@@ -414,12 +440,12 @@ moa_query_result_row <- function(row) {
 }
 
 metabolite_query_result_row <- function(row) {
-  hmdb_name_row <- row$data
-  compounds <- paste0(hmdb_name_row$name, collapse=", ")
+  hmdb_name_row <- compound_hmdb_names %>%
+    filter(cid==row["content_id"])
   list(
     h4(
       tags$strong("Metabolite:"),
-      tags$a(hmdb_name_row$name, href=paste0("?show=metabolite&query=", row$name))
+      tags$a(hmdb_name_row$name, href=paste0("?show=metabolite&query=", hmdb_name_row$name))
     ),
     div(tags$strong("Class:"), hmdb_name_row$class),
     div(tags$strong("CID:"), hmdb_name_row$cid),
@@ -475,15 +501,12 @@ compound_list_query_result_row <- function(row) {
 subtype_to_query_result_row = list(
   gene=gene_query_result_row,
   pathway=pathway_query_result_row,
-  gene_list=gene_list_query_result_row,
   cell=cell_query_result_row,
   lineage=lineage_query_result_row,
   lineage_subtype=lineage_subtype_query_result_row,
-  cell_list=cell_list_query_result_row,
   compound=compound_query_result_row,
   moa=moa_query_result_row,
-  metabolite=metabolite_query_result_row,
-  compound_list=compound_list_query_result_row
+  metabolite=metabolite_query_result_row
 )
 
 # PAGE MODULES-----

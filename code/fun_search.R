@@ -12,11 +12,57 @@ calc_rank <- function(query_str, value, priority) {
   return (str_length(query_str) / str_length(value)) / priority
 }
 
-search <- function(search_index, query_str) {
+is_multi_query_search <- function(query_str) {
+  grepl(",", query_str)
+}
+
+search_query <- function(search_index, query_str) {
+  if (is_multi_query_search(query_str)) {
+    multi_items <- split_query_str(query_str)
+    rows <- multi_query_search(search_index, multi_items)
+    list(
+      rows=rows,
+      multi_query=TRUE,
+      multi_items=multi_items
+    )
+  } else {
+    rows <- single_query_search(search_index, query_str) %>% arrange(desc(rank))
+    list(
+      rows=rows,
+      multi_query=FALSE,
+      multi_items=NULL
+    )
+  }
+}
+
+#print(search_query(search_index=search_index, query_str="A1BG"))
+#print(search_query(search_index=search_index, query_str="Alpha-1-b"))
+#print(search_query(search_index=search_index, query_str="cholesterol"))
+#print(search_query(search_index=search_index, query_str="0033344"))
+#print(search_query(search_index=search_index, query_str="ROCK1,ROCK2,0033344,BOBX"))
+#print(search_query(search_index=search_index, query_str="SALE"))
+#print(search_query(search_index=search_index, query_str="SALE,NCO2"))
+#print(search_query(search_index=search_index, query_str="Kidney"))
+#print(search_query(search_index=search_index, query_str="Fibroblast Soft Tissue"))
+#print(search_query(search_index=search_index, query_str="Fibroblast"))
+#print(search_query(search_index=search_index, query_str="cloranolol"))
+#print(search_query(search_index=search_index, query_str="immunostimulant"))
+
+
+split_query_str <- function(query_str) {
+  c(str_split(query_str, "\\s*,\\s*", simplify = TRUE))
+}
+
+single_query_search <- function(search_index, query_str) {
   word_starts_with_query_str <- word_starts_with_regex(query_str)
   search_index %>%
     filter(str_detect(label, word_starts_with_query_str)) %>%
     mutate(rank=calc_rank(query_str, label, priority))
+}
+
+multi_query_search <- function(search_index, multi_items) {
+  rows <- sapply(multi_items, function(x) {search_single_query(search_index, x)}, simplify = FALSE)
+  rows <- bind_rows(rows)
 }
 
 # 
