@@ -40,8 +40,7 @@ make_validate <- function(object_names){
     return(NULL)
   }
   make_dataset <- function(object_name){
-    ddh::get_data_object("object_name")
-    #object <- eval(parse(text = object_name))
+    object <- ddh::get_data_object(object_name)
     single_dataset <-
       object %>%
       dplyr::distinct(name) %>%
