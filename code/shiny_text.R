@@ -91,13 +91,13 @@ geneTitle <- function (id) {
   )
 }
 
+
 geneTitleServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
       output$gene_summary_title <- renderText({
-
-        paste0(make_summary_gene(input = data(), var = "name"), ": ", make_summary_gene(input = data(), var = "approved_name"))
+        paste0(make_summary_gene(input = data(), var = "id"), ": ", make_summary_gene(input = data(), var = "approved_name"))
       })
     }
   )
