@@ -35,7 +35,7 @@ withSpinnerColor <- function(ui_element, plot_type, ...) { #plot type = "gene", 
 #' \dontrun{
 #' make_validate("ROCK1")
 #' }
-make_validate <- function(object_names){
+make_validate <- function(object_names = NULL){
   if(is.null(object_names)){ 
     return(NULL)
   }
@@ -43,14 +43,15 @@ make_validate <- function(object_names){
     object <- ddh::get_data_object(object_name)
     single_dataset <-
       object %>%
-      dplyr::distinct(name) %>%
-      dplyr::filter(!is.na(name))
+      dplyr::distinct(data_set) %>%
+      dplyr::filter(!is.na(data_set))
     return(single_dataset)
   }
   validate_datasets <-
     object_names %>%
-    purrr::map_dfr(make_dataset) %>%
-    dplyr::distinct(name) %>%
-    dplyr::pull(name)
+    purrr::map(make_dataset) %>%
+    purrr::list_rbind() %>% 
+    dplyr::distinct(data_set) %>%
+    dplyr::pull(data_set)
   return(validate_datasets)
 }
