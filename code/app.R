@@ -1,18 +1,16 @@
-#DDH PARAMS-----
-source(here::here("code", "app_params.R"), local = TRUE)
-
 #LOAD LIBRARIES-----
 source(here::here("code", "install_libraries.R"))
+
+#DDH PARAMS-----
+source(here::here("code", "app_params.R"), local = TRUE)
 
 #ESTABLISH PRIVATE-----
 source(here::here("code", "private.R"))
 
 #DOWNLOAD/LOAD DATA-----
-# ddh::download_ddh_data(app_data_dir = app_data_dir,
-#                        test = testMode,
-#                        overwrite = FALSE)
-
-ddh::load_ddh_data(app_data_dir = app_data_dir)
+# Need to set the cache before loading any data
+# content_cache <- cachem::cache_mem()
+source(here::here("code", "data.R"))
 
 #FUNCTIONS-----
 #common functions
@@ -34,7 +32,7 @@ head_tags <- tags$head(includeCSS("styles.css")) # includeHTML("gtag.html")
 
 ### universal elements
 main_title <- HTML('<a href="." style="color:black;">DATA-DRIVEN HYPOTHESIS</a>')
-window_title <- "Data-Driven Hypothesis | A Hirschey Lab Resource"
+window_title <- "Data-Driven Hypothesis | Accelerate Scientific Discovery"
 
 ddhNavbarPage <- function(..., formContent = NULL, id = NULL) {
   title_with_form <- tagList(
@@ -68,7 +66,7 @@ homePage <- function (id) {
     HTML('<center><br><br><img src="ddh_logo.png", width = "338" ></center>'),
     tags$div(
       tags$br(),
-      HTML("<center>Data-driven hypothesis is a resource developed by the <a href='http://www.hirscheylab.org' style='color:black;'>Hirschey Lab</a> for predicting functional relationships for thousands of genes across the human genome.</center>"), 
+      HTML("<center>Data-driven hypothesis is a resource for predicting functional relationships for thousands of genes across the human genome to accelerate scientific discovery.</center>"), 
       tags$br(),
       tags$br()),
     HTML("<center>"),
