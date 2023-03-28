@@ -3,6 +3,7 @@
 
 ##app----
 gene_surprise <- get_content("gene_surprise", dataset = TRUE)
+universal_pathways <- get_content("univeral_patwhays", dataset = TRUE) #makes search pathway table
 
 ##search----
 search_index <- get_content("search_index", dataset = TRUE)

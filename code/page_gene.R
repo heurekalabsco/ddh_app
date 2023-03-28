@@ -497,14 +497,17 @@ genePageServer <- function(id, subtype) {
         summary_table <- pathwayListServer("gene_pathways", data)
       } else if (subtype == "pathway"){
         data <- reactive({
-          pathway_go <- getQueryString()$query
-          pathway_row <- pathways %>%
-            filter(go %in% pathway_go)
+          pathway_id <- getQueryString()$query
+          #CHANGE THIS WITH NEW SEARCH INDEX FILE???
+          #universal_pathways <- get_content(object_name = "universal_pathways", dataset = TRUE)
+          pathway_row <- 
+            get_content(object_name = "universal_pathways", dataset = TRUE) %>% #universal_pathways
+            filter(gs_id %in% pathway_id)
           list(
             type=type,
             subtype=subtype,
             query=pathway_go,
-            content=pathway_row$data[[1]]$gene
+            content=pathway_row$data[[1]]$gene_symbol
             )
         })
         title_var <- pathwayTitleServer("title_var", data)
