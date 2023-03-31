@@ -3,10 +3,11 @@
 
 ##app----
 gene_surprise <- ddh:::get_content("gene_surprise", dataset = TRUE)
-universal_pathways <- ddh:::get_content("univeral_patwhays", dataset = TRUE) #makes search pathway table
+universal_pathways <- ddh:::get_content("universal_pathways", dataset = TRUE) #makes search pathway table
+universal_gene_summary <- ddh:::get_content("universal_gene_summary", dataset = TRUE)
+
 ##search----
 search_index <- ddh:::get_content("search_index", dataset = TRUE)
-universal_gene_summary <- ddh:::get_content("universal_gene_summary", dataset = TRUE)
 
 # these no longer exist?
 # pathway_genes <- ddh:::get_content("pathway_genes", dataset = TRUE)
