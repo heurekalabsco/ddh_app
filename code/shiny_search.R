@@ -285,4 +285,4 @@ debug_print_html <-function(html_result) {
   print(tags$div(html_result))
 }
 
-debug_print_html(search_query_html_result(search_index, "ROCKa1,ROaCK2,POTATO"))
+# debug_print_html(search_query_html_result(search_index, "ROCK1,ROCK2,POTATO"))
