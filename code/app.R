@@ -1,18 +1,16 @@
-#DDH PARAMS-----
-source(here::here("code", "app_params.R"), local = TRUE)
-
 #LOAD LIBRARIES-----
 source(here::here("code", "install_libraries.R"))
+
+#DDH PARAMS-----
+source(here::here("code", "app_params.R"), local = TRUE)
 
 #ESTABLISH PRIVATE-----
 source(here::here("code", "private.R"))
 
 #DOWNLOAD/LOAD DATA-----
-# ddh::download_ddh_data(app_data_dir = app_data_dir,
-#                        test = testMode,
-#                        overwrite = FALSE)
-
-ddh::load_ddh_data(app_data_dir = app_data_dir)
+# Need to set the cache before loading any data
+# content_cache <- cachem::cache_mem()
+source(here::here("code", "data.R"))
 
 #FUNCTIONS-----
 #common functions
@@ -27,13 +25,14 @@ source(here::here("code", "shiny_reports.R"), local = TRUE)
 source(here::here("code", "shiny_text.R"), local = TRUE)
 source(here::here("code", "shiny_cards.R"), local = TRUE)
 source(here::here("code", "shiny_download.R"), local = TRUE)
+source(here::here("code", "shiny_search.R"), local = TRUE)
 
 # HEAD----
 head_tags <- tags$head(includeCSS("styles.css")) # includeHTML("gtag.html") 
 
 ### universal elements
 main_title <- HTML('<a href="." style="color:black;">DATA-DRIVEN HYPOTHESIS</a>')
-window_title <- "Data-Driven Hypothesis | A Hirschey Lab Resource"
+window_title <- "Data-Driven Hypothesis | Accelerate Scientific Discovery"
 
 ddhNavbarPage <- function(..., formContent = NULL, id = NULL) {
   title_with_form <- tagList(
@@ -67,7 +66,7 @@ homePage <- function (id) {
     HTML('<center><br><br><img src="ddh_logo.png", width = "338" ></center>'),
     tags$div(
       tags$br(),
-      HTML("<center>Data-driven hypothesis is a resource developed by the <a href='http://www.hirscheylab.org' style='color:black;'>Hirschey Lab</a> for predicting functional relationships for thousands of genes across the human genome.</center>"), 
+      HTML("<center>Data-driven hypothesis is a resource for predicting functional relationships for thousands of genes across the human genome to accelerate scientific discovery.</center>"), 
       tags$br(),
       tags$br()),
     HTML("<center>"),
@@ -142,9 +141,9 @@ exampleSearchesPanel <- function(id) {
                           tagList(
                             tags$br(),
                             h3("Examples"),
-                            HTML(examples), 
-                            browsePathwaysLink(ns("pathways")),
-                            browsePathwaysPanel(ns("pathways")) 
+                            HTML(examples)#,
+                            #browsePathwaysLink(ns("pathways")),
+                            #browsePathwaysPanel(ns("pathways"))
                           )
   )
 }
@@ -197,10 +196,7 @@ searchPage <- function (id) {
   )
 }
 
-query_result_row <- function(row) {
-  func <- subtype_to_query_result_row[[row$subtype]]
-  func(row)
-}
+
 
 searchPageServer <- function(id) {
   moduleServer(
@@ -212,282 +208,24 @@ searchPageServer <- function(id) {
         paste0("Search results for '", query_string$query, "'")
       })
       output$genes_search_result <- renderUI({
-        query_string <- getQueryString()
-        query_results_table <- search_tables(universal_gene_summary, 
-                                             gene_pathways, 
-                                             cell_expression_names, 
-                                             compound_prism_names, 
-                                             compound_hmdb_names, 
-                                             query_string$query)
-        if (nrow(query_results_table) > 0) {
-          apply(query_results_table, 1, query_result_row)
-        }
-        else {
+        query_str <- getQueryString()$query
+        search_result <- search_query(search_index, query_str)
+        search_index_rows <- search_result$rows
+        if (nrow(search_index_rows) > 0) {
+          if (search_result$multi_query) {
+            apply(search_index_rows, 1, function (x) { multi_query_result_row(x, search_result$multi_items)})
+          } else {
+            apply(search_index_rows, 1, query_result_row)
+          }
+        } else {
           "No results found."
         }
-      })      
+      })
     }
   )
 }
 
-# SEARCH RESULT ROWS ----
 
-gene_query_result_row <- function(row) {
-  gene_summary_row <- row$data
-  title <- paste0(gene_summary_row["approved_symbol"], ": ", gene_summary_row["approved_name"])
-  list(
-    h4(
-      tags$strong("Gene:"),
-      tags$a(title, href=paste0("?show=gene&query=", gene_summary_row["approved_symbol"]))
-    ),
-    div(tags$strong("Aka:"), gene_summary_row["aka"]),
-    div(tags$strong("Entrez ID:"), gene_summary_row["ncbi_gene_id"]),
-    hr()
-  )
-}
-
-pathway_query_result_row <- function(row) {
-  pathways_row <- row$data
-  gene_symbols <- lapply(pathways_row$data, function(x) { paste(x$gene, collapse=', ') })
-  title <- paste0(pathways_row$pathway, " (GO:", pathways_row$go, ")")
-  list(
-    h4(
-      tags$strong("Pathway:"),
-      tags$a(title, href=paste0("?show=pathway&query=", pathways_row$go))
-    ),
-    tags$dl(
-      tags$dt("Genes"),
-      tags$dd(gene_symbols),
-    ),
-    hr()
-  )
-}
-
-gene_list_query_result_row <- function(row) {
-  gene_summary_rows <- row$data
-  title <- row$key
-  
-  known_gene_symbols <- gene_summary_rows %>% 
-    filter(known == TRUE) %>%
-    pull(approved_symbol) %>% 
-    unique(.)
-  has_known_gene_symbols <- !is_empty(known_gene_symbols)
-  
-  unknown_gene_symbols <- gene_summary_rows %>% 
-    filter(known == FALSE) %>%
-    pull(approved_symbol)
-  has_unknown_gene_symbols <- !is_empty(unknown_gene_symbols)
-  
-  known_gene_symbols_tags <- NULL
-  if (has_known_gene_symbols) {
-    gene_query_param <- paste0("query=", paste(known_gene_symbols, collapse=","))
-    href <- paste0("?show=gene_list&", gene_query_param)
-    known_gene_symbols_tags <- list(
-      tags$h6("Known Gene Symbols"),
-      tags$a(paste(known_gene_symbols, collapse=", "), href=href)
-    )
-  }
-  
-  unknown_gene_symbols_tags <- NULL
-  if (has_unknown_gene_symbols) {
-    unknown_gene_symbols_tags <- list(
-      tags$h6("Unknown Gene Symbols"),
-      tags$div(paste(unknown_gene_symbols, collapse=", "))
-    )
-  }
-  
-  list(
-    h4(
-      tags$strong("Custom Gene List"),
-      tags$span(title)
-    ),
-    known_gene_symbols_tags,
-    unknown_gene_symbols_tags,
-    hr()
-  )
-}
-
-cell_query_result_row <- function(row) {
-  expression_names_row <- row$data
-  title <- paste0(expression_names_row["cell_line"])
-  list(
-    h4(
-      tags$strong("Cell:"),
-      tags$a(title, href=paste0("?show=cell&query=", expression_names_row["cell_line"]))
-    ),
-    div(tags$strong("Lineage:"), expression_names_row["lineage"]),
-    div(tags$strong("Sublineage:"), expression_names_row["lineage_subtype"]),
-    hr()
-  )
-}
-
-lineage_query_result_row <- function(row) {
-  expression_names_row <- row$data$data[[1]]
-  cell_lines <- paste0(expression_names_row$cell_line, collapse=", ")
-  list(
-    h4(
-      tags$strong("Lineage:"),
-      tags$a(row$title, href=paste0("?show=lineage&query=", row$key))
-    ),
-    div(tags$strong("Cells:"), cell_lines),
-    hr()
-  )
-}
-
-lineage_subtype_query_result_row <- function(row) {
-  expression_names_row <- row$data$data[[1]]
-  cell_lines <- paste0(expression_names_row$cell_line, collapse=", ")
-  list(
-    h4(
-      tags$strong("Sublineage:"),
-      tags$a(row$title, href=paste0("?show=lineage_subtype&query=", row$key))
-    ),
-    div(tags$strong("Cells:"), cell_lines),
-    hr()
-  )
-}
-
-cell_list_query_result_row <- function(row) {
-  expression_names_rows <- row$data
-  title <- row$key
-  
-  known_expression_names <- expression_names_rows %>%
-    filter(known == TRUE) %>%
-    pull(cell_line)
-  has_known_expression_names <- !is_empty(known_expression_names)
-  
-  unknown_expression_names <- expression_names_rows %>%
-    filter(known == FALSE) %>%
-    pull(cell_line)
-  has_unknown_expression_names <- !is_empty(unknown_expression_names)
-  
-  known_cell_line_tags <- NULL
-  if (has_known_expression_names) {
-    cell_list_param <- paste0("query=", paste(known_expression_names, collapse=","))
-    href <- paste0("?show=cell_list&", cell_list_param)
-    known_cell_line_tags <- list(
-      tags$h6("Known Cell Lines"),
-      tags$a(paste(known_expression_names, collapse=", "), href=href)
-    )
-  }
-  
-  unknown_cell_line_tags <- NULL
-  if (has_unknown_expression_names) {
-    unknown_cell_line_tags <- list(
-      tags$h6("Unknown Cell Lines"),
-      tags$div(paste(unknown_expression_names, collapse=", "))
-    )
-  }
-  
-  list(
-    h4(
-      tags$strong("Custom Cell Line List"),
-      tags$span(title)
-    ),
-    known_cell_line_tags,
-    unknown_cell_line_tags,
-    hr()
-  )
-}
-
-compound_query_result_row <- function(row) {
-  prism_name_row <- row$data
-  list(
-    h4(
-      tags$strong("Compound:"),
-      tags$a(prism_name_row$name, href=paste0("?show=compound&query=", prism_name_row$name))
-    ),
-    div(tags$strong("Mechanism of Action:"), prism_name_row$moa),
-    div(tags$strong("CID:"), prism_name_row$cid),
-    hr()
-  )
-}
-
-moa_query_result_row <- function(row) {
-  prism_name_row <- row$data$data[[1]]
-  compounds <- paste0(prism_name_row$name, collapse=", ")
-  list(
-    h4(
-      tags$strong("Compound Mechanism of Action:"),
-      tags$a(row$title, href=paste0("?show=moa&query=", row$key))
-    ),
-    div(tags$strong("Compounds:"), compounds),
-    hr()
-  )
-}
-
-metabolite_query_result_row <- function(row) {
-  hmdb_name_row <- row$data
-  compounds <- paste0(hmdb_name_row$name, collapse=", ")
-  list(
-    h4(
-      tags$strong("Metabolite:"),
-      tags$a(hmdb_name_row$name, href=paste0("?show=metabolite&query=", row$name))
-    ),
-    div(tags$strong("Class:"), hmdb_name_row$class),
-    div(tags$strong("CID:"), hmdb_name_row$cid),
-    hr()
-  )
-}
-
-compound_list_query_result_row <- function(row) {
-  prism_names_rows <- row$data
-  title <- row$key
-  
-  known_compound_names <- prism_names_rows %>%
-    filter(known == TRUE) %>%
-    pull(name)
-  has_known_compound_names <- !is_empty(known_compound_names)
-  
-  unknown_compound_names <- prism_names_rows %>%
-    filter(known == FALSE) %>%
-    pull(name)
-  has_unknown_compound_names <- !is_empty(unknown_compound_names)
-  
-  known_compound_tags <- NULL
-  if (has_known_compound_names) {
-    compound_list_param <- paste0("query=", paste(known_compound_names, collapse=","))
-    href <- paste0("?show=compound_list&", compound_list_param)
-    known_compound_tags <- list(
-      tags$h6("Known Compounds"),
-      tags$a(paste(known_compound_names, collapse=", "), href=href)
-    )
-  }
-  
-  unknown_compound_tags <- NULL
-  if (has_unknown_compound_names) {
-    unknown_compound_tags <- list(
-      tags$h6("Unknown Compounds"),
-      tags$div(paste(unknown_compound_names, collapse=", "))
-    )
-  }
-  
-  list(
-    h4(
-      tags$strong("Custom Compound List"),
-      tags$span(title)
-    ),
-    known_compound_tags,
-    unknown_compound_tags,
-    hr()
-  )
-}
-
-# specifies how to render the results for a specific subtype
-# functions that generate rows in fun_tables.R eg. gene_list_query_results_table()
-subtype_to_query_result_row = list(
-  gene=gene_query_result_row,
-  pathway=pathway_query_result_row,
-  gene_list=gene_list_query_result_row,
-  cell=cell_query_result_row,
-  lineage=lineage_query_result_row,
-  lineage_subtype=lineage_subtype_query_result_row,
-  cell_list=cell_list_query_result_row,
-  compound=compound_query_result_row,
-  moa=moa_query_result_row,
-  metabolite=metabolite_query_result_row,
-  compound_list=compound_list_query_result_row
-)
 
 # PAGE MODULES-----
 source(here::here("code", "page_gene.R"), local = TRUE) ### GENE PAGE ----

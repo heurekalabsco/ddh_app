@@ -91,11 +91,14 @@ geneTitle <- function (id) {
   )
 }
 
+
 geneTitleServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$gene_summary_title <- renderText({paste0(make_summary_gene(input = data(), var = "approved_symbol"), ": ", make_summary_gene(input = data(), var = "approved_name"))})
+      output$gene_summary_title <- renderText({
+        paste0(make_summary_gene(input = data(), var = "id"), ": ", make_summary_gene(input = data(), var = "approved_name"))
+      })
     }
   )
 }
@@ -133,8 +136,8 @@ geneTextServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$gene_summary_title <- renderText({paste0(make_summary_gene(input = data(), var = "approved_symbol"), ": ", make_summary_gene(input = data(), var = "approved_name"))})
-      output$gene_summary_approved_symbol <- renderText(make_summary_gene(input = data(), var = "approved_symbol"))
+      output$gene_summary_title <- renderText({paste0(make_summary_gene(input = data(), var = "name"), ": ", make_summary_gene(input = data(), var = "approved_name"))})
+      output$gene_summary_approved_symbol <- renderText(make_summary_gene(input = data(), var = "name"))
       output$gene_summary_approved_name <- renderText(make_summary_gene(input = data(), var = "approved_name"))
       output$gene_summary_aka <- renderText(make_summary_gene(input = data(), var = "aka"))
       output$gene_length <- renderText(paste0(make_summary_gene(data_gene_summary = gene_location, input = data(), var = "cds_length"), " bp"))

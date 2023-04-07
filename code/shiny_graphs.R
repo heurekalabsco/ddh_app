@@ -14,20 +14,20 @@ geneNetworkGraphServer <- function(id, data) {
       #establish reactive value
       rv <- reactiveValues(degree = 2, 
                            threshold = 10,
-                           corrType = "Positive" )
+                           corr_type = "positive" )
       
       #update value upon call
       observeEvent(input$update, {
         rv$degree <- input$deg
         rv$threshold <- input$threshold
-        rv$corrType <- input$corrType
+        rv$corr_type <- input$corr_type
       })
       
       networkGraph <- reactive({
         make_graph(input = data(), 
                    threshold = rv$threshold, 
                    deg = rv$degree, 
-                   corrType = rv$corrType, 
+                   corr_type = rv$corr_type, 
                    cell_line_var = "dependency",
                    displayHeight = '80vh', 
                    displayWidth = '100%', 
@@ -45,7 +45,7 @@ geneNetworkGraphServer <- function(id, data) {
                                                   ifelse(data()$type == "gene",
                                                          "gene", "cell line")),
                                    value =10, min = 10, max = 20),
-                       selectInput(inputId = session$ns("corrType"),
+                       selectInput(inputId = session$ns("corr_type"),
                                    label = "Associations",
                                    choices = c("Positive", "Negative", "Positive and Negative"),
                                    selected = "Positive"),
@@ -96,7 +96,7 @@ geneNetworkGraphExpServer <- function(id, data) {
       #establish reactive value
       rv <- reactiveValues(degree = 2, 
                            threshold = 10,
-                           corrType = "Positive" )
+                           corrType = "Positive" ) #will need to change all corrType to corr_type
       
       #update value upon call
       observeEvent(input$update, {

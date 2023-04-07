@@ -86,7 +86,7 @@ ideogramPlotDashServer <- function (id, data) {
       output$ideogram_card <- renderUI({
         #check to see if data are there
         shiny::validate(
-          need(data()$content %in% gene_location$approved_symbol, 
+          need("gene_location" %in% data()$validate, 
                "No data found for this gene."))
         #check to see if image exists
         img_path <- ddh::load_image(input = data(), fun_name = "make_ideogram", card = TRUE)
@@ -245,7 +245,7 @@ cellAnatogramPlotDashServer <- function (id, data) {
       output$cell_anatogram_gene_card <- renderUI({
         #check to see if data are there
         shiny::validate(
-          need(data()$content %in% gene_subcell$gene_name, 
+          need("gene_subcell" %in% data()$validate, 
                "No subcellular location data for this gene.")
         )
         #check to see if image exists
@@ -288,7 +288,7 @@ tissueAnatogramPlotDashServer <- function (id, data) {
       output$tissue_anatogram_gene_card <- renderUI({
         #check to see if data are there
         shiny::validate(
-          need(data()$content %in% gene_tissue$gene_name, "No data found for this gene.")
+          need("gene_tissue" %in% data()$validate, "No data found for this gene.")
         )
         #check to see if image exists
         img_path <- ddh::load_image(input = data(), fun_name = "make_female_anatogram", card = TRUE)
@@ -330,8 +330,9 @@ cellDependenciesPlotDashServer <- function (id, data) {
     function(input, output, session) {
       output$gene_dependencies_card <- renderUI({
         #check to see if data are there
-        shiny::validate(need(data()$content %in% universal_achilles_long$gene |
-                               data()$content %in% cell_expression_meta$cell_line, 
+        # TODO Should this be "&" instead of "|" ?
+        shiny::validate(need("universal_achilles_long" %in% data()$validate |
+                               "cell_expression_meta" %in% data()$validate, 
                              "No data found for this query."))
         #check to see if image exists
         img_path <- ddh::load_image(input = data(), fun_name = "make_celldeps", card = TRUE)
