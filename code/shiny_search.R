@@ -14,18 +14,24 @@ gene_query_result_row <- function(row) {
 }
 
 pathway_query_result_row <- function(row) {
-  pathways_row <- gene_pathways %>%
-    filter(go==row["content_id"])
-  gene_symbols <- lapply(pathways_row$data, function(x) { paste(x$gene, collapse=', ') })
-  title <- paste0(pathways_row$pathway, " (GO:", pathways_row$go, ")")
+  pathway_id <- row["content_id"]
+  pathway_rows <- universal_pathways %>%
+    filter(gs_id==pathway_id)
+  pathway_genes <- paste0(pathway_rows$gene_symbol, collapse=", ")
+  gs_name <- str_replace_all(pathway_rows$gs_name[[1]], "_", " ")
+  gs_description <- pathway_rows$gs_description[[1]]
+
+  title <- paste0(gs_name, " (GSID:", pathway_id, ")")
   list(
     h4(
       tags$strong("Pathway:"),
-      tags$a(title, href=paste0("?show=pathway&query=", pathways_row$go))
+      tags$a(title, href=paste0("?show=pathway&query=", pathway_id))
     ),
     tags$dl(
+      tags$dt("Description"),
+      tags$dd(gs_description),
       tags$dt("Genes"),
-      tags$dd(gene_symbols),
+      tags$dd(pathway_genes),
     ),
     hr()
   )

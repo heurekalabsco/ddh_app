@@ -35,7 +35,7 @@ multi_query_search <- function(search_index, multi_items) {
     nest()
 }
 
-search_query <- function(search_index, query_str) {
+search_query <- function(search_index, query_str, limit=100) {
   if (is_multi_query_search(query_str)) {
     multi_items <- split_query_str(query_str)
     rows <- multi_query_search(search_index, multi_items)
@@ -45,7 +45,7 @@ search_query <- function(search_index, query_str) {
       multi_items=multi_items
     )
   } else {
-    rows <- single_query_search(search_index, query_str) %>% arrange(desc(rank))
+    rows <- single_query_search(search_index, query_str) %>% arrange(desc(rank)) %>% head(limit)
     list(
       rows=rows,
       multi_query=FALSE,
