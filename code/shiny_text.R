@@ -113,7 +113,7 @@ pathwayTitleServer <- function(id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$pathway_title <- renderText({paste0("Pathway: ", make_summary_pathway(input = data(), var = "pathway"), " (GO:", make_summary_pathway(input = data(), var = "go"), ")")})
+      output$pathway_title <- renderText({paste0("Pathway: ", make_summary_pathway(input = data(), var = "gs_name"), " (Source:", make_summary_pathway(input = data(), var = "gs_exact_source"), ")")})
     }
   )
 }

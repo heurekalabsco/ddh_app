@@ -498,16 +498,13 @@ genePageServer <- function(id, subtype) {
       } else if (subtype == "pathway"){
         data <- reactive({
           pathway_id <- getQueryString()$query
-          #CHANGE THIS WITH NEW SEARCH INDEX FILE???
-          #universal_pathways <- get_content(object_name = "universal_pathways", dataset = TRUE)
-          pathway_row <- 
-            get_content(object_name = "universal_pathways", dataset = TRUE) %>% #universal_pathways
-            filter(gs_id %in% pathway_id)
+          pathway_genes <- ddh::get_gene_symbols_for_pathway(pathway_id)
           list(
             type=type,
             subtype=subtype,
-            query=pathway_go,
-            content=pathway_row$data[[1]]$gene_symbol
+            subtype_id=pathway_id,
+            query=pathway_id,
+            content=pathway_genes
             )
         })
         title_var <- pathwayTitleServer("title_var", data)
