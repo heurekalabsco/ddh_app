@@ -498,9 +498,7 @@ genePageServer <- function(id, subtype) {
       } else if (subtype == "pathway"){
         data <- reactive({
           pathway_id <- getQueryString()$query
-          pathway_genes <- ddh::get_data_object(pathway_id, dataset_name = "universal_pathways") %>%
-            filter(key=="gene_symbol") %>%
-            pull("value")
+          pathway_genes <- ddh::get_gene_symbols_for_pathway(pathway_id)
           list(
             type=type,
             subtype=subtype,
