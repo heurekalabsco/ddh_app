@@ -1,6 +1,6 @@
 #DDH PARAMS-----
 # Boolean to set whether private (ddh.com) or public (ddh.org)
-privateMode <- FALSE
+privateMode <- TRUE
 
 # Boolean to set whether test data or all data
 testMode <- FALSE

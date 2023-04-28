@@ -143,7 +143,7 @@ geneTextServer <- function (id, data) {
       output$gene_length <- renderText(paste0(make_summary_gene(data_gene_summary = gene_location, input = data(), var = "cds_length"), " bp"))
       output$gene_summary_entrez_summary <- renderText({
         shiny::validate(
-          need(!is.na(make_summary_gene(input = data(), var = "entrez_summary")), "No data found for this gene."))
+          shiny::need(c("universal_gene_summary") %in% data()$validate, "No summary data for this gene"))
         make_summary_gene(input = data(), var = "entrez_summary") %>% 
           lit_linkr(summary_table = universal_gene_summary)})
       output$ncbi_link <- renderText(paste0('<a href="https://www.ncbi.nlm.nih.gov/gene/?term=', 
@@ -204,7 +204,7 @@ proteinTextServer <- function (id, data) {
         })
       output$protein_summary_uniprot_summary <- renderText({
         shiny::validate(
-          need(!is.na(make_summary_protein(input = data(), var = "function_cc")), "No data found for this protein"))
+          shiny::need(c("universal_proteins") %in% data()$validate, "No summary data for this protein"))
         make_summary_protein(input = data(), var = "function_cc") %>% 
           lit_linkr(summary_table = universal_gene_summary)})
       output$uniprot_link <- renderText(paste0('<a href="https://www.uniprot.org/uniprot/', make_summary_protein(input = data(), var = "uniprot_id"), '" target="_blank">', make_summary_protein(input = data(), var = "uniprot_id"),'</a>'))
