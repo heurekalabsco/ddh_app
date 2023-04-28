@@ -60,9 +60,7 @@ barcodeDashServer <- function (id, data) {
                      alt = glue::glue('Artistic image of a gene in the style of a barcode')), 
             href = make_barcode(input = data(), card = FALSE),
             target="_blank")
-          #build a dynamic ahref here to point to the specific NFT
-          #would also be cool to dynamically add "owned by 0x...", or "available to own" if not
-          #probably will need OS API? 
+          #build a dynamic ahref here to point to???
         )
       })
     })
@@ -86,8 +84,7 @@ ideogramPlotDashServer <- function (id, data) {
       output$ideogram_card <- renderUI({
         #check to see if data are there
         shiny::validate(
-          need("gene_location" %in% data()$validate, 
-               "No data found for this gene."))
+          shiny::need(c("gene_location") %in% data()$validate, "No location data for this gene"))
         #check to see if image exists
         img_path <- ddh::load_image(input = data(), fun_name = "make_ideogram", card = TRUE)
         if(!is.null(img_path)) {
@@ -150,7 +147,7 @@ pubmedPlotDashServer <- function (id, data) {
       output$pubmed_gene_card <- renderUI({
         #check to see if data are there
         shiny::validate(
-          need(data()$content %in% universal_pubmed$name, "No literature found"))
+          shiny::need(c("universal_pubmed") %in% data()$validate, "No literature data for this gene"))
         #check to see if image exists
         img_path <- ddh::load_image(input = data(), fun_name = "make_pubmed", card = TRUE)
         if(!is.null(img_path)) {
@@ -189,22 +186,8 @@ cellExpressionPlotDashServer <- function (id, data) {
     function(input, output, session) {
       output$expression_gene_card <- renderUI({
         #check to see if data are there
-        if(data()$type == "gene") {
-          shiny::validate(
-            need(universal_expression_long %>% 
-                   drop_na(protein_expression) %>% 
-                   filter(gene %in% data()$content) %>% 
-                   nrow() > 0, "No expression data found for this gene.")
-          )
-        } else if(data()$type == "cell") {
-          shiny::validate(
-            need(universal_expression_long %>% 
-                   drop_na(protein_expression) %>% 
-                   left_join(cell_expression_names, by = "X1") %>% 
-                   filter(cell_line %in% data()$content) %>% 
-                   nrow() > 0, "No expression data found for this cell line.")
-          )
-        }
+        shiny::validate(
+          shiny::need(c("universal_expression_long") %in% data()$validate, "No expression data available"))
         #check to see if image exists
         img_path <- ddh::load_image(input = data(), fun_name = "make_cellexpression", card = TRUE)
         if(!is.null(img_path)) {
@@ -245,9 +228,7 @@ cellAnatogramPlotDashServer <- function (id, data) {
       output$cell_anatogram_gene_card <- renderUI({
         #check to see if data are there
         shiny::validate(
-          need("gene_subcell" %in% data()$validate, 
-               "No subcellular location data for this gene.")
-        )
+          shiny::need(c("gene_subcell") %in% data()$validate, "No subcellular location data for this gene"))
         #check to see if image exists
         img_path <- ddh::load_image(input = data(), fun_name = "make_cellanatogram", card = TRUE)
         if(!is.null(img_path)) {
@@ -288,8 +269,7 @@ tissueAnatogramPlotDashServer <- function (id, data) {
       output$tissue_anatogram_gene_card <- renderUI({
         #check to see if data are there
         shiny::validate(
-          need("gene_tissue" %in% data()$validate, "No data found for this gene.")
-        )
+          shiny::need(c("gene_tissue") %in% data()$validate, "No tissue data for this gene"))
         #check to see if image exists
         img_path <- ddh::load_image(input = data(), fun_name = "make_female_anatogram", card = TRUE)
         if(!is.null(img_path)) {
@@ -330,10 +310,8 @@ cellDependenciesPlotDashServer <- function (id, data) {
     function(input, output, session) {
       output$gene_dependencies_card <- renderUI({
         #check to see if data are there
-        # TODO Should this be "&" instead of "|" ?
-        shiny::validate(need("universal_achilles_long" %in% data()$validate |
-                               "cell_expression_meta" %in% data()$validate, 
-                             "No data found for this query."))
+        shiny::validate(
+          shiny::need(c("universal_achilles_long", "cell_expression_meta") %in% data()$validate, "No dependency data for this gene"))
         #check to see if image exists
         img_path <- ddh::load_image(input = data(), fun_name = "make_celldeps", card = TRUE)
         if(!is.null(img_path)) {
@@ -373,7 +351,7 @@ cellDependenciesTableDashServer <- function (id, data) {
     function(input, output, session) {
       output$deptabledash <- render_gt({
         shiny::validate(
-          need(nrow(make_top_table(input = data())) != 0, "No data found for this gene."))
+          shiny::need(c("universal_achilles_long") %in% data()$validate, "No dependency data for this gene"))
         gt::gt(make_top_table(input = data()) %>% 
                  dplyr::mutate("Rank" = row_number()) %>% 
                  dplyr::select("Rank", "Gene" = "gene", "R^2" = "r2") %>% 
@@ -399,43 +377,14 @@ cellDependenciesGraphDashServer <- function (id, data) {
     id,
     function(input, output, session) {
       output$depgraphdash <- renderVisNetwork({
-        if(nrow(make_top_table(input = data())) == 0 &
-           !(data()$content %in% unique(cell_dependency_sim$cell1_name))) {
-          make_empty_graph()
-        } else {
-          make_graph(input = data(), 
-                     threshold = 10, deg = 2, corrType = "Positive", 
-                     card = TRUE)
-        }
-      })
-    })
-}
-
-##cell coexpression graph-----
-cellExpressionGraphDash <- function(id) {
-  ns <- NS(id)
-  divFlexAlignCenter(
-    "Co-Expression Graph",
-    visNetworkOutput(outputId = ns("expgraphdash"))
-  )
-}
-
-cellExpressionGraphDashServer <- function (id, data) {
-  moduleServer(
-    id,
-    function(input, output, session) {
-      output$expgraphdash <- renderVisNetwork({
-        if(nrow(make_top_table(input = data())) == 0 &
-           !(data()$content %in% unique(cell_expression_sim$cell1_name))) {
-          make_empty_graph()
-        } else {
-          make_graph(input = data(), 
-                     threshold = 10, 
-                     deg = 2, 
-                     corrType = "Positive", 
-                     cell_line_var = "expression",
-                     card = TRUE)
-        }
+        #check to see if data are there
+        shiny::validate(
+          shiny::need(c("universal_achilles_long") %in% data()$validate, "No dependency data for this gene"))
+        make_graph(input = data(), 
+                   threshold = 10, 
+                   deg = 2, 
+                   corr_type = "positive", 
+                   card = TRUE)
       })
     })
 }
@@ -477,7 +426,7 @@ geneDrugsCorTableDashServer <- function (id, data) {
     function(input, output, session) {
       output$genedrugscortabledash <- render_gt({
         shiny::validate(
-          need(data()$content %in% gene_drugs_cor_table$fav_gene, "No gene data found for this gene."))
+          shiny::need(c("gene_drugs_cor_table") %in% data()$validate, "No dependency data for this drug"))
         gt::gt(make_gene_drugs_cor_table(input = data()) %>%
                  dplyr::mutate("Rank" = row_number()) %>%
                  dplyr::select(Rank, Drug = drug) %>%
@@ -503,11 +452,7 @@ cellDrugsTableDashServer <- function (id, data) {
     function(input, output, session) {
       output$celldrugstabledash <- render_gt({
         shiny::validate(
-          need(universal_prism_long %>% 
-                 dplyr::rename(X1 = 1) %>% 
-                 left_join(cell_expression_meta, by = "X1") %>% 
-                 pull(cell_line) %in% data()$content,
-               "No drug data found for this cell line."))
+          shiny::need(c("universal_prism_long") %in% data()$validate, "No drug data for this cell line"))
         gt::gt(make_cell_drugs_table(input = data()) %>% 
                  dplyr::mutate("Rank" = row_number()) %>%
                  dplyr::select(Rank, Drug = name) %>%
@@ -533,12 +478,7 @@ cellMetabolitesTableDashServer <- function (id, data) {
     function(input, output, session) {
       output$cellmetabolitestabledash <- render_gt({
         shiny::validate(
-          need(cell_metabolites %>% 
-                 left_join(cell_expression_names, by = c("DepMap_ID" = "X1")) %>% 
-                 filter(cell_line %in% data()$content) %>% 
-                 nrow() > 0, 
-               "No metabolites found that associate with this cell line.")
-        )
+          shiny::need(c("cell_metabolites") %in% data()$validate, "No metabolite data for this cell line"))
         gt::gt(make_metabolite_table(input = data()) %>% 
                  dplyr::mutate("Rank" = row_number()) %>%
                  dplyr::select(Rank, Metabolite = metabolite) %>%
@@ -580,6 +520,32 @@ cellImageDashServer <- function (id, data) {
 
 ##dependencies----
 #dependencies are in gene dependency plots
+##cell coexpression graph-----
+cellExpressionGraphDash <- function(id) {
+  ns <- NS(id)
+  divFlexAlignCenter(
+    "Co-Expression Graph",
+    visNetworkOutput(outputId = ns("expgraphdash"))
+  )
+}
+
+cellExpressionGraphDashServer <- function (id, data) {
+  moduleServer(
+    id,
+    function(input, output, session) {
+      output$expgraphdash <- renderVisNetwork({
+        #check to see if data are there
+        shiny::validate(
+          shiny::need(c("cell_expression_sim") %in% data()$validate, "No dependency data for this cell line"))
+        make_graph(input = data(), 
+                   threshold = 10, 
+                   deg = 2, 
+                   corr_type = "positive", 
+                   cell_line_var = "expression",
+                   card = TRUE)
+      })
+    })
+}
 
 # COMPOUND -----
 #structure plot-----
@@ -662,8 +628,7 @@ compoundDependenciesPlotDashServer <- function (id, data) {
       output$compound_dependencies_card <- renderUI({
         #check to see if data are there
         shiny::validate(
-          need(data()$content %in% universal_prism_long$name,
-               "No data found for this compound."))
+          shiny::need(c("universal_prism_long") %in% data()$validate, "No viability data for this compound"))
         #check to see if image exists
         img_path <- ddh::load_image(input = data(), fun_name = "make_celldeps", card = TRUE)
         if(!is.null(img_path)) {
@@ -699,7 +664,7 @@ compoundDependenciesTableDashServer <- function (id, data) {
     function(input, output, session) {
       output$depcompoundtabledash <- render_gt({
         shiny::validate(
-          need(nrow(make_compound_table(input = data())) != 0, "No data found for this drug"))
+          shiny::need(c("universal_prism_long") %in% data()$validate, "No viability data for this compound"))
         gt::gt(make_compound_table(input = data()) %>% 
                  dplyr::mutate("Rank" = row_number()) %>% 
                  dplyr::select("Rank", "Drug" = "name", "R^2" = "r2") %>% 
@@ -727,8 +692,11 @@ compoundDependenciesGraphDashServer <- function (id, data) {
     function(input, output, session) {
       output$compoundgraphdash <- renderVisNetwork({
         shiny::validate(
-          need(nrow(make_compound_table(input = data())) != 0, "No data found."))
-        make_graph(input = data(), threshold = 10, deg = 2, corrType = "Positive")
+          shiny::need(c("universal_prism_long") %in% data()$validate, "No viablity data for this compound"))
+        make_graph(input = data(), 
+                   threshold = 10, 
+                   deg = 2, 
+                   corr_type = "positive")
       })
     })
 }
@@ -749,7 +717,7 @@ pubmedCompoundPlotDashServer <- function (id, data) {
       output$pubmed_compound_card <- renderUI({
         #check to see if data are there
         shiny::validate(
-          need(data()$content %in% universal_pubmed$name, "No literature found"))
+          shiny::need(c("universal_pubmed") %in% data()$validate, "No literature data for this compound"))
         #check to see if image exists
         img_path <- ddh::load_image(input = data(), fun_name = "make_pubmed", card = TRUE)
         if(!is.null(img_path)) {
@@ -784,8 +752,7 @@ drugGenesCorTableDashServer <- function (id, data) {
     function(input, output, session) {
       output$druggenescortabledash <- render_gt({
         shiny::validate(
-          need(data()$content %in% compound_genes_cor_table$fav_drug, 
-               "No gene data found for this compound."))
+          shiny::need(c("compound_genes_cor_table") %in% data()$validate, "No gene correlates for this compound"))
         gt::gt(make_drug_genes_cor_table(data()$content) %>% 
                  dplyr::mutate("Rank" = row_number()) %>% 
                  dplyr::select(Rank, Gene = gene, 'R^2'=r2) %>% 
@@ -804,7 +771,7 @@ drugGenesCorTableDashServer <- function (id, data) {
 geneGoTableTab <- function(id) {
   ns <- NS(id)
   divFlexAlignCenter(
-    "Go Table",
+    "Pathway Table",
     gt_output(outputId = ns("genegotabletab"))
   )
 }
@@ -814,13 +781,11 @@ geneGoTableTabServer <- function (id, data) {
     function(input, output, session) {
       output$genegotabletab <- render_gt({
         shiny::validate(
-          need(data()$content %in% unique(unlist(gene_pathways$data, use.names = FALSE)), 
-               "GO Term pathways")
-        )
+          shiny::need(c("universal_gene_pathways") %in% data()$validate, "No pathway data for this gene"))
         gt::gt(make_pathway_list(input = data()) %>% 
-                 #dplyr::mutate(go = map_chr(go, internal_link))  %>% #from fun_helper.R
-                 dplyr::select(Pathway = pathway, GO = go) %>%
-                 dplyr::slice(1))
+                 dplyr::mutate(gs_name = purrr::map_chr(gs_name, clean_pathway_names)) %>% #from shiny_helper.R
+                 dplyr::select(Pathway = gs_name, ID = gs_id) %>% 
+                 dplyr::slice(1:3))
       },
       height = card_contents_height,
       width = card_contents_width
@@ -845,9 +810,7 @@ sizePlotTabServer <- function (id, data) {
       output$size_plot_tab <- renderUI({
         #check to see if data are there
         shiny::validate(
-          need(data()$content %in% universal_proteins$gene_name, 
-               "No size found for this protein")
-        )
+          shiny::need(c("universal_proteins") %in% data()$validate, "No size data for this protein"))
         #check to see if image exists
         img_path <- ddh::load_image(input = data(), fun_name = "make_proteinsize", card = TRUE)
         if(!is.null(img_path)) {
@@ -886,9 +849,7 @@ sequencePlotTabServer <- function (id, data) {
       output$sequence_plot_tab <- renderUI({
         #check to see if data are there
         shiny::validate(
-          need(data()$content %in% universal_proteins$gene_name, 
-               "No sequence found for this protein")
-        )
+          shiny::need(c("universal_proteins") %in% data()$validate, "No sequence data for this protein"))
         #check to see if image exists
         img_path <- ddh::load_image(input = data(), fun_name = "make_sequence", card = TRUE)
         if(!is.null(img_path)) {
@@ -927,9 +888,7 @@ signaturePlotTabServer <- function (id, data) {
       output$signature_plot_tab <- renderUI({
         #check to see if data are there
         shiny::validate(
-          need(data()$content %in% gene_signatures$gene_name, 
-               "No sequence found for this protein")
-        )
+          shiny::need(c("gene_signatures") %in% data()$validate, "No signature data for this protein"))
         #check to see if image exists
         img_path <- ddh::load_image(input = data(), fun_name = "make_radial", card = TRUE)
         if(!is.null(img_path)) {
@@ -992,15 +951,13 @@ cellGeneExpressionTableTabServer <- function (id, data) {
       output$geneexptabletab <- render_gt({
         if(data()$type == "gene") {
           shiny::validate(
-            need(nrow(make_expression_table(input = data(), var = "gene")) > 0, 
-                 "No expression data found for this gene."))
+            shiny::need(c("universal_expression_long") %in% data()$validate, "No expression data available"))
           gt::gt(make_expression_table(input = data(), var = "gene") %>% 
                    dplyr::slice(1:5) %>% 
                    dplyr::select(-Lineage, -Subtype))
         } else if (data()$type == "cell") {
           shiny::validate(
-            need(nrow(make_expression_table(input = data(), var = "gene")) > 0, 
-                 "No expression data found for this cell line."))
+            shiny::need(c("universal_expression_long") %in% data()$validate, "No expression data available"))
           gt::gt(make_expression_table(input = data(), var = "gene") %>% 
                    dplyr::slice(1:5) %>% 
                    dplyr::select(-`Gene Name`))
@@ -1027,22 +984,8 @@ cellProteinExpressionPlotTabServer <- function (id, data) {
     function(input, output, session) {
       output$expression_protein_tab <- renderUI({
         #check to see if data are there
-        if(data()$type == "gene") {
-          shiny::validate(
-            need(universal_expression_long %>% 
-                   drop_na(protein_expression) %>% 
-                   filter(gene %in% data()$content) %>% 
-                   nrow() > 0, "No protein data found for this gene.")
-          )
-        } else if(data()$type == "cell") {
-          shiny::validate(
-            need(universal_expression_long %>% 
-                   drop_na(protein_expression) %>% 
-                   left_join(cell_expression_names, by = "X1") %>% 
-                   filter(cell_line %in% data()$content) %>% 
-                   nrow() > 0, "No protein data found for this cell line.")
-          )
-        }
+        shiny::validate(
+          shiny::need(c("universal_expression_long") %in% data()$validate, "No expression data available"))
         #check to see if image exists
         img_path <- NULL #override to NULL
         if(!is.null(img_path)) {
@@ -1083,23 +1026,14 @@ cellProteinExpressionTableTabServer <- function (id, data) {
       output$proteinexptabletab <- render_gt({
         if(data()$type == "gene") {
           shiny::validate(
-            need(universal_expression_long %>% 
-                   drop_na(protein_expression) %>% 
-                   filter(gene %in% data()$content) %>% 
-                   nrow() > 0, "No protein data found for this gene.")
-          )
+            shiny::need(c("universal_expression_long") %in% data()$validate, "No expression data available"))
           gt::gt(make_expression_table(input = data(), var = "protein") %>% 
                    dplyr::slice(1:5) %>% 
                    dplyr::select(-Lineage, -Subtype))
           
         } else if(data()$type == "cell") {
           shiny::validate(
-            need(universal_expression_long %>% 
-                   drop_na(protein_expression) %>% 
-                   left_join(cell_expression_names, by = "X1") %>% 
-                   filter(cell_line %in% data()$content) %>% 
-                   nrow() > 0, "No protein data found for this cell line.")
-          )
+            shiny::need(c("universal_expression_long") %in% data()$validate, "No expression data available"))
           gt::gt(make_expression_table(input = data(), var = "protein") %>% 
                    dplyr::slice(1:5) %>% 
                    dplyr::select(-`Gene Name`))
@@ -1127,11 +1061,7 @@ cellGeneProteinPlotTabServer <- function (id, data) {
       output$expression_genevprotein_tab <- renderUI({
         #check to see if data are there
         shiny::validate(
-          need(universal_expression_long %>% 
-                 drop_na(protein_expression) %>% 
-                 filter(gene %in% data()$content) %>% 
-                 nrow() > 0, "No data found for this gene.")
-        )
+          shiny::need(c("universal_expression_long") %in% data()$validate, "No expression data available"))
         #check to see if image exists
         img_path <- ddh::load_image(input = data(), fun_name = "make_cellgeneprotein", card = TRUE)
         if(!is.null(img_path)) {
@@ -1171,9 +1101,7 @@ tissuePlotTabServer <- function (id, data) {
       output$expression_tissue_tab <- renderUI({
         #check to see if data are there
         shiny::validate(
-          need(data()$content %in% gene_tissue$gene_name,
-               "No tissue-specific expression data for this gene.")
-        )
+          shiny::need(c("gene_tissue") %in% data()$validate, "No tissue expression data for this gene"))
         #check to see if image exists
         img_path <- ddh::load_image(input = data(), fun_name = "make_tissue", card = TRUE)
         if(!is.null(img_path)) {
@@ -1211,9 +1139,7 @@ tissueTableTabServer <- function (id, data) {
     function(input, output, session) {
       output$tissuetabletab <- render_gt({
         shiny::validate(
-          need(data()$content %in% gene_tissue$gene_name,
-               "No tissue-specific expression data for this gene.")
-        )
+          shiny::need(c("gene_tissue") %in% data()$validate, "No tissue expression data for this gene"))
         gt::gt(make_humananatogram_table(input = data()) %>% 
                  dplyr::slice(1:5))
       },
@@ -1238,9 +1164,7 @@ cellLineExpressionPosTableTabServer <- function (id, data) {
     function(input, output, session) {
       output$cell_exppostabletab <- render_gt({
         shiny::validate(
-          need(nrow(make_cell_sim_table(input = data(),
-                                        similarity = "expression")$top_table) > 0, 
-               "No data found for this cell line."))
+          shiny::need(c("cell_expression_sim") %in% data()$validate, "No expression data for this cell line"))
         gt::gt(
           make_cell_sim_table(input = data(),
                               similarity = "expression")$top_table %>%
@@ -1270,9 +1194,7 @@ cellLineExpressionNegTableTabServer <- function (id, data) {
     function(input, output, session) {
       output$cell_expnegtabletab <- render_gt({
         shiny::validate(
-          need(nrow(make_cell_sim_table(input = data(),
-                                        similarity = "expression")$bottom_table) > 0, 
-               "No data found for this cell line."))
+          shiny::need(c("cell_expression_sim") %in% data()$validate, "No expression data for this cell line"))
         gt::gt(
           make_cell_sim_table(input = data(),
                               similarity = "expression")$bottom_table %>%
@@ -1305,9 +1227,7 @@ cellDependenciesBarPlotTabServer <- function (id, data) {
       output$cell_dependencies_barplot_tab <- renderUI({
         #check to see if data are there
         shiny::validate(
-          need(data()$content %in% universal_achilles_long$gene |
-                 data()$content %in% cell_expression_meta$cell_line, 
-               "No data found for this query."))
+          shiny::need(c("universal_achilles_long", "cell_expression_meta") %in% data()$validate, "No dependency data for this gene"))
         #check to see if image exists
         img_path <- ddh::load_image(input = data(), fun_name = "make_cellbar", card = TRUE)
         if(!is.null(img_path)) {
@@ -1348,9 +1268,7 @@ cellDependenciesDensityPlotTabServer <- function (id, data) {
       output$cell_dependencies_densityplot_tab <- renderUI({
         #check to see if data are there
         shiny::validate(
-          need(data()$content %in% universal_achilles_long$gene |
-                 data()$content %in% cell_expression_meta$cell_line, 
-               "No data found for this query."))
+          shiny::need(c("universal_achilles_long", "cell_expression_meta") %in% data()$validate, "No dependency data for this gene"))
         #check to see if image exists
         img_path <- ddh::load_image(input = data(), fun_name = "make_cellbins", card = TRUE)
         if(!is.null(img_path)) {
@@ -1390,9 +1308,7 @@ cellDepsLinPlotTabServer <- function (id, data) {
       output$cell_dependencies_lineageplot_tab <- renderUI({
         #check to see if data are there
         shiny::validate(
-          need(data()$content %in% universal_achilles_long$gene, 
-               "No plot found for this protein")
-        )
+          shiny::need(c("universal_achilles_long") %in% data()$validate, "No dependency data for this gene"))
         #check to see if image exists
         img_path <- ddh::load_image(input = data(), fun_name = "make_lineage", card = TRUE)
         if(!is.null(img_path)) {
@@ -1432,9 +1348,7 @@ cellDepsSubLinPlotTabServer <- function (id, data) {
       output$cell_dependencies_sublineageplot_tab <- renderUI({
         #check to see if data are there
         shiny::validate(
-          need(data()$content %in% universal_achilles_long$gene, 
-               "No plot found for this protein")
-        )
+          shiny::need(c("universal_achilles_long") %in% data()$validate, "No dependency data for this gene"))
         #check to see if image exists
         img_path <- ddh::load_image(input = data(), fun_name = "make_sublineage", card = TRUE)
         if(!is.null(img_path)) {
@@ -1474,9 +1388,7 @@ expdepPlotTabServer <- function (id, data) {
       output$cell_dependencies_expdep_tab <- renderUI({
         #check to see if data are there
         shiny::validate(
-          need(data()$content %in% universal_achilles_long$gene |
-                 data()$content %in% cell_expression_meta$cell_line, 
-               "No data found for this query."))
+          shiny::need(c("universal_achilles_long", "cell_expression_meta") %in% data()$validate, "No dependency data for this gene"))
         #check to see if image exists
         img_path <- ddh::load_image(input = data(), fun_name = "make_expdep", card = TRUE)
         if(!is.null(img_path)) {
@@ -1515,7 +1427,7 @@ cellDependenciesTableTabServer <- function (id, data) {
     function(input, output, session) {
       output$deptabletab <- render_gt({
         shiny::validate(
-          need(nrow(make_dep_table(input = data())) > 0, "No data found for this gene."))
+          shiny::need(c("universal_achilles_long") %in% data()$validate, "No dependency data for this gene"))
         gt::gt(make_dep_table(input = data()) %>% 
                  dplyr::select(`Cell Line`, contains(data()$content)) %>%
                  dplyr::slice(1:5))
@@ -1540,8 +1452,7 @@ cellDependenciesPosTableTabServer <- function (id, data) {
     function(input, output, session) {
       output$deppostabletab <- render_gt({
         shiny::validate(
-          need(data()$content %in% gene_master_top_table$fav_gene,
-               "No data found for this gene."))
+          shiny::need(c("gene_master_top_table") %in% data()$validate, "No dependency data for this gene"))
         gt::gt(make_top_table(input = data()) %>% 
                  # dplyr::mutate("Rank" = row_number()) %>% 
                  dplyr::select(c("Gene" = "gene", "Z-Score" = "z_score")) %>%
@@ -1567,8 +1478,7 @@ cellDependenciesPosPathwayTableTabServer <- function (id, data) {
     function(input, output, session) {
       output$deppospathwaystab <- render_gt({
         shiny::validate(
-          need(data()$content %in% gene_master_positive$fav_gene,
-               "No data found for this gene."))
+          shiny::need(c("gene_master_positive") %in% data()$validate, "No dependency data for this gene"))
         gt::gt(make_enrichment_top(input = data()) %>% 
                  dplyr::select(`Gene List`) %>%
                  dplyr::slice(1:5))
@@ -1593,8 +1503,7 @@ cellDependenciesNegTableTabServer <- function (id, data) {
     function(input, output, session) {
       output$depnegtabletab <- render_gt({
         shiny::validate(
-          need(data()$content %in% gene_master_bottom_table$fav_gene,
-               "No data found for this gene."))
+          shiny::need(c("gene_master_bottom_table") %in% data()$validate, "No dependency data for this gene"))
         gt::gt(make_bottom_table(input = data()) %>% 
                  # dplyr::mutate("Rank" = row_number()) %>% 
                  dplyr::select(c("Gene" = "gene", "Z-Score" = "z_score")) %>%
@@ -1620,8 +1529,7 @@ cellDependenciesNegPathwayTableTabServer <- function (id, data) {
     function(input, output, session) {
       output$depnegpathwaystab <- render_gt({
         shiny::validate(
-          need(data()$content %in% gene_master_negative$fav_gene, 
-               "No data found for this gene."))
+          shiny::need(c("gene_master_negative") %in% data()$validate, "No dependency data for this gene"))
         gt::gt(make_enrichment_bottom(input = data()) %>% 
                  dplyr::select(`Gene List`) %>%
                  dplyr::slice(1:5))
@@ -1646,9 +1554,9 @@ cellDependenciesGenePathwayTableTabServer <- function (id, data) {
     id,
     function(input, output, session) {
       output$depgenepathwaystab <- render_gt({
-        shiny::validate(
-          need(nrow(make_gene_pathways_components(input = data())) > 0,
-               "No data found for this gene."))
+        #UPDATEME
+        # shiny::validate(
+        #   shiny::need(c("gene_pathways_components") %in% data()$validate, "No dependency data for this gene"))
         gt::gt(make_gene_pathways_components(input = data()) %>%
                  dplyr::select(Pathway = feature2) %>%
                  dplyr::slice(1:5))
@@ -1676,9 +1584,7 @@ cellSummaryTableTabServer <- function (id, data) {
     function(input, output, session) {
       output$cell_summarydash <- render_gt({
         shiny::validate(
-          need(data()$content %in% cell_expression_meta$cell_line, 
-               "No data found for this cell line.")
-        )
+          shiny::need(c("cell_expression_meta") %in% data()$validate, "No summary data for this cell line"))
         gt::gt(
           make_cell_line_table(input = data()) %>%
             dplyr::select(1, 3) %>%
@@ -1705,8 +1611,7 @@ cellLineDependenciesPosTableDashServer <- function (id, data) {
     function(input, output, session) {
       output$cell_deptabledash <- render_gt({
         shiny::validate(
-          need(nrow(make_cell_sim_table(input = data())$top_table) > 0, 
-               "No data found for this cell line."))
+          shiny::need(c("cell_dependency_sim") %in% data()$validate, "No dependency data for this cell line"))
         gt::gt(
           make_cell_sim_table(input = data())$top_table %>%
             dplyr::rename("Cell" = "cell2_name", "Bonferroni" = "bonferroni") %>% 
@@ -1736,9 +1641,7 @@ cellLineExpressionPosTableDashServer <- function (id, data) {
     function(input, output, session) {
       output$cell_exppostabletab <- render_gt({
         shiny::validate(
-          need(nrow(make_cell_sim_table(input = data(),
-                                        similarity = "expression")$top_table) > 0, 
-               "No data found for this cell line."))
+          shiny::need(c("cell_dependency_exp") %in% data()$validate, "No dependency data for this cell line"))
         gt::gt(
           make_cell_sim_table(input = data(),
                               similarity = "expression")$top_table %>%
@@ -1770,8 +1673,7 @@ cellLineDependenciesPosTableTabServer <- function (id, data) {
     function(input, output, session) {
       output$cell_deppostabletab <- render_gt({
         shiny::validate(
-          need(nrow(make_cell_sim_table(input = data())$top_table) > 0, 
-               "No data found for this cell line."))
+          shiny::need(c("cell_dependency_sim") %in% data()$validate, "No dependency data for this cell line"))
         gt::gt(
           make_cell_sim_table(input = data())$top_table %>%
             dplyr::rename("Cell" = "cell2_name", "Bonferroni" = "bonferroni") %>% 
@@ -1800,8 +1702,7 @@ cellLineDependenciesNegTableTabServer <- function (id, data) {
     function(input, output, session) {
       output$cell_depnegtabletab <- render_gt({
         shiny::validate(
-          need(nrow(make_cell_sim_table(input = data())$bottom_table) > 0, 
-               "No data found for this cell line."))
+          shiny::need(c("cell_dependency_sim") %in% data()$validate, "No dependency data for this cell line"))
         gt::gt(
           make_cell_sim_table(input = data())$bottom_table %>%
             dplyr::rename("Cell" = "cell2_name", "Bonferroni" = "bonferroni") %>% 
@@ -1830,7 +1731,7 @@ cellLineDependenciesTableTabServer <- function (id, data) {
     function(input, output, session) {
       output$deptabletab <- render_gt({
         shiny::validate(
-          need(nrow(make_dep_table(input = data())) > 0, "No data found for this cell line."))
+          shiny::need(c("universal_achilles_long") %in% data()$validate, "No dependency data for this cell line"))
         gt::gt(make_dep_table(input = data()) %>% 
                  dplyr::rename(Gene = gene) %>% 
                  dplyr::select(Gene, contains(data()$content)) %>%
@@ -1857,13 +1758,7 @@ cellLineMetadataPlotTabServer <- function (id, data, type) {
     function(input, output, session) {
       output$metadata_plot_tab <- renderPlot({
         shiny::validate(
-          need(make_cell_sim_table(similarity = type, 
-                                   bonferroni_cutoff = 0.05,
-                                   input = data()) %>% 
-                 bind_rows() %>% 
-                 nrow() > 0, 
-               "No associations for this cell line.")
-        )
+          shiny::need(c("cell_dependency_sim") %in% data()$validate, "No association data for this cell line"))
         withProgress(message = 'Almost there...', value = 1, {
           make_metadata_cell(input = data(),
                              cell_line_similarity = type,

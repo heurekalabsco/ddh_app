@@ -44,7 +44,7 @@ geneNetworkGraphServer <- function(id, data) {
                                    label = paste0("# Related ", 
                                                   ifelse(data()$type == "gene",
                                                          "gene", "cell line")),
-                                   value =10, min = 10, max = 20),
+                                   value = 10, min = 10, max = 20),
                        selectInput(inputId = session$ns("corr_type"),
                                    label = "Associations",
                                    choices = c("Positive", "Negative", "Positive and Negative"),
@@ -61,21 +61,17 @@ geneNetworkGraphServer <- function(id, data) {
         )
       })
       
-      output$graph <- renderVisNetwork({
+      output$graph <- 
+        renderVisNetwork({
         if(data()$type == "gene") {
           shiny::validate(
-            need(data()$content %in% gene_master_top_table$fav_gene | 
-                   data()$content %in% gene_master_bottom_table$fav_gene,
-                 "Not enough data to make a graph.")
-          )
+            shiny::need(c("setup_graph") %in% data()$validate, "No dependency data for this gene"))
         } else if(data()$type == "cell") {
           shiny::validate(
-            need(data()$content %in% unique(cell_dependency_sim$cell1_name),
-                 "Not enough data to make a graph.")
-          )
+            shiny::need(c("cell_dependency_sim") %in% data()$validate, "No dependency data for this cell line"))
         }
         networkGraph()
-        })
+      })
     }
   )
 }
@@ -96,20 +92,20 @@ geneNetworkGraphExpServer <- function(id, data) {
       #establish reactive value
       rv <- reactiveValues(degree = 2, 
                            threshold = 10,
-                           corrType = "Positive" ) #will need to change all corrType to corr_type
+                           corr_type = "Positive" )
       
       #update value upon call
       observeEvent(input$update, {
         rv$degree <- input$deg
         rv$threshold <- input$threshold
-        rv$corrType <- input$corrType
+        rv$corr_type <- input$corr_type
       })
       
       networkGraph <- reactive({
         make_graph(input = data(), 
                    threshold = rv$threshold, 
                    deg = rv$degree, 
-                   corrType = rv$corrType, 
+                   corr_type = rv$corr_type, 
                    cell_line_var = "expression",
                    displayHeight = '80vh', 
                    displayWidth = '100%', 
@@ -127,7 +123,7 @@ geneNetworkGraphExpServer <- function(id, data) {
                                                   ifelse(data()$type == "gene",
                                                          "gene", "cell line")),
                                    value =10, min = 10, max = 20),
-                       selectInput(inputId = session$ns("corrType"),
+                       selectInput(inputId = session$ns("corr_type"),
                                    label = "Associations",
                                    choices = c("Positive", "Negative", "Positive and Negative"),
                                    selected = "Positive"),
@@ -146,15 +142,10 @@ geneNetworkGraphExpServer <- function(id, data) {
       output$graph <- renderVisNetwork({
         if(data()$type == "gene") {
           shiny::validate(
-            need(data()$content %in% gene_master_top_table$fav_gene | 
-                   data()$content %in% gene_master_bottom_table$fav_gene,
-                 "Not enough data to make a graph.")
-          )
+            shiny::need(c("gene_master_top_table", "gene_master_bottom_table") %in% data()$validate, "No expression data for this gene"))
         } else if(data()$type == "cell") {
           shiny::validate(
-            need(data()$content %in% unique(cell_expression_sim$cell1_name),
-                 "Not enough data to make a graph.")
-          )
+            shiny::need(c("cell_expression_sim") %in% data()$validate, "No expression data for this cell line"))
         }
         networkGraph()
       })
@@ -175,7 +166,7 @@ compoundNetworkGraph <- function(id) {
                    sliderInput(inputId = ns("threshold"),
                                label = "# Related genes",
                                value =10, min = 10, max = 20),
-                   selectInput(inputId = ns("corrType"),
+                   selectInput(inputId = ns("corr_type"),
                                label = "Correlations",
                                choices = c("Positive", "Negative", "Positive and Negative"),
                                selected = "Positive"),
@@ -199,20 +190,20 @@ compoundNetworkGraphServer <- function(id, data) {
       #establish reactive value
       rv <- reactiveValues(degree = 2, 
                            threshold = 10,
-                           corrType = "Positive" )
+                           corr_type = "Positive" )
       
       #update value upon call
       observeEvent(input$update, {
         rv$degree <- input$deg
         rv$threshold <- input$threshold
-        rv$corrType <- input$corrType
+        rv$corr_type <- input$corr_type
       })
       
       networkCompoundGraph <- reactive({
         make_graph(input = data(), 
                    threshold = rv$threshold, 
                    deg = rv$degree, 
-                   corrType = rv$corrType, 
+                   corr_type = rv$corr_type, 
                    displayHeight = '80vh', 
                    displayWidth = '100%', 
                    tooltipLink = TRUE) %>% 
@@ -221,7 +212,7 @@ compoundNetworkGraphServer <- function(id, data) {
       
       output$compound_graph <- renderVisNetwork({
         shiny::validate(
-          need(data()$content %in% compound_prism_cor_nest$fav_drug, "No data found."))
+          shiny::need(c("compound_prism_cor_nest") %in% data()$validate, "No viability data for this compound"))
         networkCompoundGraph()
       })
     }
@@ -237,7 +228,7 @@ geneBipartiteGraph <- function(id) {
       sidebarPanel(sliderInput(inputId = ns("threshold"),
                                label = "# Related genes",
                                value =10, min = 10, max = 20),
-                   selectInput(inputId = ns("corrType"),
+                   selectInput(inputId = ns("corr_type"),
                                label = "Correlations",
                                choices = c("Positive", "Negative", "Positive and Negative"),
                                selected = "Positive"),
@@ -274,13 +265,13 @@ geneBipartiteGraphServer <- function(id, data) {
       })
       #establish reactive value
       rv <- reactiveValues(threshold = 10,
-                           corrType = "Positive", 
+                           corr_type = "Positive", 
                            collapsed = TRUE)
       
       #update value upon call
       observeEvent(input$update, {
         rv$threshold <- input$threshold
-        rv$corrType <- input$corrType
+        rv$corr_type <- input$corr_type
         rv$collapsed <- input$simplify
         rv$censor <- input$censor
       })
@@ -288,7 +279,7 @@ geneBipartiteGraphServer <- function(id, data) {
       bipartiteNetworkGraph <- reactive({
         make_bipartite_graph(input = data(), 
                              threshold = rv$threshold, 
-                             corrType = rv$corrType, 
+                             corr_type = rv$corr_type, 
                              collapsed = rv$collapsed, 
                              censor = rv$censor) %>% 
           visLegend(position = "right", width = .2, zoom = F) #.5 fixes cut-off, but makes it too wide
@@ -296,7 +287,7 @@ geneBipartiteGraphServer <- function(id, data) {
       
       output$graph <- renderVisNetwork({
         shiny::validate(
-          need(data()$content %in% compound_hmdb_proteins$fav_gene, "No data found."))
+          shiny::need(c("compound_hmdb_proteins") %in% data()$validate, "No compound data for this gene"))
         bipartiteNetworkGraph()
       })
     }
@@ -327,11 +318,10 @@ compoundBipartiteGraphServer <- function(id, data) {
       
       output$graph <- renderVisNetwork({
         shiny::validate(
-          need(data()$content %in% compound_hmdb_metabolites$fav_metabolite, "No data found."))
+          shiny::need(c("compound_hmdb_metabolites") %in% data()$validate, "No viability data for this compound"))
         bipartiteNetworkGraph()
       })
     }
-    
   )
 }
 

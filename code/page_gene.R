@@ -130,10 +130,10 @@ genePage <- function (id, subtype) {
                                 private(AABarPlot(ns("aa_bar_plot"))),
                                 private(tags$hr()),
                                 private(UMAPPlot(ns("umap_plot"))),
-                                private(ClusterradialPlot(ns("cluster_radial_plot"))),
-                                private(ClusterAABarPlot(ns("cluster_aa_bar_plot"))),
+                                private(clusterRadialPlot(ns("cluster_radial_plot"))),
+                                private(clusterAABarPlot(ns("cluster_aa_bar_plot"))),
                                 private(proteinClusterTable(ns("prot_clust_table"))),
-                                private(ClusterEnrichmentPlot(ns("cluster_enrichment_plot"))),
+                                private(clusterEnrichmentPlot(ns("cluster_enrichment_plot"))),
                                 private(proteinClusterEnrichmentTable(ns("prot_clust_enrich_table"))),
                                 tags$br()
                               )
@@ -666,10 +666,10 @@ genePageServer <- function(id, subtype) {
       private({radialPlotServer("radial_plot", data)})
       private({AABarPlotServer("aa_bar_plot", data)})
       private({UMAPPlotServer("umap_plot", data)})
-      private({ClusterradialPlotServer("cluster_radial_plot", data)})
-      private({ClusterAABarPlotServer("cluster_aa_bar_plot", data)})
+      private({clusterRadialPlotServer("cluster_radial_plot", data)})
+      private({clusterAABarPlotServer("cluster_aa_bar_plot", data)})
       private({proteinClusterTableServer("prot_clust_table", data)})
-      private({ClusterEnrichmentPlotServer("cluster_enrichment_plot", data)})
+      private({clusterEnrichmentPlotServer("cluster_enrichment_plot", data)})
       private({proteinClusterEnrichmentTableServer("prot_clust_enrich_table", data)})
       
       # CONDITIONAL STRUCTURE

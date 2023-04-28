@@ -55,3 +55,14 @@ make_validate <- function(object_names = NULL){
     dplyr::pull(data_set)
   return(validate_datasets)
 }
+
+# NAMES ----------
+clean_pathway_names <- function(pathway_name = "C2_SIG_CHEMOTAXIS"){
+  clean_name <- 
+    pathway_name %>% 
+    stringr::str_extract(pattern = "(?<=_).+") %>% 
+    stringr::str_replace_all(pattern = "SIG_", replacement = "SIGNATURE_") %>% 
+    stringr::str_replace_all(pattern = "\\_", replacement = " ") %>% 
+    stringr::str_to_title()
+  return(clean_name)
+}
