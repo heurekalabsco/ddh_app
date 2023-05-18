@@ -363,6 +363,36 @@ cellDependenciesTableDashServer <- function (id, data) {
     }
   )
 }
+
+##cell dependencies table-----
+geneMolecularFeaturesTableDash <- function(id) {
+  ns <- NS(id)
+  divFlexAlignCenter(
+    "Molecular features",
+    gt_output(outputId = ns("molfeattabledash"))
+  )
+}
+
+geneMolecularFeaturesTableDashServer <- function (id, data) {
+  moduleServer(
+    id,
+    function(input, output, session) {
+      output$molfeattabledash <- render_gt({
+        shiny::validate(
+          shiny::need(c("universal_achilles_long") %in% data()$validate, # Check this
+                      "No molecular features for this gene"))
+        gt::gt(make_gene_molecular_features(input = data()) %>% 
+                 dplyr::mutate("Rank" = row_number()) %>% 
+                 dplyr::select(Rank, Feature, logFC) %>% 
+                 dplyr::slice(1:5))
+      },
+      height = card_contents_height,
+      width = card_contents_width
+      )
+    }
+  )
+}
+
 ##cell dependencies graph-----
 cellDependenciesGraphDash <- function(id) {
   ns <- NS(id)

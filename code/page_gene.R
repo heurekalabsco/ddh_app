@@ -41,6 +41,7 @@ genePage <- function (id, subtype) {
                  actionLink(inputId = ns("link_to_cellDependenciesPlotDash"), cellDependenciesPlotDash(ns("depdash"))),
                  actionLink(inputId = ns("link_to_cellDependenciesTableDash"), cellDependenciesTableDash(ns("deptabledash"))),
                  actionLink(inputId = ns("link_to_cellDependenciesGraphDash"), cellDependenciesGraphDash(ns("depgraphdash"))),
+                 private(actionLink(inputId = ns("link_to_geneMolecularFeaturesTableDash"), geneMolecularFeaturesTableDash(ns("molfeattabledash")))),
                  private(actionLink(inputId = ns("link_to_geneDrugsCorTableDash"), geneDrugsCorTableDash(ns("genedrugscortabledash"))))
                )
       ),
@@ -592,6 +593,12 @@ genePageServer <- function(id, subtype) {
         updateNavbarPage(session, inputId = "geneNavBar", selected = "dependencies_graph")
       })
       cellDependenciesGraphDashServer("depgraphdash", data)
+      
+      #molecular features table
+      observeEvent(input$link_to_geneMolecularFeaturesTableDash, {
+        updateNavbarPage(session, inputId = "geneNavBar", selected = "xxxxx")
+      })
+      geneMolecularFeaturesTableDashServer("molfeattabledash", data)
       
       #dep drugs
       #do i need a wrapper around this observent event too?
