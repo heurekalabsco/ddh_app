@@ -31,7 +31,6 @@ genePage <- function (id, subtype) {
       tabPanel("SUMMARY",
                title_var,
                cardLayout(
-                 barcodeDash(ns("barcodedash")),
                  actionLink(inputId = ns("link_to_ideogramPlotDash"), ideogramPlotDash(ns("ideogramdash"))),
                  actionLink(inputId = ns("link_to_structurePlotDash"), structureDash(ns("structuredash"))),
                  actionLink(inputId = ns("link_to_pubmedGenePlotDash"), pubmedPlotDash(ns("pubmedgenedash"))),
@@ -58,6 +57,7 @@ genePage <- function (id, subtype) {
                           # cards in a fluid row
                           fluidRow(
                             cardLayout(
+                              barcodeTab(ns("barcodetab")),
                               actionLink(inputId = ns("go_click"), geneGoTableTab(ns("gotab"))) 
                             )
                           ),
@@ -536,10 +536,6 @@ genePageServer <- function(id, subtype) {
       
       ## DASHBOARD SERVER-----
       
-      #barcode plot
-      #no observe event, because it's just a linkout
-      barcodeDashServer("barcodedash", data)
-      
       #ideogram plot
       observeEvent(input$link_to_ideogramPlotDash, {
         updateNavbarPage(session, inputId = "geneNavBar", selected = "about_gene")
@@ -614,6 +610,10 @@ genePageServer <- function(id, subtype) {
       gene_var
       ideogramPlotServer("chromo", data)
       
+      #barcode plot
+      #no observe event, because it's just a linkout
+      barcodeTabServer("barcodetab", data)
+      
       # CONDITIONAL GO PATHWAY
       observeEvent(input$go_click, { #store click
         shinyjs::show("go_tabcard")
@@ -623,7 +623,6 @@ genePageServer <- function(id, subtype) {
       geneGoTableTabServer("gotab", data)
       #serves the data plots
       geneGoTableTextServer("go_table_text", data)
-      #***summary table for go terms is assigned above***
       
       # PROTEIN
       protein_summary

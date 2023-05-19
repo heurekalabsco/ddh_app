@@ -39,34 +39,6 @@ divFlexAlignCenter <- function(title, ...) {
 }
 
 # GENE -----
-##gene barcode plot-----
-barcodeDash <- function(id) {
-  ns <- NS(id)
-  divFlexAlignCenter(
-    uiOutput(outputId = ns("barcode_card"))
-  )
-}
-
-barcodeDashServer <- function (id, data) {
-  moduleServer(
-    id,
-    function(input, output, session) {
-      output$barcode_card <- renderUI({
-        div(
-          tags$a(
-            tags$img(src = make_barcode(input = data(), card = TRUE), 
-                     width = card_contents_width,
-                     height = card_contents_width, #force to square
-                     alt = glue::glue('Artistic image of a gene in the style of a barcode')), 
-            href = make_barcode(input = data(), card = FALSE),
-            target="_blank")
-          #build a dynamic ahref here to point to???
-        )
-      })
-    })
-}
-
-
 ##ideogram plot-----
 ideogramPlotDash <- function(id) {
   ns <- NS(id)
@@ -797,7 +769,33 @@ drugGenesCorTableDashServer <- function (id, data) {
 
 # TAB CARDS -----
 ## GENE -----
-###DEPENDENCY tables-----
+##gene barcode plot-----
+barcodeTab <- function(id) {
+  ns <- NS(id)
+  divFlexAlignCenter(
+    uiOutput(outputId = ns("barcode_tab"))
+  )
+}
+
+barcodeTabServer <- function (id, data) {
+  moduleServer(
+    id,
+    function(input, output, session) {
+      output$barcode_tab <- renderUI({
+        div(
+          tags$a(
+            tags$img(src = make_barcode(input = data(), card = TRUE), 
+                     width = card_contents_width,
+                     height = card_contents_width, #force to square
+                     alt = glue::glue('Artistic image of a gene in the style of a barcode')), 
+            href = make_barcode(input = data(), card = FALSE),
+            target="_blank")
+          #build a dynamic ahref here to point to???
+        )
+      })
+    })
+}
+
 geneGoTableTab <- function(id) {
   ns <- NS(id)
   divFlexAlignCenter(
