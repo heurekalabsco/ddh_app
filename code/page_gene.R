@@ -457,13 +457,50 @@ genePage <- function (id, subtype) {
                               )
                             )
                           ) # end of fluid row
-                 ), ### end of tabpanel
+                 ),
                  tabPanel("Graph", value = "dependencies_graph", 
                           geneNetworkGraph(ns("graph"))
                  ),
                  tabPanel("Drugs", value = "dependencies_drugs", 
                           private(geneDrugsCorTable(ns("gene_drugs_cor"))), 
-                          private_msg())
+                          private_msg()),
+                 tabPanel("Molecular Features", value = "molecular_features",
+                          shinyjs::useShinyjs(),
+                          #summary plot
+                          fluidRow(xxxxxx(ns("xxxx"))
+                          ),
+                          tags$hr(),
+                          # cards in a fluid row
+                          fluidRow(
+                            cardLayout(
+                              actionLink(inputId = ns("xxxxx"), cellDependenciesPosTableTab(ns("dep_pos_table_tab"))),
+                              actionLink(inputId = ns("xxxx"), cellDependenciesGenePathwayTableTab(ns("dep_gene_pathways_tab")))
+                            )
+                          ),
+                          tags$br(),
+                          #conditional for features
+                          fluidRow(
+                            shinyjs::hidden(
+                              div(
+                                id = ns("xxxxx"),
+                                style = "padding-left:1%",
+                                xxxxx(ns("xxxx")),
+                                tags$br()
+                              )
+                            )
+                          ), 
+                          #conditional for pathways
+                          fluidRow(
+                            shinyjs::hidden(
+                              div(
+                                id = ns("xxxxx"),
+                                style = "padding-left:1%",
+                                xxxxx(ns("xxxxx")),
+                                tags$br()
+                              )
+                            )
+                          )
+                          )
       ),
       ## DOWNLOADS-----
       downloadTab(ns("download")), #pull download tab from module
@@ -592,7 +629,7 @@ genePageServer <- function(id, subtype) {
       
       #molecular features table
       observeEvent(input$link_to_geneMolecularFeaturesTableDash, {
-        updateNavbarPage(session, inputId = "geneNavBar", selected = "xxxxx")
+        updateNavbarPage(session, inputId = "geneNavBar", selected = "molecular_features")
       })
       geneMolecularFeaturesTableDashServer("molfeattabledash", data)
       
