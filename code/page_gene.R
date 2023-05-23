@@ -475,8 +475,8 @@ genePage <- function (id, subtype) {
                           # cards in a fluid row
                           fluidRow(
                             cardLayout(
-                              # actionLink(inputId = ns("xxxxx"), cellDependenciesPosTableTab(ns("dep_pos_table_tab"))),
-                              # actionLink(inputId = ns("xxxx"), cellDependenciesGenePathwayTableTab(ns("dep_gene_pathways_tab")))
+                              actionLink(inputId = ns("mol_feat"), geneMolecularFeaturesTableDash(ns("mol_feat_table_tab"))),
+                              actionLink(inputId = ns("mol_feat_pathways"), geneMolecularFeaturesPathwayTableTab(ns("mol_feat_pathways_table_tab")))
                             )
                           ),
                           tags$br(),
@@ -1037,6 +1037,9 @@ genePageServer <- function(id, subtype) {
       
       # Molecular Features
       private({MolecularFeaturesSegmentPlotServer("mol_feat_segments", data)})
+      
+      geneMolecularFeaturesTableDashServer("mol_feat_table_tab", data)
+      geneMolecularFeaturesPathwayTableTabServer("mol_feat_pathways_table_tab", data)
       
       # DOWNLOAD SERVER-----
       downloadTabServer("download", data, privateMode) #pull download tab from module

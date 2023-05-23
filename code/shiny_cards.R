@@ -1596,6 +1596,34 @@ cellDependenciesGenePathwayTableTabServer <- function (id, data) {
   )
 }
 
+geneMolecularFeaturesPathwayTableTab <- function(id) {
+  ns <- NS(id)
+  divFlexAlignCenter(
+    "Pathways",
+    gt_output(outputId = ns("molfeatpathwaystabletab"))
+  )
+}
+
+geneMolecularFeaturesPathwayTableTabServer <- function (id, data) {
+  moduleServer(
+    id,
+    function(input, output, session) {
+      output$molfeatpathwaystabletab <- render_gt({
+        shiny::validate(
+          shiny::need(c("universal_achilles_long") %in% data()$validate, # Check this
+                      "No pathways found for this gene"))
+        gt::gt(ddh::make_gene_molecular_features_pathways(input = data()) %>% 
+                 dplyr::mutate("Rank" = row_number()) %>% 
+                 dplyr::select(Rank, Pathway) %>% 
+                 dplyr::slice(1:5))
+      },
+      height = card_contents_height,
+      width = card_contents_width
+      )
+    }
+  )
+}
+
 ## CELL -----
 # dash
 cellSummaryTableTab <- function(id) {

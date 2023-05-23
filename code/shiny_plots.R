@@ -1379,7 +1379,7 @@ MolecularFeaturesSegmentPlot <- function(id) {
       style = "padding-left:1%",
       plotOutput(outputId = ns("mol_feat_seg_plot"), width = "100%") %>% 
         withSpinnerColor(plot_type = "gene"),
-      actionLink(inputId = ns("segments_table_click"), " View table.")
+      actionLink(inputId = ns("segments_table_click"), " View table")
       )
     ),
     conditionalPanel(condition = paste0("input['", ns("segments_table_click"), "'] != 0"),
