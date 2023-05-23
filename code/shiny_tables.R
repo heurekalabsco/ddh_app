@@ -484,6 +484,121 @@ cellLineDrugDependenciesTableServer <- function (id, data) {
     }
   )
 }
+
+## molecular features ------
+MolecularFeaturesTable <- function (id) {
+  ns <- NS(id)
+  tagList(
+    fluidRow(h4(textOutput(ns("mol_feat_table_text")))),
+    tags$br(),
+    fluidRow(    
+      div(
+        id = ns("mol_feat_table_id"),
+        style = "padding-left:1%",
+        DT::dataTableOutput(outputId = ns("mol_feat_table")),
+        actionLink(inputId = ns("mol_feat_table_click"), " View plot")
+      )
+    ),
+    conditionalPanel(condition = paste0("input['", ns("mol_feat_table_click"), "'] != 0"),
+                     fluidRow(
+                       div(
+                         id = ns("mol_feat_table_plot_id"),
+                         style = "padding-left:1%",
+                         h4(textOutput(ns("mol_feat_plot_text"))),
+                         plotOutput(outputId = ns("mol_feat_plot"))
+                       )
+                     )
+    )
+  )
+}
+
+MolecularFeaturesTableServer <- function(id, data) {
+  moduleServer(
+    id,
+    function(input, output, session) {
+      output$mol_feat_table_text <- renderText({paste0("Molecular features associated with ", 
+                                                       str_c(data()$content, collapse = ", "), " dependency")})
+      output$mol_feat_table <- DT::renderDataTable({
+        #check to see if data are there
+        shiny::validate(
+          shiny::need(c("universal_achilles_long") %in% data()$validate, "No data found."))
+        #render table
+        DT::datatable(ddh::make_gene_molecular_features(input = data()) %>% 
+                        dplyr::mutate(Feature = map_chr(Feature, internal_link)),
+                      rownames = FALSE,
+                      escape = FALSE,
+                      options = list(pageLength = 10))
+      })
+      # Conditional barplot
+      output$mol_feat_plot_text <- renderText({paste0("Molecular features barplot for ", 
+                                                      str_c(data()$content, collapse = ", "))})
+      output$mol_feat_plot <- renderPlot({
+        #check to see if data are there
+        shiny::validate(
+          shiny::need(c("universal_achilles_long") %in% data()$validate, "No data found."))
+        #plot
+        ddh::gene_molecular_features_barplot(input = data())
+      })
+    }
+  )
+}
+
+MolecularFeaturesPathwaysTable <- function (id) {
+  ns <- NS(id)
+  tagList(
+    fluidRow(h4(textOutput(ns("mol_feat_pth_table_text")))),
+    tags$br(),
+    fluidRow(    
+      div(
+        id = ns("mol_feat_pth_table_id"),
+        style = "padding-left:1%",
+        DT::dataTableOutput(outputId = ns("mol_feat_pth_table")),
+        actionLink(inputId = ns("mol_feat_pth_table_click"), " View plot")
+      )
+    ),
+    conditionalPanel(condition = paste0("input['", ns("mol_feat_pth_table_click"), "'] != 0"),
+                     fluidRow(
+                       div(
+                         id = ns("mol_feat_pth_table_plot_id"),
+                         style = "padding-left:1%",
+                         h4(textOutput(ns("mol_feat_pth_plot_text"))),
+                         plotOutput(outputId = ns("mol_feat_pth_plot"))
+                       )
+                     )
+    )
+  )
+}
+
+MolecularFeaturesPathwaysTableServer <- function(id, data) {
+  moduleServer(
+    id,
+    function(input, output, session) {
+      output$mol_feat_pth_table_text <- renderText({paste0("Pathways associated with ", 
+                                                           str_c(data()$content, collapse = ", "), " dependency")})
+      output$mol_feat_pth_table <- DT::renderDataTable({
+        #check to see if data are there
+        shiny::validate(
+          shiny::need(c("universal_achilles_long") %in% data()$validate, "No data found."))
+        #render table
+        DT::datatable(ddh::make_gene_molecular_features_pathways(input = data()),
+                      rownames = FALSE,
+                      escape = FALSE,
+                      options = list(pageLength = 10))
+      })
+      # Conditional barplot
+      output$mol_feat_pth_plot_text <- renderText({paste0("Pathways barplot for ", 
+                                                          str_c(data()$content, collapse = ", "))})
+      output$mol_feat_pth_plot <- renderPlot({
+        #check to see if data are there
+        shiny::validate(
+          shiny::need(c("universal_achilles_long") %in% data()$validate, "No data found."))
+        #plot
+        ddh::gene_molecular_features_pathway_barplot(input = data())
+      })
+    }
+  )
+}
+
 ##Similar----
 similarGenesTable <- function(id) {
   ns <- NS(id)
