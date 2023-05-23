@@ -461,20 +461,22 @@ genePage <- function (id, subtype) {
                  tabPanel("Graph", value = "dependencies_graph", 
                           geneNetworkGraph(ns("graph"))
                  ),
+                 
                  tabPanel("Drugs", value = "dependencies_drugs", 
                           private(geneDrugsCorTable(ns("gene_drugs_cor"))), 
                           private_msg()),
+                 
                  tabPanel("Molecular Features", value = "molecular_features",
                           shinyjs::useShinyjs(),
                           #summary plot
-                          fluidRow(xxxxxx(ns("xxxx"))
-                          ),
+                          private(fluidRow(MolecularFeaturesSegmentPlot(ns("mol_feat_segments")))),
+                          private_msg(),
                           tags$hr(),
                           # cards in a fluid row
                           fluidRow(
                             cardLayout(
-                              actionLink(inputId = ns("xxxxx"), cellDependenciesPosTableTab(ns("dep_pos_table_tab"))),
-                              actionLink(inputId = ns("xxxx"), cellDependenciesGenePathwayTableTab(ns("dep_gene_pathways_tab")))
+                              # actionLink(inputId = ns("xxxxx"), cellDependenciesPosTableTab(ns("dep_pos_table_tab"))),
+                              # actionLink(inputId = ns("xxxx"), cellDependenciesGenePathwayTableTab(ns("dep_gene_pathways_tab")))
                             )
                           ),
                           tags$br(),
@@ -482,9 +484,11 @@ genePage <- function (id, subtype) {
                           fluidRow(
                             shinyjs::hidden(
                               div(
-                                id = ns("xxxxx"),
-                                style = "padding-left:1%",
-                                xxxxx(ns("xxxx")),
+                                # id = ns("xxxxx"),
+                                # style = "padding-left:1%",
+                                # xxxxx(ns("xxxx")),
+                                # xxxxx(ns("xxxx")),
+                                private_msg(),
                                 tags$br()
                               )
                             )
@@ -493,9 +497,11 @@ genePage <- function (id, subtype) {
                           fluidRow(
                             shinyjs::hidden(
                               div(
-                                id = ns("xxxxx"),
-                                style = "padding-left:1%",
-                                xxxxx(ns("xxxxx")),
+                                # id = ns("xxxxx"),
+                                # style = "padding-left:1%",
+                                # xxxxx(ns("xxxxx")),
+                                # xxxxx(ns("xxxx")),
+                                private_msg(),
                                 tags$br()
                               )
                             )
@@ -1028,6 +1034,9 @@ genePageServer <- function(id, subtype) {
       
       # Drug Cor
       private({geneDrugsCorTableServer("gene_drugs_cor", data)})
+      
+      # Molecular Features
+      private({MolecularFeaturesSegmentPlotServer("mol_feat_segments", data)})
       
       # DOWNLOAD SERVER-----
       downloadTabServer("download", data, privateMode) #pull download tab from module

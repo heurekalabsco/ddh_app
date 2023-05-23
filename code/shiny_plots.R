@@ -1365,6 +1365,71 @@ expdepPlotServer <- function (id, data) {
   )
 }
 
+# MOLECULAR FEATURES ----------
+MolecularFeaturesSegmentPlot <- function(id) {
+  ns <- NS(id)
+  tagList(
+    shinyjs::useShinyjs(),
+    # Scatterplot
+    fluidRow(column(h4(textOutput(ns("mol_feat_seg_plot_text"))), width = 12)),
+    tags$br(),
+    fluidRow(    
+      div(
+      id = ns("mol_feat_seg_plot_id"),
+      style = "padding-left:1%",
+      plotOutput(outputId = ns("mol_feat_seg_plot"), width = "100%") %>% 
+        withSpinnerColor(plot_type = "gene"),
+      actionLink(inputId = ns("segments_table_click"), " View table.")
+      )
+    ),
+    conditionalPanel(condition = paste0("input['", ns("segments_table_click"), "'] != 0"),
+                     fluidRow(
+                       div(
+                         id = ns("mol_feat_seg_table_id"),
+                         style = "padding-left:1%",
+                         h4(textOutput(ns("mol_feat_seg_table_text"))),
+                         DT::dataTableOutput(outputId = ns("mol_feat_seg_table"))
+                         )
+                       )
+    )
+  )
+}
+
+MolecularFeaturesSegmentPlotServer <- function (id, data) {
+  moduleServer(
+    id,
+    function(input, output, session) {
+      # Scatterplot
+      output$mol_feat_seg_plot_text <- renderText({paste0("Dependency segments for ", 
+                                                          str_c(data()$content, collapse = ", "))})
+      output$mol_feat_seg_plot <- renderPlot({
+        #check to see if data are there
+        shiny::validate(
+          shiny::need(c("universal_achilles_long") %in% data()$validate, "No data found."))
+        #plot
+        ddh::gene_molecular_features_segments(input = data())
+      })
+      output$mol_feat_seg_table_text <- renderText({paste0("Dependency segments table for ", 
+                                                           str_c(data()$content, collapse = ", "))})
+      output$mol_feat_seg_table <- DT::renderDataTable({
+        #check to see if data are there
+        shiny::validate(
+          shiny::need(c("universal_achilles_long") %in% data()$validate, "No data found."))
+        #table
+        DT::datatable(ddh::make_gene_molecular_features_segments(input = data()) %>% 
+                        dplyr::select(Query, `Cell Line` = cell_name, Segment = group, Lineage = lineage, 
+                                      Sublineage = lineage_subtype, Sex = sex, Age = age) %>%
+                        dplyr::arrange(dplyr::desc(Segment)) #%>% 
+                        # dplyr::mutate(`Cell Line` = map_chr(`Cell Line`, cell_linkr, type = "cell"))
+                      ,
+                      rownames = FALSE,
+                      escape = FALSE,
+                      options = list(pageLength = 10))
+      })
+    }
+  )
+}
+
 # CELL -----
 ## Cell Image Loader ----------
 cellImage <- function(id) {
