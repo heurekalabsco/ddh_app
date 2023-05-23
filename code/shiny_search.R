@@ -39,7 +39,7 @@ pathway_query_result_row <- function(row) {
 
 gene_list_query_result_row <- function(gene_summary_rows, multi_items) {
   known_gene_symbols <- gene_summary_rows$content_id
-  unknown_gene_symbols <- setdiff(multi_items, known_gene_symbols)
+  unknown_gene_symbols <- multi_query_get_unknown(multi_items, known_gene_symbols)
   known_gene_symbols_tags <- NULL
   title <- paste0(multi_items, collapse=", ")
 
