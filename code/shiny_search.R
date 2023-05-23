@@ -50,7 +50,7 @@ gene_list_query_result_row <- function(gene_summary_rows, multi_items) {
     tags$a(paste(known_gene_symbols, collapse=", "), href=href)
   )
   unknown_gene_symbols_tags <- NULL
-  if (unknown_gene_symbols == "") {
+  if (length(unknown_gene_symbols) > 0) {
     unknown_gene_symbols_tags <- list(
       tags$h6("Unknown Gene Symbols"),
       tags$div(paste(unknown_gene_symbols, collapse=", "))
