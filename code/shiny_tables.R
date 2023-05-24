@@ -259,7 +259,6 @@ pubmedTableServer <- function(id, data) {
 
 ##Expression----
 # module that displays a table for cell anatogram
-
 cellAnatogramTable <- function(id) {
   ns <- NS(id)
   DT::dataTableOutput(outputId = ns("cellanatogram_table"))
@@ -271,10 +270,13 @@ cellAnatogramTableServer <- function(id, data) {
     function(input, output, session) {
       output$cellanatogram_table <- DT::renderDataTable({
         shiny::validate(
-          shiny::need(c("gene_subcell") %in% data()$validate, "No data for this gene"))
+          shiny::need(c("gene_subcell") %in% data()$validate, "")) #intentionally left blank; redundant with plot
         DT::datatable(make_cellanatogram_table(input = data()) %>% 
-                        dplyr::select(Gene, gene, Reliability, Location) %>% 
-                        dplyr::rename(`ENSEMBL ID` = gene),
+                        dplyr::select(id, main_location, value, reliability) %>% 
+                        dplyr::rename(Gene = id, 
+                                      Location = main_location,
+                                      Expression = value, 
+                                      Reliability = reliability),
                       options = list(pageLength = 10))
       })
     }
