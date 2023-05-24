@@ -30,9 +30,13 @@ single_query_search <- function(search_index, query_str) {
 multi_query_search <- function(search_index, multi_items) {
   search_subtypes <- c("gene", "compound", "cell")
   search_index %>%
-    filter(content_id %in% multi_items, label==content_id, subtype %in% search_subtypes) %>%
+    filter(toupper(content_id) %in% toupper(multi_items), label==content_id, subtype %in% search_subtypes) %>%
     group_by(subtype) %>%
     nest()
+}
+
+multi_query_get_unknown <- function(multi_items, known_items) {
+  setdiff(toupper(multi_items), toupper(known_items))
 }
 
 search_query <- function(search_index, query_str, limit=100) {
