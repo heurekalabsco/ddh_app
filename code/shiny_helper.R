@@ -56,7 +56,7 @@ make_validate <- function(object_names = NULL){
   return(validate_datasets)
 }
 
-# NAMES ----------
+# PATHWAYS ----------
 make_pathway_browse_table <- function(){
   pathway_browse_table <-
     ddh::get_content("universal_pathways", dataset = TRUE) %>% 
@@ -76,7 +76,7 @@ make_pathway_browse_table <- function(){
     dplyr::select(-tidyselect::any_of(c("name", "class"))) %>% 
     dplyr::relocate(gs_name)
   return(pathway_browse_table)
-  }
+}
 
 clean_pathway_names <- function(pathway_name = "C2_SIG_CHEMOTAXIS"){
   clean_name <- 

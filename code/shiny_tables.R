@@ -595,49 +595,52 @@ similarGenesTableServer <- function (id, data) {
     id,
     function(input, output, session) { 
       #censor reactive values
-      censor_status <- reactiveValues(choice = FALSE, 
-                                      num_sim_genes = 1000
-      )
-      
+      censor_status <- reactiveValues(censor = FALSE, 
+                                      num_sim_genes = 1000)
+      #activate censor
       observeEvent(input$censor, {
-        censor_status$choice <- TRUE
+        censor_status$censor <- TRUE
         censor_status$num_sim_genes <- input$num_sim_genes
-        censor_status$num <- nrow(make_top_table(input = data()#, 
-                                                 # gls = input$gls_table_top
-        ) %>% 
-          censor(choice = censor_status$choice, greater_than = censor_status$num_sim_genes))
+        censor_status$num <- 
+          make_censor_table(input = data(), 
+                            censor = censor_status$censor, 
+                            greater_than = censor_status$num_sim_genes) %>% 
+          nrow()
       })
-      
+      #reset censoring
       observeEvent(input$reset, {
-        censor_status$choice <- FALSE
+        censor_status$censor <- FALSE
         censor_status$num_sim_genes <- 1000
         updateSliderInput(session, inputId = "num_sim_genes", value = 1000)
-        censor_status$num <- nrow(make_top_table(input = data()#, 
-                                                 # gls = input$gls_table_top
-        )
-        )
+        censor_status$num <- 
+          make_censor_table(input = data(), 
+                            censor = censor_status$censor, 
+                            greater_than = censor_status$num_sim_genes) %>% 
+          nrow()
       })
-      observeEvent(input$sim_pathway_click, { #event to store the 'click'
-      })
+      # 
+      # observeEvent(input$sim_pathway_click, { #event to store the 'click'
+      # })
       output$text_dep_top <- renderText({paste0(censor_status$num, " genes with similar dependencies as ", str_c(data()$content, collapse = ", "))})      
       output$dep_top <- DT::renderDataTable({
         shiny::validate(
           shiny::need(c("gene_master_top_table") %in% data()$validate, "No dependency data for this gene"))
-        censor_status$num <- nrow(make_top_table(input = data()#, 
-                                                 # gls = input$gls_table_top
-        ) %>% 
-          censor(choice = censor_status$choice, greater_than = censor_status$num_sim_genes))
+        
+        censor_status$num <- make_censor_table(input = data(), 
+                                               censor = censor_status$censor, 
+                                               greater_than = censor_status$num_sim_genes) %>% 
+          nrow()
+        
         DT::datatable(
-          make_top_table(input = data()#, 
-                         # gls = input$gls_table_top
-          ) %>% 
-            censor(choice = censor_status$choice, greater_than = censor_status$num_sim_genes) %>% 
-            dplyr::mutate(gene = map_chr(gene, internal_link, linkout_img = FALSE)) %>% #from fun_helper.R
-            dplyr::rename("Query" = "fav_gene", "Gene" = "gene", "Name" = "name", 
-                          # "GLS p-value" = "GLSpvalue", 
-                          "R^2" = "r2", "Z-Score" = "z_score", "Co-publication Count" = "concept_count", "Co-publication Index" = "concept_index") %>% 
+          make_censor_table(input = data(), 
+                            censor = censor_status$censor, 
+                            greater_than = censor_status$num_sim_genes) %>%
+            # dplyr::mutate(gene = map_chr(gene, internal_link, linkout_img = FALSE)) %>% #from fun_helper.R
+            dplyr::rename("Query" = "id", "Gene" = "gene", "Name" = "gene_name",
+                          "R^2" = "r2", "Z-Score" = "z_score", "Co-publication Count" = "concept_count", "Co-publication Index" = "concept_index") %>%
             dplyr::select("Query", "Gene", "Name", input$vars_dep_top) %>%
-            dplyr::mutate_if(is.numeric, ~ signif(., digits = 3)),
+            dplyr::mutate_if(is.numeric, ~ signif(., digits = 3)
+            ),
           escape = FALSE,
           options = list(pageLength = 25)
         )
