@@ -66,3 +66,10 @@ clean_pathway_names <- function(pathway_name = "C2_SIG_CHEMOTAXIS"){
     stringr::str_to_title()
   return(clean_name)
 }
+
+clean_pathway_descriptions <- function(pathway_description = "The process in which amyloid-beta is removed from extracellular brain regions by mechanisms involving cell surface receptors. [GOC:aruk, GOC:bc, GOC:BHF, PMID:18289866, PMID:19098903, PMID:26005850]"){
+  clean_desc <- 
+    pathway_description %>% 
+    stringr::str_remove(pattern = "(\\s)?\\[[^\\]]*\\]")
+  return(clean_desc)
+}

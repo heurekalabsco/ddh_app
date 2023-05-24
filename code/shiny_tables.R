@@ -40,7 +40,7 @@ browsePathwaysPanelServer <- function(id) {
 }
 
 #GENE-----
-## GO pathways ---------------------
+## Pathways ---------------------
 pathwayList <- function (id) {
   ns <- NS(id)
   tagList(
@@ -59,7 +59,8 @@ pathwayListServer <- function(id, data) {
           shiny::need(c("universal_gene_pathways") %in% data()$validate, "No pathway data for this gene"))
         DT::datatable(make_pathway_list(input = data()) %>% 
                         dplyr::mutate(gs_id = map_chr(gs_id, internal_link), #from fun_helper.R
-                                        gs_name = purrr::map_chr(gs_name, clean_pathway_names)) %>% 
+                                      gs_name = purrr::map_chr(gs_name, clean_pathway_names), 
+                                      gs_description = purrr::map_chr(gs_description, clean_pathway_descriptions)) %>% 
                         dplyr::select(ID = gs_id, Pathway = gs_name, Description = gs_description, `Pathway Size` = pathway_size),
                       escape = FALSE,
                       options = list(paging = FALSE, 
@@ -1220,8 +1221,8 @@ geneDrugsCorTableServer <- function (id, data) {
       output$gene_drugs_cor_table <- DT::renderDataTable({
         shiny::validate(
           shiny::need(c("gene_drugs_cor_table") %in% data()$validate, "No compound data for this gene"))
-      
-      #gene_drug_list will grab a char vec of drugs known to target genes, so we can check if corr's are known; added ifelse logic so index grab doesn't break
+        
+        #gene_drug_list will grab a char vec of drugs known to target genes, so we can check if corr's are known; added ifelse logic so index grab doesn't break
         gene_drug_tibble <- gene_drugs_table %>% filter(fav_gene %in% data()$content)
         gene_drug_list <- ifelse(nrow(gene_drug_tibble) != 0, gene_drug_tibble %>% unnest(data) %>% pull(fav_drug), "")
         DT::datatable(make_gene_drugs_cor_table(input = data()) %>% 
