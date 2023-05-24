@@ -525,7 +525,10 @@ MolecularFeaturesTableServer <- function(id, data) {
           shiny::need(c("universal_achilles_long") %in% data()$validate, "No data found."))
         #render table
         DT::datatable(ddh::make_gene_molecular_features(input = data()) %>% 
-                        dplyr::mutate(Feature = map_chr(Feature, internal_link)),
+                        dplyr::mutate(Feature = ifelse(Feature %in% search_index$label[search_index$subtype == "gene"],
+                                                       map_chr(Feature, internal_link), 
+                                                       Feature)
+                                      ),
                       rownames = FALSE,
                       escape = FALSE,
                       options = list(pageLength = 10))
