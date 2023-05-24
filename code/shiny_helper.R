@@ -57,6 +57,27 @@ make_validate <- function(object_names = NULL){
 }
 
 # NAMES ----------
+make_pathway_browse_table <- function(){
+  pathway_browse_table <-
+    ddh::get_content("universal_pathways", dataset = TRUE) %>% 
+    dplyr::distinct(gs_name, .keep_all = TRUE) %>% 
+    dplyr::select(tidyselect::all_of(c("gs_name", 
+                                       "gs_description", 
+                                       "gs_id", 
+                                       "gs_pmid", 
+                                       "gs_geoid", 
+                                       "gs_exact_source", 
+                                       "gs_url", 
+                                       "pathway_size"))) %>% 
+    tidyr::separate(gs_name, into = c("class", "name"), sep = "_", extra = "merge") %>%
+    dplyr::mutate(name=stringr::str_replace_all(name, "_", " ")) %>%
+    dplyr::mutate(gs_name = glue::glue('{name} ({class})')) %>%
+    dplyr::mutate(gs_id=as.character(gs_id)) %>% 
+    dplyr::select(-tidyselect::any_of(c("name", "class"))) %>% 
+    dplyr::relocate(gs_name)
+  return(pathway_browse_table)
+  }
+
 clean_pathway_names <- function(pathway_name = "C2_SIG_CHEMOTAXIS"){
   clean_name <- 
     pathway_name %>% 
