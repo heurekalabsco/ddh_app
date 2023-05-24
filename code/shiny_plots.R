@@ -1285,7 +1285,7 @@ cellDependenciesCorrPlotServer <- function (id, data) {
       output$gene_correlation_plot <- renderUI({
         #check to see if data are there
         shiny::validate(
-          shiny::need(c("gene_achilles_cor_nest") %in% data()$validate, "No data found."))
+          shiny::need(c("gene_achilles_cor_long") %in% data()$validate, "No data found."))
         #check to see if image exists
         img_path <- ddh::load_image(input = data(), fun_name = "make_correlation", card = FALSE)
         if(!is.null(img_path)) {
