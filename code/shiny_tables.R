@@ -247,7 +247,7 @@ pubmedTableServer <- function(id, data) {
                           ) %>% 
                           dplyr::mutate(pmcid = map_chr(pmcid, pmc_linkr) #from fun_helper.R
                           ) %>% 
-                          dplyr::rename(Name = name, 'Pubmed ID' = pmid, Year = year, PMCID = pmcid),
+                          dplyr::rename(Name = id, 'Pubmed ID' = pmid, Year = year, PMCID = pmcid),
                         escape = FALSE,
                         options = list(pageLength = 10))
         })
