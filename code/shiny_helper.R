@@ -80,29 +80,34 @@ clean_pathway_descriptions <- function(pathway_description = "The process in whi
 #' @importFrom magrittr %>%
 #'
 #' @export
-internal_link <- function(query, linkout_img=FALSE) {
-  hrefr <- function(x, linkout_img) {
-    paste0('<a href="?show=gene&query=',
-           x,
-           '" target="_blank">',
-           dplyr::if_else(linkout_img==TRUE, '<img src="link out_25.png", width="10", height="10">', x),
-           '</a>')
-  }
-  if (stringr::str_detect(query, ",") == TRUE){ #code for list
-    string_vec <- unlist(stringr::str_split(query, ", "))
-    string_vec_link <- purrr::map_chr(string_vec, hrefr, linkout_img = FALSE)
-    query_link <- stringr::str_c(string_vec_link, collapse = ", ")
-    
-  } else if (stringr::str_detect(query, "^[:digit:]{7}") == TRUE) { #regex for GO, used in shiny_tables browsePathwaysPanelServer
-    query_link <- paste0('<a href="?show=pathway&go=',
-                         query,
-                         '">',
-                         query,
-                         '</a>')
+internal_link <- function(query, linkout_img = FALSE) {
+  
+  if (query %in% search_index$label[search_index$subtype == "gene"]) {
+    hrefr <- function(x, linkout_img) {
+      paste0('<a href="?show=gene&query=',
+             x,
+             '" target="_blank">',
+             dplyr::if_else(linkout_img==TRUE, '<img src="link out_25.png", width="10", height="10">', x),
+             '</a>')
+    }
+    if (stringr::str_detect(query, ",") == TRUE){ #code for list
+      string_vec <- unlist(stringr::str_split(query, ", "))
+      string_vec_link <- purrr::map_chr(string_vec, hrefr, linkout_img = FALSE)
+      query_link <- stringr::str_c(string_vec_link, collapse = ", ")
+      
+    } else if (stringr::str_detect(query, "^[:digit:]{7}") == TRUE) { #regex for GO, used in shiny_tables browsePathwaysPanelServer
+      query_link <- paste0('<a href="?show=pathway&go=',
+                           query,
+                           '">',
+                           query,
+                           '</a>')
+    } else {
+      query_link <- hrefr(query, linkout_img)
+    }
+    return(query_link)
   } else {
-    query_link <- hrefr(query, linkout_img)
+    return(query)
   }
-  return(query_link)
 }
 
 #' Internal link cell

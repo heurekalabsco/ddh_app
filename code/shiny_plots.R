@@ -1419,9 +1419,8 @@ MolecularFeaturesSegmentPlotServer <- function (id, data) {
         DT::datatable(ddh::make_gene_molecular_features_segments(input = data()) %>% 
                         dplyr::select(Query, `Cell Line` = cell_name, Segment = group, Lineage = lineage, 
                                       Sublineage = lineage_subtype, Sex = sex, Age = age) %>%
-                        dplyr::arrange(dplyr::desc(Segment)) #%>% 
-                        # dplyr::mutate(`Cell Line` = map_chr(`Cell Line`, cell_linkr, type = "cell"))
-                      ,
+                        dplyr::arrange(dplyr::desc(Segment)) %>% 
+                        dplyr::mutate(`Cell Line` = map_chr(`Cell Line`, cell_linkr, type = "cell")),
                       rownames = FALSE,
                       escape = FALSE,
                       options = list(pageLength = 10))
