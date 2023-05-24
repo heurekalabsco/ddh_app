@@ -1,44 +1,3 @@
-#LANDING PAGE TABLES----
-# Browse Pathways
-# module that displays a table of pathways when an link is clicked
-
-browsePathwaysLink <- function (id) {
-  ns <- NS(id)
-  actionLink(inputId = ns("pathway_click"), h4("Browse the pathways"))
-}
-
-browsePathwaysLinkServer <- function(id) {
-  moduleServer(
-    id,
-    function(input, output, session) {
-      observeEvent(input$pathway_click, {}) #event to store the 'click'
-    }
-  )
-}
-
-browsePathwaysPanel <- function (id) {
-  ns <- NS(id)
-  notZeroConditionalPanel(ns("pathway_click"),
-                          tags$br(),
-                          h4("GO Biological Processes"),
-                          DT::dataTableOutput(outputId = ns("pathway_table")))
-}
-
-browsePathwaysPanelServer <- function(id) {
-  moduleServer(
-    id,
-    function(input, output, session) {
-      output$pathway_table <- DT::renderDataTable({
-        DT::datatable(make_pathway_table(gene_pathways) %>% 
-                        dplyr::mutate(go = map_chr(go, internal_link)) %>% #from fun_helper.R
-                        dplyr::rename(Pathway = pathway, GO = go, Genes = genes), 
-                      escape = FALSE,
-                      options = list(pageLength = 10))
-      })      
-    }
-  )
-}
-
 #GENE-----
 ## Pathways ---------------------
 pathwayList <- function (id) {
@@ -259,7 +218,6 @@ pubmedTableServer <- function(id, data) {
 
 ##Expression----
 # module that displays a table for cell anatogram
-
 cellAnatogramTable <- function(id) {
   ns <- NS(id)
   DT::dataTableOutput(outputId = ns("cellanatogram_table"))
@@ -271,10 +229,13 @@ cellAnatogramTableServer <- function(id, data) {
     function(input, output, session) {
       output$cellanatogram_table <- DT::renderDataTable({
         shiny::validate(
-          shiny::need(c("gene_subcell") %in% data()$validate, "No data for this gene"))
+          shiny::need(c("gene_subcell") %in% data()$validate, "")) #intentionally left blank; redundant with plot
         DT::datatable(make_cellanatogram_table(input = data()) %>% 
-                        dplyr::select(Gene, gene, Reliability, Location) %>% 
-                        dplyr::rename(`ENSEMBL ID` = gene),
+                        dplyr::select(id, main_location, value, reliability) %>% 
+                        dplyr::rename(Gene = id, 
+                                      Location = main_location,
+                                      Expression = value, 
+                                      Reliability = reliability),
                       options = list(pageLength = 10))
       })
     }

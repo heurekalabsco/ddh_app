@@ -99,7 +99,7 @@ querySearchInput <- function(id) {
   ns <- NS(id)
   searchInput(
     inputId = ns("gene_or_pathway"),
-    placeholder = "genes, pathways, or GO number", #change to genes, cells, or compounds
+    placeholder = "genes, cells, or compounds", #was genes, pathways, or GO number
     btnSearch = icon("search")
   )
 }
@@ -141,9 +141,10 @@ exampleSearchesPanel <- function(id) {
                           tagList(
                             tags$br(),
                             h3("Examples"),
-                            HTML(examples)#,
-                            #browsePathwaysLink(ns("pathways")),
-                            #browsePathwaysPanel(ns("pathways"))
+                            HTML(examples),
+                            HTML(example_pathways),
+                            tags$ul(tags$li(browsePathwaysLink(ns("pathways")))),
+                            browsePathwaysPanel(ns("pathways"))
                           )
   )
 }
@@ -154,6 +155,56 @@ exampleSearchesPanelServer <- function(id) {
     function(input, output, session) {
       browsePathwaysLinkServer("pathways")
       browsePathwaysPanelServer("pathways")
+    }
+  )
+}
+
+##Browse Pathways----
+# module that displays a table of pathways when an link is clicked
+
+browsePathwaysLink <- function (id) {
+  ns <- NS(id)
+  actionLink(inputId = ns("pathway_click"), "Browse pathways")
+}
+
+browsePathwaysLinkServer <- function(id) {
+  moduleServer(
+    id,
+    function(input, output, session) {
+      observeEvent(input$pathway_click, {}) #event to store the 'click'
+    }
+  )
+}
+
+browsePathwaysPanel <- function (id) {
+  ns <- NS(id)
+  notZeroConditionalPanel(ns("pathway_click"),
+                          tags$br(),
+                          h4("GO Biological Processes"),
+                          DT::dataTableOutput(outputId = ns("pathway_table")))
+}
+
+browsePathwaysPanelServer <- function(id) {
+  moduleServer(
+    id,
+    function(input, output, session) {
+      output$pathway_table <- DT::renderDataTable({
+        DT::datatable(make_pathway_browse_table() %>% 
+                        #remove some columns for now, for simplicity
+                        dplyr::select(-tidyselect::any_of(c("gs_geoid", "gs_exact_source", "gs_url", "gs_pmid"))) %>% 
+                        dplyr::arrange(gs_name) %>% 
+                        #dplyr::mutate(gs_pmid = purrr::map_chr(gs_pmid, pubmed_linkr, number_only = TRUE)) %>% #from shiny_helper.R
+                        dplyr::rename(Pathway = gs_name, 
+                                      Description = gs_description, 
+                                      ID = gs_id, 
+                                      #PMID = gs_pmid, 
+                                      #GEO = gs_geoid, 
+                                      #Source = gs_exact_source, 
+                                      #URL = gs_url, 
+                                      `Pathway Size` = pathway_size), 
+                      escape = FALSE,
+                      options = list(pageLength = 10))
+      })      
     }
   )
 }
