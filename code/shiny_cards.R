@@ -773,6 +773,7 @@ drugGenesCorTableDashServer <- function (id, data) {
 barcodeTab <- function(id) {
   ns <- NS(id)
   divFlexAlignCenter(
+    "Gene Barcode",
     uiOutput(outputId = ns("barcode_tab"))
   )
 }
