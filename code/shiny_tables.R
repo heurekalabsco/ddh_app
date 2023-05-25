@@ -645,63 +645,59 @@ similarGenesTableServer <- function (id, data) {
   )
 }
 
-GenePathwaysTable <- function(id) {
+GenePathwayEnrichmentTable <- function(id) {
   ns <- NS(id)
   tagList(
     # TABLE
     fluidRow(h4(textOutput(ns("text_gene_path_coessentiality")))),
     fluidRow(DT::dataTableOutput(outputId = ns("genes_pathways"))),
     # PLOT
-    fluidRow(actionLink(inputId = ns("network_click"), "View network plot")),
-    tags$br(),
-    conditionalPanel(condition = paste0("input['", ns("network_click"), "'] != 0"), 
-                     fluidRow(h4(textOutput(ns("text_network_plot")))),
-                     # fluidRow(checkboxInput(inputId = ns("labels_network"), 
-                     #                        label = "Show labels", value = FALSE)),
-                     fluidRow(plotOutput(outputId = ns("network_pathway_components"), 
-                                         height = "600px")),
-                     tags$br(),
-                     fluidRow(ddh::make_legend("make_gene_pathways_components_network"))
-    )
+    # fluidRow(actionLink(inputId = ns("network_click"), "View network plot")),
+    tags$br()#,
+    # conditionalPanel(condition = paste0("input['", ns("network_click"), "'] != 0"), 
+    #                  fluidRow(h4(textOutput(ns("text_network_plot")))),
+    #                  # fluidRow(checkboxInput(inputId = ns("labels_network"), 
+    #                  #                        label = "Show labels", value = FALSE)),
+    #                  fluidRow(plotOutput(outputId = ns("network_pathway_components"), 
+    #                                      height = "600px")),
+    #                  tags$br(),
+    #                  fluidRow(ddh::make_legend("make_gene_pathways_components_network"))
+    # )
   )
 }
 
-GenePathwaysTableServer <- function (id, data) {
+GenePathwayEnrichmentTableServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
       # TABLE
-      output$text_gene_path_coessentiality <- renderText({paste0("Pathways with similar dependencies as ", str_c(data()$content, collapse = ", "))})
+      output$text_gene_path_coessentiality <- renderText({paste0("Enriched pathways for ", str_c(data()$content, collapse = ", "))})
       output$genes_pathways <- DT::renderDataTable({
         shiny::validate(
-          shiny::need(c("gene_pathways_components") %in% data()$validate, "No data for this gene"))
-        DT::datatable(make_gene_pathways_components(input = data()) %>%
-                        dplyr::mutate(abs_corr = abs(pearson_corr)) %>% 
-                        dplyr::select("Query" = feature1,
-                                      "Pathway" = feature2,
-                                      "abs(R^2)" = abs_corr) %>% 
+          shiny::need(c("universal_achilles_long") %in% data()$validate, "No dependency data for this gene"))
+        DT::datatable(ddh::make_gene_dependency_enrichment(input = data()) %>% 
                         dplyr::mutate_if(is.numeric, ~ signif(., digits = 3)),
                       options = list(pageLength = 25))
       })
       # CLICKABLE PLOT
-      output$text_network_plot <- renderText({paste0("Network plot of pathways with similar dependencies as ", str_c(data()$content, collapse = ", "))})
-      output$network_pathway_components <- renderPlot({
-        
-        if(!is.null(input$genes_pathways_rows_selected)){
-          highlight_sel_table <- make_gene_pathways_components(input = data()) %>% 
-            dplyr::slice(input$genes_pathways_rows_selected)
-          
-          highlight_sel <- c(highlight_sel_table$feature1, highlight_sel_table$feature2)
-        } else {
-          highlight_sel <- NULL
-        }
-        
-        make_gene_pathways_components_network(input = data(), 
-                                              highlight = highlight_sel,
-                                              cutoff = 0.3, # SET TO NULL AFTER NEXT DATA GENERATION
-                                              fontsize = 4
-        )
-      })
+      # output$text_network_plot <- renderText({paste0("Network plot of pathways with similar dependencies as ", str_c(data()$content, collapse = ", "))})
+      # output$network_pathway_components <- renderPlot({
+      #   
+      #   if(!is.null(input$genes_pathways_rows_selected)){
+      #     highlight_sel_table <- make_gene_pathways_components(input = data()) %>% 
+      #       dplyr::slice(input$genes_pathways_rows_selected)
+      #     
+      #     highlight_sel <- c(highlight_sel_table$feature1, highlight_sel_table$feature2)
+      #   } else {
+      #     highlight_sel <- NULL
+      #   }
+      #   
+      #   make_gene_pathways_components_network(input = data(), 
+      #                                         highlight = highlight_sel,
+      #                                         cutoff = 0.3, # SET TO NULL AFTER NEXT DATA GENERATION
+      #                                         fontsize = 4
+      #   )
+      # })
     }
   )
 }

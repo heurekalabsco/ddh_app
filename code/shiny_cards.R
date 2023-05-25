@@ -1483,7 +1483,6 @@ cellDependenciesPosTableTabServer <- function (id, data) {
         shiny::validate(
           shiny::need(c("gene_master_top_table") %in% data()$validate, "No dependency data for this gene"))
         gt::gt(make_top_table(input = data()) %>% 
-                 # dplyr::mutate("Rank" = row_number()) %>% 
                  dplyr::select(c("Gene" = "gene", "Z-Score" = "z_score")) %>%
                  dplyr::slice(1:5))
       },
@@ -1519,7 +1518,7 @@ cellDependenciesNegTableTabServer <- function (id, data) {
   )
 }
 
-cellDependenciesGenePathwayTableTab <- function(id) {
+genePathwayEnrichmentTableTab <- function(id) {
   ns <- NS(id)
   divFlexAlignCenter(
     "Pathway Enrichment",
@@ -1527,16 +1526,16 @@ cellDependenciesGenePathwayTableTab <- function(id) {
   )
 }
 
-cellDependenciesGenePathwayTableTabServer <- function (id, data) {
+genePathwayEnrichmentTableTabServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
       output$depgenepathwaystab <- render_gt({
-        #UPDATEME
-        # shiny::validate(
-        #   shiny::need(c("gene_pathways_components") %in% data()$validate, "No dependency data for this gene"))
-        gt::gt(make_gene_pathways_components(input = data()) %>%
-                 dplyr::select(Pathway = feature2) %>%
+        shiny::validate(
+          shiny::need(c("universal_achilles_long") %in% data()$validate, "No dependency data for this gene"))
+        gt::gt(make_gene_dependency_enrichment(input = data()) %>%
+                 dplyr::mutate("Rank" = row_number()) %>% 
+                 dplyr::select(Rank, Pathway) %>% 
                  dplyr::slice(1:5))
       },
       height = card_contents_height,

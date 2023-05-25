@@ -387,7 +387,7 @@ genePage <- function (id, subtype) {
                             cardLayout(
                               actionLink(inputId = ns("dep_pos_table_click"), cellDependenciesPosTableTab(ns("dep_pos_table_tab"))), #pos table
                               actionLink(inputId = ns("dep_neg_table_click"), cellDependenciesNegTableTab(ns("dep_neg_table_tab"))), #neg table
-                              actionLink(inputId = ns("dep_gene_pathways_click"), cellDependenciesGenePathwayTableTab(ns("dep_gene_pathways_tab"))),
+                              actionLink(inputId = ns("dep_gene_pathways_click"), genePathwayEnrichmentTableTab(ns("dep_gene_pathways_tab"))),
                               actionLink(inputId = ns("dep_graph_click"), cellDependenciesGraphTab(ns("depgraphtab")))
                             )
                           ),
@@ -420,7 +420,7 @@ genePage <- function (id, subtype) {
                               div(
                                 id = ns("dep_gene_pathways_tabcard"),
                                 style = "padding-left:1%",
-                                GenePathwaysTable(ns("gene_paths_comps")),
+                                GenePathwayEnrichmentTable(ns("gene_paths_comps")),
                                 tags$br()
                               )
                             )
@@ -916,9 +916,9 @@ genePageServer <- function(id, subtype) {
         shinyjs::hide("dep_graph_tabcard")
       })
       #serves the card
-      cellDependenciesGenePathwayTableTabServer("dep_gene_pathways_tab", data)
+      genePathwayEnrichmentTableTabServer("dep_gene_pathways_tab", data)
       #serves the table
-      GenePathwaysTableServer("gene_paths_comps", data)
+      GenePathwayEnrichmentTableServer("gene_paths_comps", data)
       
       # CONDITIONAL graph
       observeEvent(input$dep_graph_click, { #store click
