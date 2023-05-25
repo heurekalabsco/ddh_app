@@ -366,19 +366,19 @@ geneMolecularFeaturesTableDashServer <- function (id, data) {
 }
 
 ##cell dependencies graph-----
-cellDependenciesGraphDash <- function(id) {
+cellDependenciesGraphTab <- function(id) {
   ns <- NS(id)
   divFlexAlignCenter(
     "Dependencies Graph",
-    visNetworkOutput(outputId = ns("depgraphdash"))
+    visNetworkOutput(outputId = ns("depgraphtab"))
   )
 }
 
-cellDependenciesGraphDashServer <- function (id, data) {
+cellDependenciesGraphTabServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$depgraphdash <- renderVisNetwork({
+      output$depgraphtab <- renderVisNetwork({
         #check to see if data are there
         shiny::validate(
           shiny::need(c("universal_achilles_long") %in% data()$validate, "No dependency data for this gene"))

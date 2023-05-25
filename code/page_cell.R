@@ -35,7 +35,7 @@ cellPage <- function (id, subtype) {
                  private(actionLink(inputId = ns("link_to_cellLineDrugTable"), cellDrugsTableDash(ns("celldrugtabledash")))),
                  private(actionLink(inputId = ns("link_to_cellLineDependenciesPlotDash"), cellDependenciesPlotDash(ns("celldepdash")))),
                  private(actionLink(inputId = ns("link_to_cellLineCoessentiality"), cellLineDependenciesPosTableDash(ns("celldeptabledash")))), 
-                 private(actionLink(inputId = ns("link_to_cellLineDependenciesGraphDash"), cellDependenciesGraphDash(ns("celldepgraphdash"))))
+                 private(actionLink(inputId = ns("link_to_cellLineDependenciesGraphDash"), cellDependenciesGraphTab(ns("celldepgraphdash"))))
                )
       ),
       ## INFO-----
@@ -681,7 +681,7 @@ cellPageServer <- function(id, subtype) {
         updateNavbarPage(session, inputId = "cellNavBar", selected = "cell_dependencies_graph")
       })
       
-      private({cellDependenciesGraphDashServer("celldepgraphdash", data)})
+      private({cellDependenciesGraphTabServer("celldepgraphdash", data)})
       private({geneNetworkGraphServer("cell_deps_graph", data)})
       
       # # Drug Cor
