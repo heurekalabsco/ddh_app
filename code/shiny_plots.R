@@ -166,8 +166,9 @@ proteinStructurePlot3dServer <- function (id, data) {
       
       output$gene_ui <- renderUI({
         
-        gene_options <- make_structure3d_table(input = data()) %>%
-          pull(gene_name) %>%
+        gene_options <- 
+          ddh::make_structure3d_table(input = data()) %>%
+          dplyr::pull(id) %>%
           unique()
         
         selectizeInput(session$ns("gene3dstructure"),
@@ -180,25 +181,24 @@ proteinStructurePlot3dServer <- function (id, data) {
       output$title_structure3d_table <- renderText({paste0("PDB table for ", str_c(input$gene3dstructure, collapse = ", "))})
       output$structure3d_table <- DT::renderDataTable({
         shiny::validate(
-          shiny::need(c("universal_proteins") %in% data()$validate, "No data found."))
+          shiny::need(c("gene_pdb_table") %in% data()$validate, "No PDB data found."))
         
-        DT::datatable(make_structure3d_table(input = data()) %>%
-                        mutate(uniprot_id = uniprot_linkr2(uniprot_id),
-                               pdb = pdb_linkr(pdb)) %>% 
-                        dplyr::select('Query' = gene_name, 
-                                      'UniProt ID' = uniprot_id, 
-                                      'PDB ID' = pdb,
-                                      'Name' = title, 
-                                      'Organism' = organism) %>% 
-                        dplyr::filter(Query == input$gene3dstructure),
-                      escape = FALSE,
-                      options = list(pageLength = 10),
-                      selection = c("single"),
+        DT::datatable(
+          ddh::make_structure3d_table(input = data()) %>%
+            dplyr::mutate(pdb = pdb_linkr(pdb)) %>% 
+            dplyr::select('Query' = id, 
+                          'PDB ID' = pdb,
+                          'Name' = title, 
+                          'Organism' = organism) %>% 
+            dplyr::filter(Query == input$gene3dstructure),
+          escape = FALSE,
+          options = list(pageLength = 10),
+          selection = c("single"),
         )
       })
       
       ## PLOT
-      rv <- reactiveValues(gene3dstructure = NULL,
+      rv <- reactiveValues(#gene3dstructure = NULL,
                            pdb3dstructure = NULL,
                            color3dstructure = FALSE,
                            ribbon3dstructure = FALSE,
@@ -210,14 +210,15 @@ proteinStructurePlot3dServer <- function (id, data) {
       observeEvent(input$update3d, {
         
         if(!is.null(input$structure3d_table_rows_selected)){
-          pdb3dstructure <- make_structure3d_table(input = data()) %>% 
+          pdb3dstructure <- 
+            ddh::make_structure3d_table(input = data()) %>% 
             dplyr::slice(input$structure3d_table_rows_selected) %>% 
-            pull(pdb)
+            dplyr::pull(pdb)
         } else {
           pdb3dstructure <- NULL
         }
         
-        rv$gene3dstructure <- input$gene3dstructure 
+        #rv$gene3dstructure <- input$gene3dstructure 
         rv$pdb3dstructure <- pdb3dstructure
         rv$color3dstructure <- input$color3dstructure
         rv$ribbon3dstructure <- input$ribbon3dstructure
@@ -227,20 +228,20 @@ proteinStructurePlot3dServer <- function (id, data) {
       })
       
       plot3dprotein <- reactive({
-        make_structure3d(input = data(),
-                         gene_id = rv$gene3dstructure,
-                         pdb_id = rv$pdb3dstructure,
-                         color = rv$color3dstructure,
-                         ribbon = rv$ribbon3dstructure,
-                         selection = rv$selection3dstructure,
-                         resi = rv$residue,
-                         chain = rv$chain)
+        ddh::make_structure3d(input = data(),
+                              #gene_id = rv$gene3dstructure,
+                              pdb_id = rv$pdb3dstructure,
+                              color = rv$color3dstructure,
+                              ribbon = rv$ribbon3dstructure,
+                              selection = rv$selection3dstructure,
+                              resi = rv$residue,
+                              chain = rv$chain)
       })
       
       output$text_protein_structure3d <- renderText({paste0("Predicted 3D Structure for ", str_c(input$gene3dstructure, collapse = ", "))})
       output$protein_structure3D <- r3dmol::renderR3dmol({
         shiny::validate(
-          shiny::need(c("universal_proteins") %in% data()$validate, "No data found."))
+          shiny::need(c("gene_pdb_table") %in% data()$validate, "No data found."))
         plot3dprotein()
       })
     }
@@ -341,8 +342,8 @@ clusterRadialPlotServer <- function (id, data) {
         
         clust_num <- 
           ddh::get_data_object(object_names = data()$content,
-                          dataset_name = "gene_signature_clusters",
-                          pivotwider = TRUE) %>%
+                               dataset_name = "gene_signature_clusters",
+                               pivotwider = TRUE) %>%
           dplyr::pull(clust) %>%
           unique()
         
@@ -535,7 +536,7 @@ clusterEnrichmentPlotServer <- function (id, data) {
         shiny::validate(
           shiny::need(c("universal_proteins") %in% data()$validate, "No data found."),
           shiny::need(length(clust_num) == 1, 
-               "More than one cluster identified in the table above. Cluster enrichment analysis is only available for individual gene queries or multiple gene queries belonging to the same cluster."))
+                      "More than one cluster identified in the table above. Cluster enrichment analysis is only available for individual gene queries or multiple gene queries belonging to the same cluster."))
         make_cluster_enrich(input = data(),
                             ontology = input$ontology_info_plot,
                             num_terms = input$num_terms)
@@ -804,7 +805,7 @@ cellAnatogramFacetPlot <- function(id) {
     conditionalPanel(condition = paste0("input['", ns("anato_facet_click"), "'] != 0"),
                      plotOutput(ns("cell_anatogram_gene_facet"))),
     tags$br(),
-    )
+  )
 }
 
 cellAnatogramFacetPlotServer <- function(id, data) {
@@ -946,8 +947,8 @@ cellGeneExpressionPlotServer <- function(id, data) {
       output$expression_gene_plot_title <- renderText({paste0("Expression values for ", str_c(data()$content, collapse = ", "))})
       output$expression_gene_plot <- renderUI({
         #check to see if data are there
-          shiny::validate(
-            shiny::need(c("universal_expression_long") %in% data()$validate, "No data found."))
+        shiny::validate(
+          shiny::need(c("universal_expression_long") %in% data()$validate, "No data found."))
         #check to see if image exists
         img_path <- ddh::load_image(input = data(), fun_name = "make_cellexpression", card = FALSE)
         if(!is.null(img_path)) {
@@ -987,8 +988,8 @@ cellProteinExpressionPlotServer <- function(id, data) {
       output$expression_protein_plot_title <- renderText({paste0("Expression values for ", str_c(data()$content, collapse = ", "))})
       output$expression_protein_plot <- renderUI({
         #check to see if data are there
-          shiny::validate(
-            shiny::need(c("universal_expression_long") %in% data()$validate, "No data found."))
+        shiny::validate(
+          shiny::need(c("universal_expression_long") %in% data()$validate, "No data found."))
         #check to see if image exists
         img_path <- NULL #override b/c protein data not stored
         if(!is.null(img_path)) {
@@ -1365,11 +1366,11 @@ MolecularFeaturesSegmentPlot <- function(id) {
     tags$br(),
     fluidRow(    
       div(
-      id = ns("mol_feat_seg_plot_id"),
-      style = "padding-left:1%",
-      plotOutput(outputId = ns("mol_feat_seg_plot"), width = "100%") %>% 
-        withSpinnerColor(plot_type = "gene"),
-      actionLink(inputId = ns("segments_table_click"), " View table")
+        id = ns("mol_feat_seg_plot_id"),
+        style = "padding-left:1%",
+        plotOutput(outputId = ns("mol_feat_seg_plot"), width = "100%") %>% 
+          withSpinnerColor(plot_type = "gene"),
+        actionLink(inputId = ns("segments_table_click"), " View table")
       )
     ),
     conditionalPanel(condition = paste0("input['", ns("segments_table_click"), "'] != 0"),
@@ -1379,8 +1380,8 @@ MolecularFeaturesSegmentPlot <- function(id) {
                          style = "padding-left:1%",
                          h4(textOutput(ns("mol_feat_seg_table_text"))),
                          DT::dataTableOutput(outputId = ns("mol_feat_seg_table"))
-                         )
                        )
+                     )
     )
   )
 }
