@@ -340,16 +340,14 @@ clusterRadialPlotServer <- function (id, data) {
       output$cluster_text_radial_plot <- renderText({
         
         clust_num <- 
-          data_gene_signature_clusters <-
-          get_data_object(object_names = data()$content,
+          ddh::get_data_object(object_names = data()$content,
                           dataset_name = "gene_signature_clusters",
                           pivotwider = TRUE) %>%
-          dplyr::mutate(across(contains(c("X", "clust", "member_prob")), as.numeric)) %>%
           dplyr::pull(clust) %>%
           unique()
         
         shiny::validate(
-          shiny::need(c("universal_proteins") %in% data()$validate, "No data found."))
+          shiny::need(c("gene_signature_clusters") %in% data()$validate, "No data found."))
         
         title_text <- paste0("Amino Acid Signature for Cluster ", 
                              str_c(clust_num, collapse = ", "))
@@ -401,7 +399,7 @@ clusterAABarPlotServer <- function (id, data) {
           unique()
         
         shiny::validate(
-          shiny::need(c("universal_proteins") %in% data()$validate, "No data found."))
+          shiny::need(c("gene_signature_clusters") %in% data()$validate, "No data found."))
         
         title_text <- paste0("Amino Acid Signature for Cluster ", 
                              str_c(clust_num, collapse = ", "))
@@ -410,7 +408,7 @@ clusterAABarPlotServer <- function (id, data) {
       })
       output$cluster_aa_bar_plot <- renderPlot({
         shiny::validate(
-          shiny::need(c("universal_proteins") %in% data()$validate, "No data found."))
+          shiny::need(c("gene_signature_clusters") %in% data()$validate, "No data found."))
         make_radial(input = data(),
                     relative = input$cluster_bar_mean_relative,
                     cluster = TRUE,
@@ -447,27 +445,21 @@ UMAPPlotServer <- function (id, data) {
     id,
     function(input, output, session) {
       output$text_umap_plot <- renderText({
-        
-        clust_num <- make_clustering_table(input = data()) %>%
-          dplyr::pull(clust) %>%
-          unique()
-        
         shiny::validate(
-          shiny::need(c("universal_proteins") %in% data()$validate, "No data found."))
+          shiny::need(c("gene_signature_clusters") %in% data()$validate, "No data found."))
         
-        title_text <- paste0("UMAP Embeddings for Cluster ", 
-                             str_c(clust_num, collapse = ", "))
+        clust_num <- ddh::get_cluster(input = data())
+        
+        title_text <- glue::glue('UMAP Embeddings for Cluster {stringr::str_c(clust_num, collapse = ", ")}')
         
         return(title_text)
       })
       output$umap_plot <- renderPlot({
-        
-        clust_num <- make_clustering_table(input = data()) %>%
-          dplyr::pull(clust) %>%
-          unique()
-        
         shiny::validate(
           shiny::need(c("universal_proteins") %in% data()$validate, "No data found."))
+        
+        clust_num <- ddh::get_cluster(input = data())
+        
         make_umap_plot(input = data(),
                        show_subset = input$show_all_umap,
                        labels = input$labels_umap)
@@ -489,11 +481,10 @@ clusterEnrichmentPlotServer <- function (id, data) {
     function(input, output, session) {
       output$conditional_clusterenrichmentplot <- renderUI({
         if(!is.null(data()$content)) {
-          sig_clust <- make_clustering_table(input = data()) %>%
-            dplyr::pull(clust) %>%
-            unique()
+          sig_clust <- ddh::get_cluster(input = data())
           
-          sig_clust_len <- sig_clust %>% 
+          sig_clust_len <- 
+            sig_clust %>% 
             length()
         } else {
           sig_clust <- 0
@@ -523,13 +514,10 @@ clusterEnrichmentPlotServer <- function (id, data) {
         
       })
       output$text_cluster_enrich_plot <- renderText({
-        
-        clust_num <- make_clustering_table(input = data()) %>%
-          dplyr::pull(clust) %>%
-          unique()
-        
         shiny::validate(
           shiny::need(c("universal_proteins") %in% data()$validate, "No data found."))
+        
+        clust_num <- ddh::get_cluster(input = data())
         
         if(length(clust_num) == 1) {
           title_text <- paste0("Enrichment Analysis Plot for Cluster ", 
@@ -542,9 +530,7 @@ clusterEnrichmentPlotServer <- function (id, data) {
       })
       output$cluster_enrichment_plot <- renderPlot({
         
-        clust_num <- make_clustering_table(input = data()) %>%
-          dplyr::pull(clust) %>%
-          unique()
+        clust_num <- ddh::get_cluster(input = data())
         
         shiny::validate(
           shiny::need(c("universal_proteins") %in% data()$validate, "No data found."),

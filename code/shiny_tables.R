@@ -78,7 +78,7 @@ proteinClusterTableServer <- function(id, data) {
       output$text_cluster_table <- renderText({paste0("Amino Acid Signature Clusters for ", str_c(data()$content, collapse = ", "))})
       output$prot_clust_table <- DT::renderDataTable({
         shiny::validate(
-          shiny::need(c("universal_proteins") %in% data()$validate, "No cluster data for this protein"))
+          shiny::need(c("gene_signature_clusters") %in% data()$validate, "No cluster data for this protein"))
         withProgress(message = 'Building a smart clustering table...', {
           DT::datatable(make_clustering_table(input = data(),
                                               cluster = input$show_all_clusters_tab,
@@ -86,8 +86,7 @@ proteinClusterTableServer <- function(id, data) {
                           dplyr::mutate(gene_name = map_chr(gene_name, internal_link)) %>%
                           dplyr::rename('Gene Name' = gene_name, 
                                         'Protein Name' = protein_name, 
-                                        'Cluster' = clust,
-                                        'Cluster Keywords' = cluster_name),
+                                        'Cluster Keywords' = description),
                         escape = FALSE,
                         options = list(pageLength = 10))
         })
