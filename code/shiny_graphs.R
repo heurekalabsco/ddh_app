@@ -10,7 +10,7 @@ geneNetworkGraphServer <- function(id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$text_graph <- renderText({paste0("Co-essentiality network graph for ", str_c(data()$content, collapse = ", "))})
+      output$text_graph <- renderText({paste0("Co-essentiality graph for ", str_c(data()$content, collapse = ", "))})
       #establish reactive value
       rv <- reactiveValues(degree = 2, 
                            threshold = 10,

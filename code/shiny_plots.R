@@ -1159,7 +1159,7 @@ cellDependenciesDensityPlotServer <- function(id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$cell_dep_density_title <- renderText({paste0("Dependency density plot for ", str_c(data()[[3]], collapse = ", "))})
+      output$cell_dep_density_title <- renderText({paste0("Dependency density plot for ", str_c(data()$content, collapse = ", "))})
       output$density_plot_plot <- renderUI({
         fluidRow(plotOutput(outputId = session$ns("cell_deps_density"),  height = "auto") %>% 
                    withSpinnerColor(plot_type = data()$type) #see shiny_helper.R
@@ -1210,9 +1210,10 @@ cellDependenciesBarPlotServer <- function (id, data) {
 cellDepsLinPlot <- function(id) {
   ns <- NS(id)
   tagList(
-    fluidRow(prettySwitch(inputId = ns("celllin_click_high"), "Show statistically significant")),
+    h4(textOutput(outputId = ns("lineage_title"))),
     tags$br(),
-    fluidRow(plotOutput(outputId = ns("cell_deps_lin"),  height = "auto") %>% 
+    fluidRow(prettySwitch(inputId = ns("celllin_click_high"), "Show statistically significant"),
+             plotOutput(outputId = ns("cell_deps_lin"),  height = "auto") %>% 
                withSpinnerColor(plot_type = "gene") #see shiny_helper.R
     ),
     tags$br(),
@@ -1224,6 +1225,7 @@ cellDepsLinPlotServer <- function(id, data) {
   moduleServer(
     id,
     function(input, output, session) {
+      output$lineage_title <- renderText({paste0("Dependency lineage plot for ", str_c(data()$content, collapse = ", "))})
       output$cell_deps_lin <- renderPlot({
         shiny::validate(
           shiny::need(c("universal_achilles_long") %in% data()$validate, "No data found."))
@@ -1240,9 +1242,10 @@ cellDepsLinPlotServer <- function(id, data) {
 cellDepsSubLinPlot <- function(id) {
   ns <- NS(id)
   tagList(
-    fluidRow(prettySwitch(inputId = ns("cellsublin_click_high"), "Show statistically significant")),
+    h4(textOutput(outputId = ns("sublineage_title"))),
     tags$br(),
-    fluidRow(plotOutput(outputId = ns("cell_deps_sublin"),  height = "auto") %>% 
+    fluidRow(prettySwitch(inputId = ns("cellsublin_click_high"), "Show statistically significant"),
+             plotOutput(outputId = ns("cell_deps_sublin"),  height = "auto") %>% 
                withSpinnerColor(plot_type = "gene") #see shiny_helper.R
     ),
     tags$br(),
@@ -1254,6 +1257,7 @@ cellDepsSubLinPlotServer <- function(id, data) {
   moduleServer(
     id,
     function(input, output, session) {
+      output$sublineage_title <- renderText({paste0("Dependency sublineage plot for ", str_c(data()$content, collapse = ", "))})
       output$cell_deps_sublin <- renderPlot({
         shiny::validate(
           shiny::need(c("universal_achilles_long") %in% data()$validate, "No data found."))

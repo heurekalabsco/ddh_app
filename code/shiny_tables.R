@@ -347,7 +347,7 @@ cellDependenciesTableServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$text_cell_dep_table <- renderText({paste0("Dependency table generated for ", str_c(data()$content, collapse = ", "))})
+      output$text_cell_dep_table <- renderText({paste0("Dependency table for ", str_c(data()$content, collapse = ", "))})
       output$target_achilles <- DT::renderDataTable({
         shiny::validate(
           shiny::need(c("universal_achilles_long") %in% data()$validate, "No dependency data for this gene"))
@@ -618,9 +618,6 @@ similarGenesTableServer <- function (id, data) {
                             greater_than = censor_status$num_sim_genes) %>% 
           nrow()
       })
-      # 
-      # observeEvent(input$sim_pathway_click, { #event to store the 'click'
-      # })
       output$text_dep_top <- renderText({paste0(censor_status$num, " genes with similar dependencies as ", str_c(data()$content, collapse = ", "))})      
       output$dep_top <- DT::renderDataTable({
         shiny::validate(
@@ -632,44 +629,18 @@ similarGenesTableServer <- function (id, data) {
           nrow()
         
         DT::datatable(
-          make_censor_table(input = data(), 
+          ddh::make_censor_table(input = data(), 
                             censor = censor_status$censor, 
                             greater_than = censor_status$num_sim_genes) %>%
-            # dplyr::mutate(gene = map_chr(gene, internal_link, linkout_img = FALSE)) %>% #from fun_helper.R
             dplyr::rename("Query" = "id", "Gene" = "gene", "Name" = "gene_name",
                           "R^2" = "r2", "Z-Score" = "z_score", "Co-publication Count" = "concept_count", "Co-publication Index" = "concept_index") %>%
             dplyr::select("Query", "Gene", "Name", input$vars_dep_top) %>%
-            dplyr::mutate_if(is.numeric, ~ signif(., digits = 3)
-            ),
+            dplyr::mutate_if(is.numeric, ~ signif(., digits = 3)) %>% 
+            dplyr::mutate(Gene = map_chr(Gene, internal_link, linkout_img = FALSE)),
           escape = FALSE,
           options = list(pageLength = 25)
         )
       })
-    }
-  )
-}
-
-similarPathwaysTable <- function(id) {
-  ns <- NS(id)
-  tagList(
-    fluidRow(h4(textOutput(ns("text_pos_enrich")))),
-    fluidRow(DT::dataTableOutput(outputId = ns("pos_enrich")))
-  )
-}
-
-similarPathwaysTableServer <- function (id, data) {
-  moduleServer(
-    id,
-    function(input, output, session) { 
-      output$text_pos_enrich <- renderText({paste0("Pathways of genes with similar dependencies as ", str_c(data()$content, collapse = ", "))})
-      output$pos_enrich <- DT::renderDataTable({
-        shiny::validate(
-          shiny::need(c("gene_master_positive") %in% data()$validate, "No dependency data for this gene"))
-        DT::datatable(
-          make_enrichment_top(input = data()) %>% 
-            dplyr::mutate_if(is.numeric, ~ signif(., digits = 3)),
-          options = list(pageLength = 25))
-      })  
     }
   )
 }
@@ -865,9 +836,6 @@ dissimilarGenesTable <- function(id) {
   ns <- NS(id)
   tagList(
     fluidRow(h4(textOutput(ns("text_dep_bottom")))),
-    # shinyWidgets::prettySwitch(inputId = ns("gls_table_bottom"), 
-    #                            "Show GLS table", 
-    #                            value = FALSE),
     fluidRow(checkboxGroupInput(inputId = ns("vars_dep_bottom"), 
                                 "Select columns:",
                                 c("R^2", "Z-Score", "Co-publication Count", "Co-publication Index"), # "GLS p-value"
@@ -881,26 +849,20 @@ dissimilarGenesTableServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) { 
-      observeEvent(input$dsim_pathway_click, { #event to store the 'click'
-      })
-      output$text_dep_bottom <- renderText({paste0(nrow(make_bottom_table(input = data()#, 
-                                                                          # gls = input$gls_table_bottom
-      )
-      ), " genes with dissimilar dependencies as ", str_c(data()$content, collapse = ", "))})      
+      output$text_dep_bottom <- renderText({paste0(nrow(make_bottom_table(input = data())), 
+                                                   " genes with dissimilar dependencies as ", 
+                                                   str_c(data()$content, collapse = ", "))})      
       output$dep_bottom <- DT::renderDataTable({
         shiny::validate(
           shiny::need(c("gene_master_bottom_table") %in% data()$validate, "No dependency data for this gene"))
+        
         DT::datatable(
-          make_bottom_table(input = data()#, 
-                            # gls = input$gls_table_bottom
-          ) %>%
-            dplyr::mutate(gene = map_chr(gene, internal_link, linkout_img = FALSE)) %>%  #from fun_helper.R 
-            #dplyr::mutate(link = map_chr(gene, internal_link, linkout_img = TRUE)) %>% 
-            dplyr::rename("Query" = "fav_gene", "Gene" = "gene", "Name" = "name", 
-                          # "GLS p-value" = "GLSpvalue", 
+          ddh::make_bottom_table(input = data()) %>%
+            dplyr::rename("Query" = "id", "Gene" = "gene", "Name" = "name", 
                           "R^2" = "r2", "Z-Score" = "z_score", "Co-publication Count" = "concept_count", "Co-publication Index" = "concept_index") %>%
             dplyr::select("Query", "Gene", "Name", input$vars_dep_bottom) %>%
-            dplyr::mutate_if(is.numeric, ~ signif(., digits = 3)),
+            dplyr::mutate_if(is.numeric, ~ signif(., digits = 3)) %>% 
+            dplyr::mutate(Gene = map_chr(Gene, internal_link, linkout_img = FALSE)),
           escape = FALSE,
           options = list(pageLength = 25))
       })
@@ -991,31 +953,6 @@ dissimilarExpCellsTableServer <- function (id, data) {
           escape = FALSE,
           options = list(pageLength = 25))
       })
-    }
-  )
-}
-
-dissimilarPathwaysTable <- function(id) {
-  ns <- NS(id)
-  tagList(
-    fluidRow(h4(textOutput(ns("text_neg_enrich")))),
-    fluidRow(DT::dataTableOutput(outputId = ns("neg_enrich")))
-  )
-}
-
-dissimilarPathwaysTableServer <- function (id, data) {
-  moduleServer(
-    id,
-    function(input, output, session) { 
-      output$text_neg_enrich <- renderText({paste0("Pathways of genes with inverse dependencies as ", str_c(data()$content, collapse = ", "))})
-      output$neg_enrich <- DT::renderDataTable({
-        shiny::validate(
-          shiny::need(c("gene_master_negative") %in% data()$validate, "No dependency data for this gene"))
-        DT::datatable(
-          make_enrichment_bottom(input = data()) %>% 
-            dplyr::mutate_if(is.numeric, ~ signif(., digits = 3)),
-          options = list(pageLength = 25))
-      })      
     }
   )
 }

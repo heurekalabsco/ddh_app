@@ -369,7 +369,7 @@ geneMolecularFeaturesTableDashServer <- function (id, data) {
 cellDependenciesGraphTab <- function(id) {
   ns <- NS(id)
   divFlexAlignCenter(
-    "Dependencies Graph",
+    "Co-essentiality Graph",
     visNetworkOutput(outputId = ns("depgraphtab"))
   )
 }
@@ -1494,31 +1494,6 @@ cellDependenciesPosTableTabServer <- function (id, data) {
   )
 }
 
-cellDependenciesPosPathwayTableTab <- function(id) {
-  ns <- NS(id)
-  divFlexAlignCenter(
-    "Positive Enrichment",
-    gt_output(outputId = ns("deppospathwaystab"))
-  )
-}
-cellDependenciesPosPathwayTableTabServer <- function (id, data) {
-  moduleServer(
-    id,
-    function(input, output, session) {
-      output$deppospathwaystab <- render_gt({
-        shiny::validate(
-          shiny::need(c("gene_master_positive") %in% data()$validate, "No dependency data for this gene"))
-        gt::gt(make_enrichment_top(input = data()) %>% 
-                 dplyr::select(`Gene List`) %>%
-                 dplyr::slice(1:5))
-      },
-      height = card_contents_height,
-      width = card_contents_width
-      )
-    }
-  )
-}
-
 cellDependenciesNegTableTab <- function(id) {
   ns <- NS(id)
   divFlexAlignCenter(
@@ -1534,33 +1509,7 @@ cellDependenciesNegTableTabServer <- function (id, data) {
         shiny::validate(
           shiny::need(c("gene_master_bottom_table") %in% data()$validate, "No dependency data for this gene"))
         gt::gt(make_bottom_table(input = data()) %>% 
-                 # dplyr::mutate("Rank" = row_number()) %>% 
                  dplyr::select(c("Gene" = "gene", "Z-Score" = "z_score")) %>%
-                 dplyr::slice(1:5))
-      },
-      height = card_contents_height,
-      width = card_contents_width
-      )
-    }
-  )
-}
-
-cellDependenciesNegPathwayTableTab <- function(id) {
-  ns <- NS(id)
-  divFlexAlignCenter(
-    "Negative Enrichment",
-    gt_output(outputId = ns("depnegpathwaystab"))
-  )
-}
-cellDependenciesNegPathwayTableTabServer <- function (id, data) {
-  moduleServer(
-    id,
-    function(input, output, session) {
-      output$depnegpathwaystab <- render_gt({
-        shiny::validate(
-          shiny::need(c("gene_master_negative") %in% data()$validate, "No dependency data for this gene"))
-        gt::gt(make_enrichment_bottom(input = data()) %>% 
-                 dplyr::select(`Gene List`) %>%
                  dplyr::slice(1:5))
       },
       height = card_contents_height,
@@ -1573,7 +1522,7 @@ cellDependenciesNegPathwayTableTabServer <- function (id, data) {
 cellDependenciesGenePathwayTableTab <- function(id) {
   ns <- NS(id)
   divFlexAlignCenter(
-    "Pathways",
+    "Pathway Enrichment",
     gt_output(outputId = ns("depgenepathwaystab"))
   )
 }

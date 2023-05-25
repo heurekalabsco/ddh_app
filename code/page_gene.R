@@ -274,9 +274,7 @@ genePage <- function (id, subtype) {
                               )
                             )
                           )
-                 )#, #end tab panel
-                 # tabPanel("Coexpression", value = "expression_co",
-                 #          "Integrated co-expression analyses")
+                 ) #end tab panel
       ),
       # COMPOUNDS (thing)-----
       navbarMenu(title = "COMPOUNDS",
@@ -339,7 +337,6 @@ genePage <- function (id, subtype) {
                               div(
                                 id = ns("lineage_tabcard"),
                                 style = "padding-left:1%",
-                                # cellDepsLinPlotText(ns("dep_lineage_text")), 
                                 cellDepsLinPlot(ns("dep_lineage")),
                                 tags$br()
                               )
@@ -351,7 +348,6 @@ genePage <- function (id, subtype) {
                               div(
                                 id = ns("sublineage_tabcard"),
                                 style = "padding-left:1%",
-                                # cellDepsSubLinPlotText(ns("dep_sublineage_text")), 
                                 cellDepsSubLinPlot(ns("dep_sublineage")),
                                 tags$br()
                               )
@@ -363,7 +359,6 @@ genePage <- function (id, subtype) {
                               div(
                                 id = ns("dep_table_tabcard"),
                                 style = "padding-left:1%",
-                                # cellDependenciesTableText(ns("dep_table_text")), 
                                 cellDependenciesTable(ns("dep_table")),
                                 tags$br()
                               )
@@ -391,9 +386,7 @@ genePage <- function (id, subtype) {
                           fluidRow(
                             cardLayout(
                               actionLink(inputId = ns("dep_pos_table_click"), cellDependenciesPosTableTab(ns("dep_pos_table_tab"))), #pos table
-                              # actionLink(inputId = ns("dep_pos_pathways_click"), cellDependenciesPosPathwayTableTab(ns("dep_pos_pathways_tab"))), #pos pathways
                               actionLink(inputId = ns("dep_neg_table_click"), cellDependenciesNegTableTab(ns("dep_neg_table_tab"))), #neg table
-                              # actionLink(inputId = ns("dep_neg_pathways_click"), cellDependenciesNegPathwayTableTab(ns("dep_neg_pathways_tab"))), #neg pathways
                               actionLink(inputId = ns("dep_gene_pathways_click"), cellDependenciesGenePathwayTableTab(ns("dep_gene_pathways_tab"))),
                               actionLink(inputId = ns("dep_graph_click"), cellDependenciesGraphTab(ns("depgraphtab")))
                             )
@@ -409,19 +402,7 @@ genePage <- function (id, subtype) {
                                 tags$br()
                               )
                             )
-                          ), 
-                          #conditional for pos pathways
-                          # fluidRow(
-                          #   shinyjs::hidden(
-                          #     div(
-                          #       id = ns("dep_pos_pathways_tabcard"),
-                          #       style = "padding-left:1%",
-                          #       # similarPathwaysTableText(ns("sim_pathways_text")), 
-                          #       similarPathwaysTable(ns("sim_pathways")), ##REMOVEE
-                          #       tags$br()
-                          #     )
-                          #   )
-                          # ), 
+                          ),
                           #conditional for neg table
                           fluidRow(
                             shinyjs::hidden(
@@ -432,19 +413,8 @@ genePage <- function (id, subtype) {
                                 tags$br()
                               )
                             )
-                          ), 
-                          #conditional for neg pathways
-                          # fluidRow(
-                          #   shinyjs::hidden(
-                          #     div(
-                          #       id = ns("dep_neg_pathways_tabcard"),
-                          #       style = "padding-left:1%",
-                          #       dissimilarPathwaysTable(ns("dsim_pathways")),##REMOVEE
-                          #       tags$br()
-                          #     )
-                          #   )
-                          # ),
-                          #conditional for gene - pathways
+                          ),
+                          #conditional for pathway enrichment
                           fluidRow(
                             shinyjs::hidden(
                               div(
@@ -867,7 +837,6 @@ genePageServer <- function(id, subtype) {
       #serves the card for the image
       cellDepsLinPlotTabServer("dep_lineage_tab", data)
       #serves the data plots
-      cellDepsLinPlotTextServer("dep_lineage_text", data)
       cellDepsLinPlotServer("dep_lineage", data)
       
       # CONDITIONAL sublineage
@@ -882,7 +851,6 @@ genePageServer <- function(id, subtype) {
       #serves the card for the image
       cellDepsSubLinPlotTabServer("dep_sublineage_tab", data)
       #serves the data plots
-      cellDepsSubLinPlotTextServer("dep_sublineage_text", data)
       cellDepsSubLinPlotServer("dep_sublineage", data)
       
       # CONDITIONAL table
@@ -897,7 +865,6 @@ genePageServer <- function(id, subtype) {
       #serves the card for the image
       cellDependenciesTableTabServer("dep_table_tab", data)
       #serves the data table
-      cellDependenciesTableTextServer("dep_table_text", data)
       cellDependenciesTableServer("dep_table", data)    
       
       # CONDITIONAL expdep
@@ -927,7 +894,6 @@ genePageServer <- function(id, subtype) {
       #serves the card
       cellDependenciesPosTableTabServer("dep_pos_table_tab", data)
       #serves the table
-      # similarGenesTableTextServer("sim_text", data) ##REMOVEE
       similarGenesTableServer("sim", data)
       
       # CONDITIONAL neg table
@@ -940,7 +906,6 @@ genePageServer <- function(id, subtype) {
       #serves the card
       cellDependenciesNegTableTabServer("dep_neg_table_tab", data)
       #serves the table
-      # dissimilarGenesTableTextServer("dsim_text", data) ## REMOVE
       dissimilarGenesTableServer("dsim", data)
 
       # CONDITIONAL gene pathways
