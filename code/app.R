@@ -13,7 +13,7 @@ source(here::here("code", "private.R"))
 source(here::here("code", "data.R"))
 
 #FUNCTIONS-----
-ddh::load_ddh_colors()
+# ddh::load_ddh_colors() # No need anymore
 source(here::here("code", "fun_search.R"), local = TRUE)
 
 #SHINY FUNCTIONS-----
