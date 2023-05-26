@@ -484,7 +484,7 @@ MolecularFeaturesTableServer <- function(id, data) {
         shiny::validate(
           shiny::need(c("universal_achilles_long") %in% data()$validate, "No data found."))
         #render table
-        DT::datatable(ddh::make_gene_molecular_features(input = data()) %>% 
+        DT::datatable(ddh::make_molecular_features_table(input = data()) %>% 
                         dplyr::mutate(Feature = map_chr(Feature, internal_link)),
                       rownames = FALSE,
                       escape = FALSE,
@@ -498,7 +498,7 @@ MolecularFeaturesTableServer <- function(id, data) {
         shiny::validate(
           shiny::need(c("universal_achilles_long") %in% data()$validate, "No data found."))
         #plot
-        ddh::gene_molecular_features_barplot(input = data())
+        ddh::make_molecular_features(input = data())
       })
     }
   )
@@ -541,7 +541,7 @@ MolecularFeaturesPathwaysTableServer <- function(id, data) {
         shiny::validate(
           shiny::need(c("universal_achilles_long") %in% data()$validate, "No data found."))
         #render table
-        DT::datatable(ddh::make_gene_molecular_features_pathways(input = data()),
+        DT::datatable(ddh::make_molecular_features_pathways_table(input = data()),
                       rownames = FALSE,
                       escape = FALSE,
                       options = list(pageLength = 10))
@@ -554,7 +554,7 @@ MolecularFeaturesPathwaysTableServer <- function(id, data) {
         shiny::validate(
           shiny::need(c("universal_achilles_long") %in% data()$validate, "No data found."))
         #plot
-        ddh::gene_molecular_features_pathway_barplot(input = data())
+        ddh::make_molecular_features_pathways(input = data())
       })
     }
   )
@@ -674,9 +674,9 @@ GenePathwayEnrichmentTableServer <- function (id, data) {
       output$genes_pathways <- DT::renderDataTable({
         shiny::validate(
           shiny::need(c("universal_achilles_long") %in% data()$validate, "No dependency data for this gene"))
-        DT::datatable(ddh::make_gene_dependency_enrichment(input = data()) %>% 
+        DT::datatable(ddh::make_gene_dependency_enrichment_table(input = data()) %>% 
                         dplyr::mutate_if(is.numeric, ~ signif(., digits = 3)),
-                      options = list(pageLength = 25))
+                      options = list(pageLength = 10))
       })
       # CLICKABLE PLOT
       # output$text_network_plot <- renderText({paste0("Network plot of pathways with similar dependencies as ", str_c(data()$content, collapse = ", "))})

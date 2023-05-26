@@ -353,7 +353,7 @@ geneMolecularFeaturesTableDashServer <- function (id, data) {
         shiny::validate(
           shiny::need(c("universal_achilles_long") %in% data()$validate, # Check this
                       "No molecular features for this gene"))
-        gt::gt(make_gene_molecular_features(input = data()) %>% 
+        gt::gt(ddh::make_molecular_features_table(input = data()) %>% 
                  dplyr::mutate("Rank" = row_number()) %>% 
                  dplyr::select(Rank, Feature, logFC) %>% 
                  dplyr::slice(1:5))
@@ -1533,7 +1533,7 @@ genePathwayEnrichmentTableTabServer <- function (id, data) {
       output$depgenepathwaystab <- render_gt({
         shiny::validate(
           shiny::need(c("universal_achilles_long") %in% data()$validate, "No dependency data for this gene"))
-        gt::gt(make_gene_dependency_enrichment(input = data()) %>%
+        gt::gt(ddh::make_gene_dependency_enrichment_table(input = data()) %>%
                  dplyr::mutate("Rank" = row_number()) %>% 
                  dplyr::select(Rank, Pathway) %>% 
                  dplyr::slice(1:5))
@@ -1561,7 +1561,7 @@ geneMolecularFeaturesPathwayTableTabServer <- function (id, data) {
         shiny::validate(
           shiny::need(c("universal_achilles_long") %in% data()$validate, # Check this
                       "No pathways found for this gene"))
-        gt::gt(ddh::make_gene_molecular_features_pathways(input = data()) %>% 
+        gt::gt(ddh::make_molecular_features_pathways_table(input = data()) %>% 
                  dplyr::mutate("Rank" = row_number()) %>% 
                  dplyr::select(Rank, Pathway) %>% 
                  dplyr::slice(1:5))

@@ -1398,7 +1398,7 @@ MolecularFeaturesSegmentPlotServer <- function (id, data) {
         shiny::validate(
           shiny::need(c("universal_achilles_long") %in% data()$validate, "No data found."))
         #plot
-        ddh::gene_molecular_features_segments(input = data())
+        ddh::make_molecular_features_segments(input = data())
       })
       output$mol_feat_seg_table_text <- renderText({paste0("Dependency segments table for ", 
                                                            str_c(data()$content, collapse = ", "))})
@@ -1407,7 +1407,7 @@ MolecularFeaturesSegmentPlotServer <- function (id, data) {
         shiny::validate(
           shiny::need(c("universal_achilles_long") %in% data()$validate, "No data found."))
         #table
-        DT::datatable(ddh::make_gene_molecular_features_segments(input = data()) %>% 
+        DT::datatable(ddh::make_molecular_features_segments_table(input = data()) %>% 
                         dplyr::select(Query, `Cell Line` = cell_name, Segment = group, Lineage = lineage, 
                                       Sublineage = lineage_subtype, Sex = sex, Age = age) %>%
                         dplyr::arrange(dplyr::desc(Segment)) %>% 
