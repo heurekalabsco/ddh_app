@@ -484,7 +484,7 @@ MolecularFeaturesTableServer <- function(id, data) {
         shiny::validate(
           shiny::need(c("universal_achilles_long") %in% data()$validate, "No data found."))
         #render table
-        DT::datatable(ddh::make_gene_molecular_features(input = data()) %>% 
+        DT::datatable(ddh::make_molecular_features_table(input = data()) %>% 
                         dplyr::mutate(Feature = map_chr(Feature, internal_link)),
                       rownames = FALSE,
                       escape = FALSE,
@@ -498,7 +498,7 @@ MolecularFeaturesTableServer <- function(id, data) {
         shiny::validate(
           shiny::need(c("universal_achilles_long") %in% data()$validate, "No data found."))
         #plot
-        ddh::gene_molecular_features_barplot(input = data())
+        ddh::make_molecular_features(input = data())
       })
     }
   )
@@ -541,7 +541,7 @@ MolecularFeaturesPathwaysTableServer <- function(id, data) {
         shiny::validate(
           shiny::need(c("universal_achilles_long") %in% data()$validate, "No data found."))
         #render table
-        DT::datatable(ddh::make_gene_molecular_features_pathways(input = data()),
+        DT::datatable(ddh::make_molecular_features_pathways_table(input = data()),
                       rownames = FALSE,
                       escape = FALSE,
                       options = list(pageLength = 10))
@@ -554,7 +554,7 @@ MolecularFeaturesPathwaysTableServer <- function(id, data) {
         shiny::validate(
           shiny::need(c("universal_achilles_long") %in% data()$validate, "No data found."))
         #plot
-        ddh::gene_molecular_features_pathway_barplot(input = data())
+        ddh::make_molecular_features_pathways(input = data())
       })
     }
   )
@@ -674,9 +674,9 @@ GenePathwayEnrichmentTableServer <- function (id, data) {
       output$genes_pathways <- DT::renderDataTable({
         shiny::validate(
           shiny::need(c("universal_achilles_long") %in% data()$validate, "No dependency data for this gene"))
-        DT::datatable(ddh::make_gene_dependency_enrichment(input = data()) %>% 
+        DT::datatable(ddh::make_gene_dependency_enrichment_table(input = data()) %>% 
                         dplyr::mutate_if(is.numeric, ~ signif(., digits = 3)),
-                      options = list(pageLength = 25))
+                      options = list(pageLength = 10))
       })
       # CLICKABLE PLOT
       # output$text_network_plot <- renderText({paste0("Network plot of pathways with similar dependencies as ", str_c(data()$content, collapse = ", "))})
@@ -988,6 +988,66 @@ dissimilarCompoundsTableServer <- function (id, data) {
     }
   )
 }
+
+##CCA-----
+geneCCATable <- function (id) {
+  ns <- NS(id)
+  tagList(
+    fluidRow(h4(textOutput(ns("cca_table_text")))),
+    tags$br(),
+    fluidRow(
+      div(
+        id = ns("cca_table_id"),
+        style = "padding-left:1%",
+        DT::dataTableOutput(outputId = ns("cca_table")),
+        actionLink(inputId = ns("cca_table_click"), " View plot")
+      )
+    ),
+    conditionalPanel(condition = paste0("input['", ns("cca_table_click"), "'] != 0"),
+                     fluidRow(
+                       div(
+                         id = ns("cca_table_plot_id"),
+                         style = "padding-left:1%",
+                         h4(textOutput(ns("cca_plot_text"))),
+                         plotOutput(outputId = ns("cca_plot"))
+                       )
+                     )
+    )
+  )
+}
+
+geneCCATableServer <- function(id, data) {
+  moduleServer(
+    id,
+    function(input, output, session) {
+      output$cca_table_text <- renderText({paste0("Co-essential pathways for ",
+                                                  str_c(data()$content, collapse = ", "))})
+      output$cca_table <- DT::renderDataTable({
+        #check to see if data are there
+        shiny::validate(
+          shiny::need(c("universal_achilles_long") %in% data()$validate, "No data found."))
+        #render table
+        DT::datatable(ddh::make_cca_genes_table(input = data()) %>%
+                        dplyr::mutate_if(is.numeric, ~ signif(., digits = 3)) %>% 
+                        dplyr::rename(Correlation = CC),
+                      rownames = FALSE,
+                      escape = FALSE,
+                      options = list(pageLength = 10))
+      })
+      # Conditional plot
+      output$cca_plot_text <- renderText({paste0("Co-essential pathways plot for ",
+                                                 str_c(data()$content, collapse = ", "))})
+      output$cca_plot <- renderPlot({
+        #check to see if data are there
+        shiny::validate(
+          shiny::need(c("universal_achilles_long") %in% data()$validate, "No data found."))
+        #plot
+        ddh::make_cca_genes(input = data())
+      })
+    }
+  )
+}
+
 ##Metabolites-----
 #module that displays a table for metabolites
 

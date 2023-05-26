@@ -388,7 +388,8 @@ genePage <- function (id, subtype) {
                               actionLink(inputId = ns("dep_pos_table_click"), cellDependenciesPosTableTab(ns("dep_pos_table_tab"))), #pos table
                               actionLink(inputId = ns("dep_neg_table_click"), cellDependenciesNegTableTab(ns("dep_neg_table_tab"))), #neg table
                               actionLink(inputId = ns("dep_gene_pathways_click"), genePathwayEnrichmentTableTab(ns("dep_gene_pathways_tab"))),
-                              actionLink(inputId = ns("dep_graph_click"), cellDependenciesGraphTab(ns("depgraphtab")))
+                              actionLink(inputId = ns("dep_graph_click"), cellDependenciesGraphTab(ns("depgraphtab"))),
+                              actionLink(inputId = ns("dep_cca_click"), geneCCATableTab(ns("depccatab")))
                             )
                           ),
                           tags$br(),
@@ -435,8 +436,19 @@ genePage <- function (id, subtype) {
                                 tags$br()
                               )
                             )
-                          ) # end of fluid row
-                 ),
+                          ),
+                          # conditional for CCA
+                          fluidRow(
+                            shinyjs::hidden(
+                              div(
+                                id = ns("dep_cca_tabcard"),
+                                style = "padding-left:1%",
+                                geneCCATable(ns("dep_cca")),
+                                tags$br()
+                              )
+                            )
+                          )
+                 ), # end of tabPanel
                  tabPanel("Drugs", value = "dependencies_drugs", 
                           private(geneDrugsCorTable(ns("gene_drugs_cor"))), 
                           private_msg()),
@@ -890,6 +902,7 @@ genePageServer <- function(id, subtype) {
         shinyjs::hide("dep_neg_table_tabcard")
         shinyjs::hide("dep_gene_pathways_tabcard")
         shinyjs::hide("dep_graph_tabcard")
+        shinyjs::hide("dep_cca_tabcard")
       })
       #serves the card
       cellDependenciesPosTableTabServer("dep_pos_table_tab", data)
@@ -902,6 +915,7 @@ genePageServer <- function(id, subtype) {
         shinyjs::show("dep_neg_table_tabcard")
         shinyjs::hide("dep_gene_pathways_tabcard")
         shinyjs::hide("dep_graph_tabcard")
+        shinyjs::hide("dep_cca_tabcard")
       })
       #serves the card
       cellDependenciesNegTableTabServer("dep_neg_table_tab", data)
@@ -914,6 +928,7 @@ genePageServer <- function(id, subtype) {
         shinyjs::hide("dep_neg_table_tabcard")
         shinyjs::show("dep_gene_pathways_tabcard")
         shinyjs::hide("dep_graph_tabcard")
+        shinyjs::hide("dep_cca_tabcard")
       })
       #serves the card
       genePathwayEnrichmentTableTabServer("dep_gene_pathways_tab", data)
@@ -926,12 +941,26 @@ genePageServer <- function(id, subtype) {
         shinyjs::hide("dep_neg_table_tabcard")
         shinyjs::hide("dep_gene_pathways_tabcard")
         shinyjs::show("dep_graph_tabcard")
+        shinyjs::hide("dep_cca_tabcard")
       })
       #serves the card
       cellDependenciesGraphTabServer("depgraphtab", data)
       #serves the graph
       geneNetworkGraphServer("graph", data)
       
+      # CONDITIONAL CCA
+      observeEvent(input$dep_cca_click, { #store click
+        shinyjs::hide("dep_pos_table_tabcard")
+        shinyjs::hide("dep_neg_table_tabcard")
+        shinyjs::hide("dep_gene_pathways_tabcard")
+        shinyjs::hide("dep_graph_tabcard")
+        shinyjs::show("dep_cca_tabcard")
+      })
+      #serves the card
+      geneCCATableTabServer("depccatab", data)
+      #serves the table
+      geneCCATableServer("dep_cca", data)
+
       ### Drugs ----
       private({geneDrugsCorTableServer("gene_drugs_cor", data)})
       

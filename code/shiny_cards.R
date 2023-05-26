@@ -312,7 +312,7 @@ cellDependenciesPlotDashServer <- function (id, data) {
 cellDependenciesTableDash <- function(id) {
   ns <- NS(id)
   divFlexAlignCenter(
-    "Co-essential genes",
+    "Co-essential Genes",
     gt_output(outputId = ns("deptabledash"))
   )
 }
@@ -340,7 +340,7 @@ cellDependenciesTableDashServer <- function (id, data) {
 geneMolecularFeaturesTableDash <- function(id) {
   ns <- NS(id)
   divFlexAlignCenter(
-    "Molecular features",
+    "Molecular Features",
     gt_output(outputId = ns("molfeattabledash"))
   )
 }
@@ -353,7 +353,7 @@ geneMolecularFeaturesTableDashServer <- function (id, data) {
         shiny::validate(
           shiny::need(c("universal_achilles_long") %in% data()$validate, # Check this
                       "No molecular features for this gene"))
-        gt::gt(make_gene_molecular_features(input = data()) %>% 
+        gt::gt(ddh::make_molecular_features_table(input = data()) %>% 
                  dplyr::mutate("Rank" = row_number()) %>% 
                  dplyr::select(Rank, Feature, logFC) %>% 
                  dplyr::slice(1:5))
@@ -1471,7 +1471,7 @@ cellDependenciesTableTabServer <- function (id, data) {
 cellDependenciesPosTableTab <- function(id) {
   ns <- NS(id)
   divFlexAlignCenter(
-    "Positive Genes",
+    "Similar Genes",
     gt_output(outputId = ns("deppostabletab"))
   )
 }
@@ -1496,7 +1496,7 @@ cellDependenciesPosTableTabServer <- function (id, data) {
 cellDependenciesNegTableTab <- function(id) {
   ns <- NS(id)
   divFlexAlignCenter(
-    "Negative Genes",
+    "Dissimilar Genes",
     gt_output(outputId = ns("depnegtabletab"))
   )
 }
@@ -1521,7 +1521,7 @@ cellDependenciesNegTableTabServer <- function (id, data) {
 genePathwayEnrichmentTableTab <- function(id) {
   ns <- NS(id)
   divFlexAlignCenter(
-    "Pathway Enrichment",
+    "Dependency Enrichment",
     gt_output(outputId = ns("depgenepathwaystab"))
   )
 }
@@ -1533,9 +1533,36 @@ genePathwayEnrichmentTableTabServer <- function (id, data) {
       output$depgenepathwaystab <- render_gt({
         shiny::validate(
           shiny::need(c("universal_achilles_long") %in% data()$validate, "No dependency data for this gene"))
-        gt::gt(make_gene_dependency_enrichment(input = data()) %>%
+        gt::gt(ddh::make_gene_dependency_enrichment_table(input = data()) %>%
                  dplyr::mutate("Rank" = row_number()) %>% 
                  dplyr::select(Rank, Pathway) %>% 
+                 dplyr::slice(1:5))
+      },
+      height = card_contents_height,
+      width = card_contents_width
+      )
+    }
+  )
+}
+
+geneCCATableTab <- function(id) {
+  ns <- NS(id)
+  divFlexAlignCenter(
+    "Co-essential Pathways",
+    gt_output(outputId = ns("cca_genes_tab"))
+  )
+}
+
+geneCCATableTabServer <- function (id, data) {
+  moduleServer(
+    id,
+    function(input, output, session) {
+      output$cca_genes_tab <- render_gt({
+        shiny::validate(
+          shiny::need(c("universal_achilles_long") %in% data()$validate, "No dependency data for this gene"))
+        gt::gt(ddh::make_cca_genes_table(input = data()) %>%
+                 dplyr::mutate("Rank" = row_number()) %>%
+                 dplyr::select(Rank, Pathway) %>%
                  dplyr::slice(1:5))
       },
       height = card_contents_height,
@@ -1561,7 +1588,7 @@ geneMolecularFeaturesPathwayTableTabServer <- function (id, data) {
         shiny::validate(
           shiny::need(c("universal_achilles_long") %in% data()$validate, # Check this
                       "No pathways found for this gene"))
-        gt::gt(ddh::make_gene_molecular_features_pathways(input = data()) %>% 
+        gt::gt(ddh::make_molecular_features_pathways_table(input = data()) %>% 
                  dplyr::mutate("Rank" = row_number()) %>% 
                  dplyr::select(Rank, Pathway) %>% 
                  dplyr::slice(1:5))
