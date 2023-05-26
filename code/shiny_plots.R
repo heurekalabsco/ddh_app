@@ -839,16 +839,16 @@ maleAnatogramPlotServer <- function(id, data) {
         #check to see if image exists
         img_path <- ddh::load_image(input = data(), fun_name = "make_male_anatogram", card = FALSE)
         if(!is.null(img_path)) {
-          uiOutput(outputId = session$ns("male_anatogram_gene_plot_image"), width = "100%")
+          uiOutput(outputId = session$ns("male_anatogram_gene_plot_image"), width = "80%")
         } else {
           plotOutput(outputId = session$ns("male_anatogram_gene_plot_render"), 
-                     width = "100%") %>%
+                     width = "80%") %>%
             withSpinnerColor(plot_type = data()$type)
         }
       })
       output$male_anatogram_gene_plot_image <- renderUI({
         div(tags$img(src = load_image(input = data(), fun_name = "make_male_anatogram", card = FALSE), 
-                     width = "100%"))
+                     width = "80%"))
       })
       output$male_anatogram_gene_plot_render <- renderPlot({
         make_male_anatogram(input = data(), anatogram = "male")
@@ -873,16 +873,16 @@ femaleAnatogramPlotServer <- function(id, data) {
         #check to see if image exists
         img_path <- ddh::load_image(input = data(), fun_name = "make_female_anatogram", card = FALSE)
         if(!is.null(img_path)) {
-          uiOutput(outputId = session$ns("female_anatogram_gene_plot_image"), width = "100%")
+          uiOutput(outputId = session$ns("female_anatogram_gene_plot_image"), width = "80%")
         } else {
           plotOutput(outputId = session$ns("female_anatogram_gene_plot_render"), 
-                     width = "100%") %>%
+                     width = "80%") %>%
             withSpinnerColor(plot_type = data()$type)
         }
       })
       output$female_anatogram_gene_plot_image <- renderUI({
         div(tags$img(src = load_image(input = data(), fun_name = "make_female_anatogram", card = FALSE), 
-                     width = "100%"))
+                     width = "80%"))
       })
       output$female_anatogram_gene_plot_render <- renderPlot({
         make_female_anatogram(input = data())
@@ -1050,7 +1050,7 @@ cellDependenciesPlot <- function(id) {
              column(actionButton(ns("cell_dep_switch"), label = "Show interactive plot"), width = 3)
     ),
     tags$br(),
-    fluidRow(
+    fluidRow(align = "center",
       div(
         id = ns("cell_deps_static"),
         style = "padding-left:1%",
@@ -1102,16 +1102,16 @@ cellDependenciesPlotServer <- function (id, data) {
         #check to see if image exists
         img_path <- ddh::load_image(input = data(), fun_name = "make_celldeps", card = FALSE)
         if(!is.null(img_path)) {
-          uiOutput(outputId = session$ns("cell_deps_plot_image"), width = "100%")
+          uiOutput(outputId = session$ns("cell_deps_plot_image"), width = "80%")
         } else {
           plotOutput(outputId = session$ns("cell_deps_plot_render"), 
-                     width = "100%") %>%
+                     width = "80%") %>%
             withSpinnerColor(plot_type = data()$type)
         }
       })
       output$cell_deps_plot_image <- renderUI({
         div(tags$img(src = load_image(input = data(), fun_name = "make_celldeps", card = FALSE), 
-                     width = "100%"))
+                     width = "80%"))
       })
       output$cell_deps_plot_render <- renderPlot({
         make_celldeps(input = data(), 
@@ -1260,7 +1260,7 @@ cellDependenciesCorrPlot <- function(id) {
   ns <- NS(id)
   tagList(
     fluidRow(h4(textOutput(ns("gene_correlation_text")))),
-    uiOutput(outputId = ns("gene_correlation_plot"), height = "auto"),
+    fluidRow(uiOutput(outputId = ns("gene_correlation_plot"), height = "auto"),align = "center"),
     tags$br(),
     fluidRow(ddh::make_legend("make_correlation"))
   )
@@ -1280,16 +1280,16 @@ cellDependenciesCorrPlotServer <- function (id, data) {
         #check to see if image exists
         img_path <- ddh::load_image(input = data(), fun_name = "make_correlation", card = FALSE)
         if(!is.null(img_path)) {
-          uiOutput(outputId = session$ns("gene_correlation_plot_image"), width = "100%")
+          uiOutput(outputId = session$ns("gene_correlation_plot_image"), width = "80%")
         } else {
           plotOutput(outputId = session$ns("gene_correlation_plot_render"), 
-                     width = "100%") %>%
+                     width = "80%") %>%
             withSpinnerColor(plot_type = data()$type)
         }
       })
       output$gene_correlation_plot_image <- renderUI({
         div(tags$img(src = load_image(input = data(), fun_name = "make_correlation", card = FALSE), 
-                     width = "100%"))
+                     width = "80%"))
       })
       output$gene_correlation_plot_render <- renderPlot({
         make_correlation(input = data())
