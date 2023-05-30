@@ -355,7 +355,7 @@ geneMolecularFeaturesTableDashServer <- function (id, data) {
                       "No molecular features for this gene"))
         gt::gt(ddh::make_molecular_features_table(input = data()) %>% 
                  dplyr::mutate("Rank" = row_number()) %>% 
-                 dplyr::select(Rank, Feature, logFC) %>% 
+                 dplyr::select(Rank, Feature) %>% 
                  dplyr::slice(1:5))
       },
       height = card_contents_height,
