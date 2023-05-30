@@ -373,7 +373,8 @@ clusterAABarPlot <- function(id) {
   ns <- NS(id)
   tagList(
     fluidRow(ddh::make_legend("make_radial"), # this belongs to RADIAL PLOT
-             actionLink(inputId = ns("aa_bar_cluster_click"), " View bar plot of cluster amino acid signatures")),
+             actionLink(inputId = ns("aa_bar_cluster_click"), 
+                        " View bar plot of cluster amino acid signatures")),
     tags$br(), 
     conditionalPanel(condition = paste0("input['", ns("aa_bar_cluster_click"), "'] != 0"), 
                      fluidRow(h4(textOutput(ns("cluster_text_aa_bar_plot")))),
@@ -760,8 +761,7 @@ cellAnatogramPlot <- function(id) {
   tagList(
     fluidRow(h4(textOutput(ns("cell_anatogram_gene_plot_text")))),
     uiOutput(outputId = ns("cell_anatogram_gene_plot"), height = "auto"),
-    tags$br(),
-    fluidRow(ddh::make_legend("make_cellanatogram"))
+    tags$br()
   )
 }
 
@@ -785,6 +785,7 @@ cellAnatogramPlotServer <- function(id, data) {
                      width = "100%") %>%
             withSpinnerColor(plot_type = data()$type)
         }
+        fluidRow(ddh::make_legend("make_cellanatogram"))
       })
       output$cell_anatogram_gene_plot_image <- renderUI({
         div(tags$img(src = load_image(input = data(), fun_name = "make_cellanatogram", card = FALSE), 
