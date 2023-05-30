@@ -396,7 +396,10 @@ clusterAABarPlotServer <- function (id, data) {
     function(input, output, session) {
       output$cluster_text_aa_bar_plot <- renderText({
         
-        clust_num <- make_clustering_table(input = data()) %>%
+        clust_num <- 
+          ddh::get_data_object(object_names = data()$content,
+                               dataset_name = "gene_signature_clusters",
+                               pivotwider = TRUE) %>%
           dplyr::pull(clust) %>%
           unique()
         
@@ -425,7 +428,7 @@ clusterAABarPlotServer <- function (id, data) {
 UMAPPlot <- function(id) {
   ns <- NS(id)
   tagList(
-    fluidRow(actionLink(inputId = ns("umap_click"), " View UMAP embeddings plot")),
+    fluidRow(actionLink(inputId = ns("umap_click"), " View UMAP plot")),
     tags$br(), 
     conditionalPanel(condition = paste0("input['", ns("umap_click"), "'] != 0"),
                      fluidRow(h4(textOutput(ns("text_umap_plot")))),
@@ -452,7 +455,7 @@ UMAPPlotServer <- function (id, data) {
         
         clust_num <- ddh::get_cluster(input = data())
         
-        title_text <- glue::glue('UMAP Embeddings for Cluster {stringr::str_c(clust_num, collapse = ", ")}')
+        title_text <- glue::glue('Amino Acid Signature Emdeddings (clusters {stringr::str_c(clust_num, collapse = ", ")})')
         
         return(title_text)
       })
@@ -472,80 +475,80 @@ UMAPPlotServer <- function (id, data) {
 }
 
 ## cluster enrichment --------------------------------------------------------
-clusterEnrichmentPlot <- function(id) {
-  ns <- NS(id)
-  uiOutput(outputId = ns("conditional_clusterenrichmentplot"))
-}
-
-clusterEnrichmentPlotServer <- function (id, data) {
-  moduleServer(
-    id,
-    function(input, output, session) {
-      output$conditional_clusterenrichmentplot <- renderUI({
-        if(!is.null(data()$content)) {
-          sig_clust <- ddh::get_cluster(input = data())
-          
-          sig_clust_len <- 
-            sig_clust %>% 
-            length()
-        } else {
-          sig_clust <- 0
-          sig_clust_len <- 0
-        }
-        
-        if((sig_clust_len == 1) & (sig_clust != 0)) {
-          tagList(
-            fluidRow(h4(textOutput(session$ns("text_cluster_enrich_plot")))),
-            selectizeInput(session$ns("ontology_info_plot"),
-                           "Ontology",
-                           choices = c("Biological Process (GO)" = "BP",
-                                       "Molecular Function (GO)" = "MF",
-                                       "Cellular Component (GO)" = "CC"), 
-                           selected = "BP"),
-            sliderInput(session$ns("num_terms"), "Number of terms to show",
-                        min = 10, max = 40, value = 20),
-            fluidRow(plotOutput(outputId = session$ns("cluster_enrichment_plot"), height = "auto") %>% 
-                       withSpinnerColor(plot_type = "protein") #see shiny_helper.R
-            ),
-            tags$br(),
-            fluidRow(ddh::make_legend("make_cluster_enrich"))
-          )
-        } else {
-          return(NULL)
-        }
-        
-      })
-      output$text_cluster_enrich_plot <- renderText({
-        shiny::validate(
-          shiny::need(c("universal_proteins") %in% data()$validate, "No data found."))
-        
-        clust_num <- ddh::get_cluster(input = data())
-        
-        if(length(clust_num) == 1) {
-          title_text <- paste0("Enrichment Analysis Plot for Cluster ", 
-                               clust_num)
-        } else{
-          title_text <- NULL
-        }
-        
-        return(title_text)
-      })
-      output$cluster_enrichment_plot <- renderPlot({
-        
-        clust_num <- ddh::get_cluster(input = data())
-        
-        shiny::validate(
-          shiny::need(c("universal_proteins") %in% data()$validate, "No data found."),
-          shiny::need(length(clust_num) == 1, 
-                      "More than one cluster identified in the table above. Cluster enrichment analysis is only available for individual gene queries or multiple gene queries belonging to the same cluster."))
-        make_cluster_enrich(input = data(),
-                            ontology = input$ontology_info_plot,
-                            num_terms = input$num_terms)
-      },
-      height = 550)
-    }
-  )
-}
+# clusterEnrichmentPlot <- function(id) {
+#   ns <- NS(id)
+#   uiOutput(outputId = ns("conditional_clusterenrichmentplot"))
+# }
+# 
+# clusterEnrichmentPlotServer <- function (id, data) {
+#   moduleServer(
+#     id,
+#     function(input, output, session) {
+#       output$conditional_clusterenrichmentplot <- renderUI({
+#         if(!is.null(data()$content)) {
+#           sig_clust <- ddh::get_cluster(input = data())
+#           
+#           sig_clust_len <- 
+#             sig_clust %>% 
+#             length()
+#         } else {
+#           sig_clust <- 0
+#           sig_clust_len <- 0
+#         }
+#         
+#         if((sig_clust_len == 1) & (sig_clust != 0)) {
+#           tagList(
+#             fluidRow(h4(textOutput(session$ns("text_cluster_enrich_plot")))),
+#             selectizeInput(session$ns("ontology_info_plot"),
+#                            "Ontology",
+#                            choices = c("Biological Process (GO)" = "BP",
+#                                        "Molecular Function (GO)" = "MF",
+#                                        "Cellular Component (GO)" = "CC"), 
+#                            selected = "BP"),
+#             sliderInput(session$ns("num_terms"), "Number of terms to show",
+#                         min = 10, max = 40, value = 20),
+#             fluidRow(plotOutput(outputId = session$ns("cluster_enrichment_plot"), height = "auto") %>% 
+#                        withSpinnerColor(plot_type = "protein") #see shiny_helper.R
+#             ),
+#             tags$br(),
+#             fluidRow(ddh::make_legend("make_cluster_enrich"))
+#           )
+#         } else {
+#           return(NULL)
+#         }
+#         
+#       })
+#       output$text_cluster_enrich_plot <- renderText({
+#         shiny::validate(
+#           shiny::need(c("universal_proteins") %in% data()$validate, "No data found."))
+#         
+#         clust_num <- ddh::get_cluster(input = data())
+#         
+#         if(length(clust_num) == 1) {
+#           title_text <- paste0("Enrichment Analysis Plot for Cluster ", 
+#                                clust_num)
+#         } else{
+#           title_text <- NULL
+#         }
+#         
+#         return(title_text)
+#       })
+#       output$cluster_enrichment_plot <- renderPlot({
+#         
+#         clust_num <- ddh::get_cluster(input = data())
+#         
+#         shiny::validate(
+#           shiny::need(c("universal_proteins") %in% data()$validate, "No data found."),
+#           shiny::need(length(clust_num) == 1, 
+#                       "More than one cluster identified in the table above. Cluster enrichment analysis is only available for individual gene queries or multiple gene queries belonging to the same cluster."))
+#         make_cluster_enrich(input = data(),
+#                             ontology = input$ontology_info_plot,
+#                             num_terms = input$num_terms)
+#       },
+#       height = 550)
+#     }
+#   )
+# }
 
 ## protein domain --------------------------------------------------------
 proteinDomainPlot <- function(id) {

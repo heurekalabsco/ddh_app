@@ -133,8 +133,8 @@ genePage <- function (id, subtype) {
                                 private(clusterRadialPlot(ns("cluster_radial_plot"))),
                                 private(clusterAABarPlot(ns("cluster_aa_bar_plot"))),
                                 private(proteinClusterTable(ns("prot_clust_table"))),
-                                private(clusterEnrichmentPlot(ns("cluster_enrichment_plot"))),
-                                private(proteinClusterEnrichmentTable(ns("prot_clust_enrich_table"))),
+                                # private(clusterEnrichmentPlot(ns("cluster_enrichment_plot"))),
+                                # private(proteinClusterEnrichmentTable(ns("prot_clust_enrich_table"))),
                                 tags$br()
                               )
                             )
@@ -692,8 +692,8 @@ genePageServer <- function(id, subtype) {
       private({clusterRadialPlotServer("cluster_radial_plot", data)})
       private({clusterAABarPlotServer("cluster_aa_bar_plot", data)})
       private({proteinClusterTableServer("prot_clust_table", data)})
-      private({clusterEnrichmentPlotServer("cluster_enrichment_plot", data)})
-      private({proteinClusterEnrichmentTableServer("prot_clust_enrich_table", data)})
+      # private({clusterEnrichmentPlotServer("cluster_enrichment_plot", data)})
+      # private({proteinClusterEnrichmentTableServer("prot_clust_enrich_table", data)})
       
       # CONDITIONAL STRUCTURE
       observeEvent(input$structure_click, { #store click
