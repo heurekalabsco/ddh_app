@@ -509,13 +509,13 @@ genePageServer <- function(id, subtype) {
       if(subtype == "gene"){
         data <- reactive({
           gene_symbols <- getQueryString()$query
-          validation_datasets <- make_validate(gene_symbols) #example of how to make validation_datasets
+          validation_datasets <- make_validate(gene_symbols)
           list(
             type=type,
             subtype=subtype,
             query=gene_symbols,
             content=gene_symbols,
-            validate=validation_datasets #example of how to pass this into functions using data()
+            validate=validation_datasets
           )
         })
         title_var <- geneTitleServer("title_var", data)
@@ -526,12 +526,14 @@ genePageServer <- function(id, subtype) {
         data <- reactive({
           pathway_id <- getQueryString()$query
           pathway_genes <- ddh::get_gene_symbols_for_pathway(pathway_id)
+          validation_datasets <- make_validate(pathway_genes)
           list(
             type=type,
             subtype=subtype,
             subtype_id=pathway_id,
             query=pathway_id,
-            content=pathway_genes
+            content=pathway_genes,
+            validate=validation_datasets
             )
         })
         title_var <- pathwayTitleServer("title_var", data)
@@ -542,11 +544,13 @@ genePageServer <- function(id, subtype) {
         data <- reactive({
           custom_gene_list <- getQueryString()$query
           gene_symbols <- c(str_split(custom_gene_list, "\\s*,\\s*", simplify = TRUE))
+          validation_datasets <- make_validate(gene_symbols)
           list(
             type=type,
             subtype=subtype,
             query=custom_gene_list,
-            content=gene_symbols
+            content=gene_symbols,
+            validate=validation_datasets
           )
         })
         title_var <- summaryListTitleServer("title_var", data)
