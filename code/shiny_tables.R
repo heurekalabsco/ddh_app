@@ -474,7 +474,7 @@ MolecularFeaturesTableServer <- function(id, data) {
     id,
     function(input, output, session) {
       output$mol_feat_table_text <- renderText({paste0("Molecular features associated with ", 
-                                                       str_c(data()$content, collapse = ", "), " dependency")})
+                                                       str_c(data()$content, collapse = ", "), " knock-out sensitivity")})
       output$mol_feat_table <- DT::renderDataTable({
         #check to see if data are there
         shiny::validate(
@@ -531,7 +531,7 @@ MolecularFeaturesPathwaysTableServer <- function(id, data) {
     id,
     function(input, output, session) {
       output$mol_feat_pth_table_text <- renderText({paste0("Pathways associated with ", 
-                                                           str_c(data()$content, collapse = ", "), " dependency")})
+                                                           str_c(data()$content, collapse = ", "), " knock-out sensitivity")})
       output$mol_feat_pth_table <- DT::renderDataTable({
         #check to see if data are there
         shiny::validate(
@@ -1005,7 +1005,8 @@ geneCCATable <- function (id) {
                          id = ns("cca_table_plot_id"),
                          style = "padding-left:1%",
                          h4(textOutput(ns("cca_plot_text"))),
-                         plotOutput(outputId = ns("cca_plot"))
+                         plotOutput(outputId = ns("cca_plot")),
+                         fluidRow(ddh::make_legend("make_cca_genes"))
                        )
                      )
     )

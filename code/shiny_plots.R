@@ -939,8 +939,7 @@ cellGeneExpressionPlot <- function(id) {
   tagList(
     h3(textOutput(outputId = ns("expression_gene_plot_title"))),
     uiOutput(ns("expression_gene_plot")),
-    tags$br(),
-    fluidRow(ddh::make_legend("make_cellexpression"))
+    tags$br()
   )
 }
 
@@ -962,6 +961,7 @@ cellGeneExpressionPlotServer <- function(id, data) {
                      width = "100%") %>%
             withSpinnerColor(plot_type = data()$type)
         }
+        fluidRow(ddh::make_legend("make_cellexpression"))
       })
       output$expression_gene_plot_image <- renderUI({
         div(tags$img(src = load_image(input = data(), fun_name = "make_cellexpression", card = FALSE), 
@@ -1374,6 +1374,7 @@ MolecularFeaturesSegmentPlot <- function(id) {
         style = "padding-left:1%",
         plotOutput(outputId = ns("mol_feat_seg_plot"), width = "100%") %>% 
           withSpinnerColor(plot_type = "gene"),
+        fluidRow(ddh::make_legend("make_molecular_features_segments")),
         actionLink(inputId = ns("segments_table_click"), " View table")
       )
     ),
