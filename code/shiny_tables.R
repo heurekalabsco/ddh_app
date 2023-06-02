@@ -473,8 +473,8 @@ MolecularFeaturesTableServer <- function(id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$mol_feat_table_text <- renderText({paste0("Molecular features associated with ", 
-                                                       str_c(data()$content, collapse = ", "), " knock-out sensitivity")})
+      output$mol_feat_table_text <- renderText({paste0("Molecular features associated with with sensitivity to ", 
+                                                       str_c(data()$content, collapse = ", "), " ablation")})
       output$mol_feat_table <- DT::renderDataTable({
         #check to see if data are there
         shiny::validate(
@@ -530,8 +530,8 @@ MolecularFeaturesPathwaysTableServer <- function(id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$mol_feat_pth_table_text <- renderText({paste0("Pathways associated with ", 
-                                                           str_c(data()$content, collapse = ", "), " knock-out sensitivity")})
+      output$mol_feat_pth_table_text <- renderText({paste0("Pathways associated with with sensitivity to ", 
+                                                           str_c(data()$content, collapse = ", "), " ablation")})
       output$mol_feat_pth_table <- DT::renderDataTable({
         #check to see if data are there
         shiny::validate(
