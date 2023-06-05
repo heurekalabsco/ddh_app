@@ -56,6 +56,31 @@ pathwayGeneListServer <- function(id, data) {
   )
 }
 
+## Protein Sequence ---------------------
+proteinSeq <- function (id) {
+  ns <- NS(id)
+  tagList(
+    fluidRow(h4(textOutput(ns("text_protein_sequence")))),
+    fluidRow(verbatimTextOutput(ns("protein_sequence"), placeholder = FALSE)),
+    fluidRow(h4(textOutput(ns("text_protein_length")))),
+    fluidRow(textOutput(outputId = ns("protein_length")))
+  )
+}
+
+proteinSeqServer <- function (id, data) {
+  moduleServer(
+    id,
+    function(input, output, session) {
+      output$text_protein_sequence <- renderText({paste0("Protein Sequence for ", str_c(data()$content, collapse = ", "))})
+      output$protein_sequence <- renderText(make_summary_protein(input = data(), var = "sequence"))
+      output$text_protein_length <- renderText({paste0("Protein Length for ", str_c(data()$content, collapse = ", "))})
+      output$protein_length <- renderText({paste0(paste0(str_c(data()$content, " ", 
+                                                               stringr::str_count(make_summary_protein(input = data(), var = "sequence")), 
+                                                               " AA")), collapse = ", ")})
+    }
+  )
+}
+
 ## Protein Cluster ---------------------
 proteinClusterTable <- function(id) {
   ns <- NS(id)
@@ -82,6 +107,7 @@ proteinClusterTableServer <- function(id, data) {
           shiny::need(c("gene_signature_clusters") %in% data()$validate, "No cluster data for this protein"))
         withProgress(message = 'Building a smart clustering table...', {
           DT::datatable(make_signature_clusters_table(input = data()) %>%
+                          dplyr::filter(Gene %in% data()$content) %>% 
                           dplyr::mutate(Gene = map_chr(Gene, internal_link)),
                         escape = FALSE,
                         options = list(pageLength = 10))

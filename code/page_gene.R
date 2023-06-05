@@ -99,7 +99,6 @@ genePage <- function (id, subtype) {
                               div(
                                 id = ns("size_tabcard"),
                                 style = "padding-left:1%",
-                                proteinSizeText(ns("protein_size_text")),
                                 proteinSizePlot(ns("protein_size")),
                                 tags$br()
                               )
@@ -111,7 +110,6 @@ genePage <- function (id, subtype) {
                               div(
                                 id = ns("sequence_tabcard"),
                                 style = "padding-left:1%",
-                                proteinSeqText(ns("protein_seq_text")),
                                 proteinSeq(ns("protein_seq")),
                                 proteinDomainPlot(ns("protein_domain_plot")),
                                 tags$br()
@@ -125,7 +123,6 @@ genePage <- function (id, subtype) {
                                 id = ns("signature_tabcard"),
                                 style = "padding-left:1%",
                                 private_msg(),
-                                private(proteinSignatureText(ns("protein_signature_text"))),
                                 private(radialPlot(ns("radial_plot"))),
                                 private(AABarPlot(ns("aa_bar_plot"))),
                                 private(tags$hr()),
@@ -146,7 +143,6 @@ genePage <- function (id, subtype) {
                                 id = ns("structure_tabcard"),
                                 style = "padding-left:1%",
                                 private_msg(),
-                                private(proteinStructureText(ns("protein_structure_text"))),
                                 private(proteinStructurePlot3d(ns("protein_structure_plot3d"))),
                                 tags$br()
                               )
@@ -189,7 +185,6 @@ genePage <- function (id, subtype) {
                               div(
                                 id = ns("gene_exp_table_tabcard"),
                                 style = "padding-left:1%",
-                                # cellGeneExpressionTableText(ns("cell_gene_table_text")),
                                 cellGeneExpressionTable(ns("cell_gene_table")),
                                 tags$br()
                               )
@@ -201,7 +196,6 @@ genePage <- function (id, subtype) {
                               div(
                                 id = ns("protein_exp_plot_tabcard"),
                                 style = "padding-left:1%",
-                                # cellProteinExpressionPlotText(ns("cell_protein_text")), 
                                 cellProteinExpressionPlot(ns("cell_protein")),
                                 tags$br()
                               )
@@ -233,10 +227,6 @@ genePage <- function (id, subtype) {
                  ), #end tab panel
                  tabPanel("Tissue", value = "expression_tissue", 
                           shinyjs::useShinyjs(),
-                          #summary plot
-                          fluidRow(
-                            tissueTitle(ns("tissue_title")), #from shiny_text
-                          ),
                           fluidRow(
                             column(6, maleAnatogramPlot(ns("male_anatogram"))),
                             column(6, femaleAnatogramPlot(ns("female_anatogram")))
@@ -256,7 +246,6 @@ genePage <- function (id, subtype) {
                               div(
                                 id = ns("tissue_plot_tabcard"),
                                 style = "padding-left:1%",
-                                tissuePlotText(ns("tissue_plot_text")),
                                 tissuePlot(ns("tissue_plot")),
                                 tags$br()
                               )
@@ -268,7 +257,6 @@ genePage <- function (id, subtype) {
                               div(
                                 id = ns("tissue_table_tabcard"),
                                 style = "padding-left:1%",
-                                tissueTableText(ns("tissue_table_text")), 
                                 tissueTable(ns("tissue_table")),
                                 tags$br()
                               )
@@ -645,8 +633,6 @@ genePageServer <- function(id, subtype) {
       })
       #serves the card for the image
       geneGoTableTabServer("gotab", data)
-      #serves the data plots
-      geneGoTableTextServer("go_table_text", data)
       
       # PROTEIN
       protein_summary
@@ -662,7 +648,6 @@ genePageServer <- function(id, subtype) {
       #serves the card for the image
       sizePlotTabServer("sizetab", data)
       #serves the data plots
-      proteinSizeTextServer("protein_size_text", data)
       proteinSizePlotServer("protein_size", data)
       
       # CONDITIONAL SEQUENCE
@@ -675,7 +660,6 @@ genePageServer <- function(id, subtype) {
       #serves the card for the image
       sequencePlotTabServer("sequencetab", data)
       #serves the data plots
-      proteinSeqTextServer("protein_seq_text", data)
       proteinSeqServer("protein_seq", data)
       proteinDomainPlotServer("protein_domain_plot", data)
       
@@ -689,7 +673,6 @@ genePageServer <- function(id, subtype) {
       #serves the card for the image
       signaturePlotTabServer("signaturetab", data)
       #serves the data plots
-      private({proteinSignatureTextServer("protein_signature_text", data)})
       private({radialPlotServer("radial_plot", data)})
       private({AABarPlotServer("aa_bar_plot", data)})
       private({UMAPPlotServer("umap_plot", data)})
@@ -709,7 +692,6 @@ genePageServer <- function(id, subtype) {
       #serves the card for the image
       structurePlotTabServer("structuretab", data)
       #serves the data plots
-      private({proteinStructureTextServer("protein_structure_text", data)})
       private({proteinStructurePlot3dServer("protein_structure_plot3d", data)})
       
       # Literature
@@ -737,7 +719,6 @@ genePageServer <- function(id, subtype) {
       #serves the card for the image
       cellGeneExpressionTableTabServer("gene_exp_table_tab", data)
       #serves the data plots
-      cellGeneExpressionTableTextServer("cell_gene_table_text", data)
       cellGeneExpressionTableServer("cell_gene_table", data)
       
       # CONDITIONAL cellProteinExpressionPlot
@@ -750,7 +731,6 @@ genePageServer <- function(id, subtype) {
       #serves the card for the image
       cellProteinExpressionPlotTabServer("protein_exp_plot_tab", data)
       #serves the data plots
-      cellProteinExpressionPlotTextServer("cell_protein_text", data)
       cellProteinExpressionPlotServer("cell_protein", data)
       
       # CONDITIONAL cellProteinExpressionTable
@@ -790,7 +770,6 @@ genePageServer <- function(id, subtype) {
       #serves the card for the image
       tissuePlotTabServer("tissue_plot_tab", data)
       #serves the data plots
-      tissuePlotTextServer("tissue_plot_text", data)
       tissuePlotServer("tissue_plot", data)
       
       # CONDITIONAL tissueTable
@@ -801,7 +780,6 @@ genePageServer <- function(id, subtype) {
       #serves the card for the image
       tissueTableTabServer("tissue_table_tab", data)
       #serves the data plots
-      tissueTableTextServer("tissue_table_text", data)
       tissueTableServer("tissue_table", data)
       
       # COMPOUNDS SERVER-----
