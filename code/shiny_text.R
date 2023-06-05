@@ -573,7 +573,7 @@ compoundListSummaryTextServer <- function(id, data) {
     })
 }
 
-## GENE
+## TISSUE
 tissuePlotText <- function (id) {
   ns <- NS(id)
   fluidRow(h4(textOutput(ns("tissueplot_text"))))
