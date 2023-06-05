@@ -227,6 +227,7 @@ genePage <- function (id, subtype) {
                  ), #end tab panel
                  tabPanel("Tissue", value = "expression_tissue", 
                           shinyjs::useShinyjs(),
+                          fluidRow(tissuePlotText(ns("tissue_text"))),
                           fluidRow(
                             column(6, maleAnatogramPlot(ns("male_anatogram"))),
                             column(6, femaleAnatogramPlot(ns("female_anatogram")))
@@ -758,7 +759,7 @@ genePageServer <- function(id, subtype) {
       cellGeneProteinPlotServer("cell_geneprotein", data)
       
       # HUMAN TISSUE
-      tissueTitleServer("tissue_title", data)
+      tissuePlotTextServer("tissue_text", data)
       maleAnatogramPlotServer("male_anatogram", data)
       femaleAnatogramPlotServer("female_anatogram", data)
       

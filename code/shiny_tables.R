@@ -74,7 +74,7 @@ proteinSeqServer <- function (id, data) {
       output$text_protein_sequence <- renderText({paste0("Protein Sequence for ", str_c(data()$content, collapse = ", "))})
       output$protein_sequence <- renderText(make_summary_protein(input = data(), var = "sequence"))
       output$text_protein_length <- renderText({paste0("Protein Length for ", str_c(data()$content, collapse = ", "))})
-      output$protein_length <- renderText({paste0(paste0(str_c(data()$content, " ", 
+      output$protein_length <- renderText({paste0(paste0(str_c(data()$content, ": ", 
                                                                stringr::str_count(make_summary_protein(input = data(), var = "sequence")), 
                                                                " AA")), collapse = ", ")})
     }
@@ -241,13 +241,17 @@ pubmedTableServer <- function(id, data) {
 # module that displays a table for cell anatogram
 cellAnatogramTable <- function(id) {
   ns <- NS(id)
-  DT::dataTableOutput(outputId = ns("cellanatogram_table"))
+  tagList(
+    fluidRow(h4(textOutput(ns("text_subcell_table")))),
+    fluidRow(DT::dataTableOutput(outputId = ns("cellanatogram_table")))
+  )
 }
 
 cellAnatogramTableServer <- function(id, data) {
   moduleServer(
     id,
     function(input, output, session) {
+      output$text_subcell_table <- renderText({paste0("Subcellular expression table for ", str_c(data()$content, collapse = ", "))})
       output$cellanatogram_table <- DT::renderDataTable({
         shiny::validate(
           shiny::need(c("gene_subcell") %in% data()$validate, "")) #intentionally left blank; redundant with plot
@@ -266,6 +270,7 @@ cellAnatogramTableServer <- function(id, data) {
 tissueTable <- function(id) {
   ns <- NS(id)
   tagList(
+    fluidRow(h4(textOutput(ns("text_tissue_table")))),
     fluidRow(checkboxInput(inputId = ns("tissue_filter_click"), label = "Filter tissue table", value = FALSE)),
     fluidRow(DT::dataTableOutput(outputId = ns("tissueanatogram_table")))
   )
@@ -275,6 +280,7 @@ tissueTableServer <- function(id, data) {
   moduleServer(
     id,
     function(input, output, session) {
+      output$text_tissue_table <- renderText({paste0("Human tissue expression table for ", str_c(data()$content, collapse = ", "))})
       output$tissueanatogram_table <- DT::renderDataTable({
         shiny::validate(
           shiny::need(c("gene_subcell") %in% data()$validate, "No tissue data for this gene"))

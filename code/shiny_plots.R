@@ -937,7 +937,7 @@ tissuePlotServer <- function(id, data) {
 cellGeneExpressionPlot <- function(id) {
   ns <- NS(id)
   tagList(
-    h3(textOutput(outputId = ns("expression_gene_plot_title"))),
+    fluidRow(h4(textOutput(ns("expression_gene_plot_text")))),
     uiOutput(ns("expression_gene_plot")),
     tags$br()
   )
@@ -947,7 +947,7 @@ cellGeneExpressionPlotServer <- function(id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$expression_gene_plot_title <- renderText({paste0("Expression values for ", str_c(data()$content, collapse = ", "))})
+      output$expression_gene_plot_text <- renderText({paste0("Expression values for ", str_c(data()$content, collapse = ", "))})
       output$expression_gene_plot <- renderUI({
         #check to see if data are there
         shiny::validate(

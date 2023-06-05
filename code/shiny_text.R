@@ -573,3 +573,18 @@ compoundListSummaryTextServer <- function(id, data) {
     })
 }
 
+## GENE
+tissuePlotText <- function (id) {
+  ns <- NS(id)
+  fluidRow(h4(textOutput(ns("tissueplot_text"))))
+}
+
+tissuePlotTextServer <- function (id, data) {
+  moduleServer(
+    id,
+    function(input, output, session) {
+      output$tissueplot_text <- renderText({paste0("Human tissue expression for ", str_c(data()$content, collapse = ", "))})
+    }
+  )
+}
+
