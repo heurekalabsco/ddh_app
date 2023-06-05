@@ -3,15 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Data-Driven Hypothesis</title>
 </head>
 
 <body>
   <div align="center">
     <img src="code/www/ddh_logo.png" alt="ddh_app Logo" width="500" height="200">
   </div>
-
-  <h1 align="center">Data-Driven Hypothesis</h1>
 
   <p align="center">
     Welcome to Data-Driven Hypothesis - the Scientific Data Discovery Hub!
