@@ -247,8 +247,6 @@ searchPage <- function (id) {
   )
 }
 
-
-
 searchPageServer <- function(id) {
   moduleServer(
     id,
@@ -276,16 +274,16 @@ searchPageServer <- function(id) {
   )
 }
 
-
-
 # PAGE MODULES-----
 source(here::here("code", "page_gene.R"), local = TRUE) ### GENE PAGE ----
 source(here::here("code", "page_cell.R"), local = TRUE) ### CELL PAGE ----
 source(here::here("code", "page_compound.R"), local = TRUE) ### COMPOUND PAGE ----
+source(here::here("code", "waiting_quotes.R"), local = TRUE) ### WAITING QUOTES ----
 
 # Create output for our router in main UI of Shiny app.
 ui <- shinyUI(
   fluidPage(
+    waiter::useWaiter(),
     uiOutput("pageUI")
   )
 )
@@ -307,7 +305,15 @@ pages <- list(
 )
 
 server <- shinyServer(function(input, output, session) {
-  options(shiny.usecairo=TRUE) # ensure high quality images
+  options(shiny.usecairo = TRUE) # ensure high quality images
+  
+  # call the waiter
+  waiter::waiter_show(html = tagList(
+    waiter::spin_loaders(id = 3, color = "#2EC09C", style = NULL),
+    h4(HTML(paste0('<p style="font-family:Roboto Slab; color:#2EC09C; ">', sample(waiting_quotes, 1), '</p>'))) # font-size: 20px;
+  ), color = "#ffffff")
+  
+  # serve the page
   output$pageUI <- renderUI({
     query_string <- getQueryString()
     show_page <- query_string$show
@@ -332,6 +338,11 @@ server <- shinyServer(function(input, output, session) {
   # session$onSessionEnded(function() {
   #   delete_tmp_zip_directory(session)
   # })
+  
+  # stop the waiter
+  waiter::waiter_hide()
+  
 })
 
 shinyApp(ui, server)
+
