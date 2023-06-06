@@ -16,7 +16,8 @@ cran_pkgs <- c(
   "shinyjs",
   "shinyWidgets",
   "tidyverse",
-  "visNetwork"
+  "visNetwork",
+  "waiter"
   )
 
 #CRAN pkg graveyard

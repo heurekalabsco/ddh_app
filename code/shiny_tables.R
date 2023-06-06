@@ -204,13 +204,12 @@ proteinClusterTableServer <- function(id, data) {
 
 ##Pubmed----
 # module that displays a table for pubmed
-
 pubmedTable <- function(id) {
   ns <- NS(id)
   tagList(
     fluidRow(h4(textOutput(ns("text_pubmed_table")))),
     tags$br(),
-    DT::dataTableOutput(outputId = ns("pubmed_table"))
+    fluidRow(DT::dataTableOutput(outputId = ns("pubmed_table")))
   )
 }
 
@@ -379,8 +378,7 @@ cellDependenciesTableServer <- function (id, data) {
         shiny::validate(
           shiny::need(c("universal_achilles_long") %in% data()$validate, "No dependency data for this gene"))
         DT::datatable(make_dep_table(input = data()) %>%
-                        dplyr::mutate(`Cell Line` = map_chr(`Cell Line`, cell_linkr, type = "cell")) #from fun_helper.R
-                      , 
+                        dplyr::mutate(`Cell Line` = map_chr(`Cell Line`, cell_linkr, type = "cell")), 
                       filter = if(input$dep_filter_click == FALSE) {'none'} else {'top'}, 
                       escape = FALSE,
                       options = list(pageLength = 10))
@@ -479,7 +477,6 @@ MolecularFeaturesTable <- function (id) {
   ns <- NS(id)
   tagList(
     fluidRow(h4(textOutput(ns("mol_feat_table_text")))),
-    tags$br(),
     fluidRow(    
       div(
         id = ns("mol_feat_table_id"),
@@ -536,7 +533,6 @@ MolecularFeaturesPathwaysTable <- function (id) {
   ns <- NS(id)
   tagList(
     fluidRow(h4(textOutput(ns("mol_feat_pth_table_text")))),
-    tags$br(),
     fluidRow(    
       div(
         id = ns("mol_feat_pth_table_id"),
@@ -612,8 +608,7 @@ similarGenesTable <- function(id) {
                       column(3, actionButton(inputId = ns("reset"), "Reset"))))
     ),
     hr(),
-    fluidRow(DT::dataTableOutput(outputId = ns("dep_top"))), 
-    tags$br()
+    fluidRow(DT::dataTableOutput(outputId = ns("dep_top")))
   )
 }
 
@@ -621,6 +616,8 @@ similarGenesTableServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) { 
+      output$text_dep_top <- renderText({paste0(censor_status$num, " genes with similar dependencies as ", str_c(data()$content, collapse = ", "))})      
+      
       #censor reactive values
       censor_status <- reactiveValues(censor = FALSE, 
                                       num_sim_genes = 1000)
@@ -645,7 +642,6 @@ similarGenesTableServer <- function (id, data) {
                             greater_than = censor_status$num_sim_genes) %>% 
           nrow()
       })
-      output$text_dep_top <- renderText({paste0(censor_status$num, " genes with similar dependencies as ", str_c(data()$content, collapse = ", "))})      
       output$dep_top <- DT::renderDataTable({
         shiny::validate(
           shiny::need(c("gene_master_top_table") %in% data()$validate, "No dependency data for this gene"))
@@ -739,8 +735,7 @@ similarCellsTable <- function(id) {
                                             "P.Value", "Bonferroni", "Sex", "Age", "Status"),
                                 selected = c("Lineage", "Estimate", "Bonferroni"),
                                 inline = TRUE)),
-    fluidRow(DT::dataTableOutput(outputId = ns("cells_dep_top"))), 
-    tags$br()
+    fluidRow(DT::dataTableOutput(outputId = ns("cells_dep_top")))
   )
 }
 
@@ -782,8 +777,7 @@ similarExpCellsTable <- function(id) {
                                             "P.Value", "Bonferroni", "Sex", "Age", "Status"),
                                 selected = c("Lineage", "Estimate", "Bonferroni"),
                                 inline = TRUE)),
-    fluidRow(DT::dataTableOutput(outputId = ns("cells_exp_top"))), 
-    tags$br()
+    fluidRow(DT::dataTableOutput(outputId = ns("cells_exp_top")))
   )
 }
 
@@ -826,8 +820,7 @@ similarCompoundsTable <- function(id) {
                                 c("Mechanism", "R^2", "Z-Score"), #"Co-publication Count", "Co-publication Index"
                                 selected = c("Z-Score"), #, "Co-publication Count"
                                 inline = TRUE)),
-    fluidRow(DT::dataTableOutput(outputId = ns("compound_dep_top"))), 
-    tags$br()
+    fluidRow(DT::dataTableOutput(outputId = ns("compound_dep_top")))
   )
 }
 
@@ -903,8 +896,7 @@ dissimilarCellsTable <- function(id) {
                                             "P.Value", "Bonferroni", "Sex", "Age", "Status"),
                                 selected = c("Lineage", "Estimate", "Bonferroni"),
                                 inline = TRUE)),
-    fluidRow(DT::dataTableOutput(outputId = ns("cells_dep_bottom"))), 
-    tags$br()
+    fluidRow(DT::dataTableOutput(outputId = ns("cells_dep_bottom")))
   )
 }
 
@@ -945,8 +937,7 @@ dissimilarExpCellsTable <- function(id) {
                                             "P.Value", "Bonferroni", "Sex", "Age", "Status"),
                                 selected = c("Lineage", "Estimate", "Bonferroni"),
                                 inline = TRUE)),
-    fluidRow(DT::dataTableOutput(outputId = ns("cells_exp_bottom"))), 
-    tags$br()
+    fluidRow(DT::dataTableOutput(outputId = ns("cells_exp_bottom")))
   )
 }
 
@@ -989,8 +980,7 @@ dissimilarCompoundsTable <- function(id) {
                                 c("Mechanism", "R^2", "Z-Score"), #"Co-publication Count", "Co-publication Index"
                                 selected = c("Z-Score"), #, "Co-publication Count"
                                 inline = TRUE)),
-    fluidRow(DT::dataTableOutput(outputId = ns("compound_dep_bottom"))), 
-    tags$br()
+    fluidRow(DT::dataTableOutput(outputId = ns("compound_dep_bottom")))
   )
 }
 
@@ -1022,7 +1012,6 @@ geneCCATable <- function (id) {
   ns <- NS(id)
   tagList(
     fluidRow(h4(textOutput(ns("cca_table_text")))),
-    tags$br(),
     fluidRow(
       div(
         id = ns("cca_table_id"),
@@ -1127,7 +1116,7 @@ geneDrugsTable <- function(id) { #GENE QUERY
   tagList(
     fluidRow(h4(textOutput(ns("title_gene_drugs_table")))),
     fluidRow(DT::dataTableOutput(outputId = ns("gene_drugs_table"))), 
-    br(),
+    tags$br(),
     fluidRow(textOutput(ns("text_gene_drugs_table")))
   )
 }
@@ -1156,7 +1145,7 @@ cellDrugsTable <- function(id) {
   tagList(
     fluidRow(h4(textOutput(ns("title_cell_drugs_table")))),
     fluidRow(DT::dataTableOutput(outputId = ns("cell_drugs_table"))), 
-    br(),
+    tags$br(),
     fluidRow(textOutput(ns("text_cell_drugs_table")))
   )
 }
@@ -1191,7 +1180,7 @@ geneDrugsCorTable <- function(id) { #GENE QUERY
                                 selected = c("Z-Score"), 
                                 inline = TRUE)),
     fluidRow(DT::dataTableOutput(outputId = ns("gene_drugs_cor_table"))), 
-    br(),
+    tags$br(),
     fluidRow(textOutput(ns("text_gene_drugs_cor_table")))
   )
 }
@@ -1257,13 +1246,17 @@ cellSummaryTableServer <- function(id, data) {
 ##Pubmed-----
 pubmedCompoundTable <- function(id) {
   ns <- NS(id)
-  DT::dataTableOutput(outputId = ns("pubmed_compound_table"))
+  tagList(
+    fluidRow(h4(textOutput(ns("pubmed_compound_title")))),
+    fluidRow(DT::dataTableOutput(outputId = ns("pubmed_compound_table")))
+  )
 }
 
 pubmedCompoundTableServer <- function(id, data) {
   moduleServer(
     id,
     function(input, output, session) {
+      output$pubmed_compound_title <- renderText({paste0("Literature table for ", str_c(data()$content, collapse = ", "))})
       output$pubmed_compound_table <- DT::renderDataTable({
         shiny::validate(
           shiny::need(c("universal_pubmed") %in% data()$validate, ""))
@@ -1284,13 +1277,17 @@ pubmedCompoundTableServer <- function(id, data) {
 
 pubmedCellLineTable <- function(id) {
   ns <- NS(id)
-  DT::dataTableOutput(outputId = ns("pubmed_cell_line_table"))
+  tagList(
+    fluidRow(h4(textOutput(ns("pubmed_cell_line_title")))),
+    fluidRow(DT::dataTableOutput(outputId = ns("pubmed_cell_line_table")))
+  )
 }
 
 pubmedCellLineTableServer <- function(id, data) {
   moduleServer(
     id,
     function(input, output, session) {
+      output$pubmed_cell_line_title <- renderText({paste0("Literature table for ", str_c(data()$content, collapse = ", "))})
       output$pubmed_cell_line_table <- DT::renderDataTable({
         shiny::validate(
           shiny::need(c("universal_pubmed") %in% data()$validate, ""))
@@ -1316,7 +1313,7 @@ drugGenesTable <- function(id) { #DRUG QUERY
   tagList(
     fluidRow(h4(textOutput(ns("title_drug_genes_table")))),
     fluidRow(DT::dataTableOutput(outputId = ns("drug_genes_table"))), 
-    br(),
+    tags$br(),
     fluidRow(textOutput(ns("text_drug_genes_table")))
   )
 }
@@ -1381,18 +1378,20 @@ drugGenesCorTableServer <- function (id, data) {
   )
 }
 
-
 ##Metabolites----
-
 metaboliteGenesTable <- function(id) {
   ns <- NS(id)
-  DT::dataTableOutput(outputId = ns("metabolite_genes_table"))
+  tagList(
+    fluidRow(h4(textOutput(ns("metabolite_genes_text")))),
+    fluidRow(DT::dataTableOutput(outputId = ns("metabolite_genes_table")))
+  )
 }
 
 metaboliteGenesTableServer <- function(id, data) {
   moduleServer(
     id,
     function(input, output, session) {
+      output$metabolite_genes_text <- renderText({paste0("Metabolite table for ", str_c(data()$content, collapse = ", "))})
       output$metabolite_genes_table <- DT::renderDataTable({
         shiny::validate(
           shiny::need(c("compound_hmdb_metabolites") %in% data()$validate, "No gene data for this compound"))
