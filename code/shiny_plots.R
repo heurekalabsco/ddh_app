@@ -49,7 +49,7 @@ proteinSizePlot <- function(id) {
   ns <- NS(id)
   tagList(
     fluidRow(h4(textOutput(ns("protein_size_plot_text")))),
-    uiOutput(outputId = ns("protein_size_plot"), height = "auto"),
+    fluidRow(uiOutput(outputId = ns("protein_size_plot"), height = "auto")),
     tags$br(),
     fluidRow(ddh::make_legend("make_proteinsize"))
   )
@@ -117,7 +117,6 @@ proteinStructurePlot3d <- function(id) {
   ns <- NS(id)
   tagList(
     fluidRow(h4(textOutput(ns("text_protein_structure3d")))),
-    tags$br(),
     fluidRow(
       column(8,
              r3dmol::r3dmolOutput(outputId = ns("protein_structure3D"),
@@ -154,7 +153,7 @@ proteinStructurePlot3d <- function(id) {
     ## TABLE
     conditionalPanel(condition = paste0("input['", ns("pdb_table_click"), "'] != 0"),
                      fluidRow(h4(textOutput(ns("title_structure3d_table")))),
-                     DT::dataTableOutput(outputId = ns("structure3d_table"))
+                     fluidRow(DT::dataTableOutput(outputId = ns("structure3d_table")))
     )
   )
 }
@@ -253,11 +252,12 @@ radialPlot <- function(id) {
   ns <- NS(id)
   tagList(
     fluidRow(h4(textOutput(ns("text_radial_plot")))),
-    shinyWidgets::prettySwitch(inputId = ns("mean_relative"), 
-                               "Show relative frequency to the mean", 
-                               value = TRUE),
-    fluidRow(plotOutput(outputId = ns("radial_plot"), height = "auto") %>% 
-               withSpinnerColor(plot_type = "protein") #see shiny_helper.R
+    fluidRow(
+      shinyWidgets::prettySwitch(inputId = ns("mean_relative"), 
+                                 "Show relative frequency to the mean", 
+                                 value = TRUE),
+      plotOutput(outputId = ns("radial_plot"), height = "auto") %>% 
+        withSpinnerColor(plot_type = "protein")
     )
   )
 }
@@ -284,17 +284,17 @@ radialPlotServer <- function (id, data) {
 AABarPlot <- function(id) {
   ns <- NS(id)
   tagList(
+    tags$br(),
     fluidRow(ddh::make_legend("make_radial"), # this belongs to RADIAL PLOT
              actionLink(inputId = ns("aa_bar_click"), " View bar plot of amino acid signatures")),
     tags$br(), 
     conditionalPanel(condition = paste0("input['", ns("aa_bar_click"), "'] != 0"), 
                      fluidRow(h4(textOutput(ns("text_aa_bar_plot")))),
-                     shinyWidgets::prettySwitch(inputId = ns("bar_mean_relative"), 
+                     fluidRow(shinyWidgets::prettySwitch(inputId = ns("bar_mean_relative"), 
                                                 "Show relative frequency to the mean", 
                                                 value = TRUE),
-                     fluidRow(plotOutput(outputId = ns("aa_bar_plot"), height = "auto") %>% 
-                                withSpinnerColor(plot_type = "protein") #see shiny_helper.R
-                     ),
+                              plotOutput(outputId = ns("aa_bar_plot"), height = "auto") %>% 
+                                withSpinnerColor(plot_type = "protein")),
                      tags$br(),
                      fluidRow(ddh::make_legend("make_radial_bar"))
     )
@@ -324,13 +324,13 @@ clusterRadialPlot <- function(id) {
   ns <- NS(id)
   tagList(
     fluidRow(h4(textOutput(ns("cluster_text_radial_plot")))),
-    shinyWidgets::prettySwitch(inputId = ns("cluster_mean_relative"), 
-                               "Show relative frequency to the mean", 
-                               value = TRUE),
-    fluidRow(plotOutput(outputId = ns("cluster_radial_plot"), height = "auto") %>% 
-               withSpinnerColor(plot_type = "protein") #see shiny_helper.R
-    ),
-    tags$br()
+    fluidRow(
+      shinyWidgets::prettySwitch(inputId = ns("cluster_mean_relative"), 
+                                 "Show relative frequency to the mean", 
+                                 value = TRUE),
+      plotOutput(outputId = ns("cluster_radial_plot"), height = "auto") %>% 
+        withSpinnerColor(plot_type = "protein")
+    )
   )
 }
 
@@ -372,18 +372,19 @@ clusterRadialPlotServer <- function (id, data) {
 clusterAABarPlot <- function(id) {
   ns <- NS(id)
   tagList(
+    tags$br(),
     fluidRow(ddh::make_legend("make_radial"), # this belongs to RADIAL PLOT
              actionLink(inputId = ns("aa_bar_cluster_click"), 
                         " View bar plot of cluster amino acid signatures")),
     tags$br(), 
     conditionalPanel(condition = paste0("input['", ns("aa_bar_cluster_click"), "'] != 0"), 
                      fluidRow(h4(textOutput(ns("cluster_text_aa_bar_plot")))),
-                     shinyWidgets::prettySwitch(inputId = ns("cluster_bar_mean_relative"), 
-                                                "Show relative frequency to the mean", 
-                                                value = TRUE),
-                     fluidRow(plotOutput(outputId = ns("cluster_aa_bar_plot"), height = "auto") %>% 
-                                withSpinnerColor(plot_type = "protein") #see shiny_helper.R
-                     ),
+                     fluidRow(shinyWidgets::prettySwitch(inputId = ns("cluster_bar_mean_relative"), 
+                                                         "Show relative frequency to the mean", 
+                                                         value = TRUE),
+                              plotOutput(outputId = ns("cluster_aa_bar_plot"), height = "auto") %>% 
+                                withSpinnerColor(plot_type = "protein")
+                              ),
                      tags$br(),
                      fluidRow(ddh::make_legend("make_radial_bar"))
     )
@@ -428,16 +429,18 @@ clusterAABarPlotServer <- function (id, data) {
 UMAPPlot <- function(id) {
   ns <- NS(id)
   tagList(
+    tags$br(),
     fluidRow(actionLink(inputId = ns("umap_click"), " View UMAP plot")),
     tags$br(), 
     conditionalPanel(condition = paste0("input['", ns("umap_click"), "'] != 0"),
                      fluidRow(h4(textOutput(ns("text_umap_plot")))),
-                     checkboxInput(inputId = ns("show_all_umap"), 
-                                   label = "Show only selected clusters", value = FALSE),
-                     checkboxInput(inputId = ns("labels_umap"), 
-                                   label = "Show labels", value = FALSE),
-                     fluidRow(plotOutput(outputId = ns("umap_plot"), height = "auto") %>% 
-                                withSpinnerColor(plot_type = "protein") #see shiny_helper.R
+                     fluidRow(
+                       checkboxInput(inputId = ns("show_all_umap"), 
+                                     label = "Show only selected clusters", value = FALSE),
+                       checkboxInput(inputId = ns("labels_umap"), 
+                                     label = "Show labels", value = FALSE),
+                       plotOutput(outputId = ns("umap_plot"), height = "auto") %>% 
+                         withSpinnerColor(plot_type = "protein")
                      ),
                      tags$br(),
                      fluidRow(ddh::make_legend("make_umap_plot"))
@@ -562,8 +565,7 @@ proteinDomainPlot <- function(id) {
                withSpinnerColor(plot_type = "protein") #see shiny_helper.R
     ),
     tags$br(),
-    fluidRow(ddh::make_legend("make_protein_domain")),
-    tags$br()
+    fluidRow(ddh::make_legend("make_protein_domain"))
   )
 }
 
@@ -630,7 +632,7 @@ pubmedPlot <- function(id) {
   tagList(
     fluidRow(h4(textOutput(ns("pubmed_plot_title")))),
     fluidRow(textOutput(ns("pubmed_plot_text"))),
-    uiOutput(ns("pubmed_plot"), height = "auto"), 
+    fluidRow(uiOutput(ns("pubmed_plot"), height = "auto")), 
     tags$br(),
     fluidRow(ddh::make_legend("make_pubmed"))
   )
@@ -674,7 +676,7 @@ pubmedCompoundPlot <- function(id) {
   tagList(
     fluidRow(h4(textOutput(ns("pubmed_compound_plot_title")))),
     fluidRow(textOutput(ns("pubmed_compound_plot_text"))),
-    uiOutput(ns("pubmed_compound_plot"), height = "auto"), 
+    fluidRow(uiOutput(ns("pubmed_compound_plot"), height = "auto")), 
     tags$br(),
     fluidRow(ddh::make_legend("make_pubmed"))
   )
@@ -718,7 +720,7 @@ pubmedCellLinePlot <- function(id) {
   tagList(
     fluidRow(h4(textOutput(ns("pubmed_cell_plot_title")))),
     fluidRow(textOutput(ns("pubmed_cell_plot_text"))),
-    uiOutput(ns("pubmed_cell_plot"), height = "auto"), 
+    fluidRow(uiOutput(ns("pubmed_cell_plot"), height = "auto")), 
     tags$br(),
     fluidRow(ddh::make_legend("make_pubmed"))
   )
@@ -763,8 +765,9 @@ cellAnatogramPlot <- function(id) {
   ns <- NS(id)
   tagList(
     fluidRow(h4(textOutput(ns("cell_anatogram_gene_plot_text")))),
-    uiOutput(outputId = ns("cell_anatogram_gene_plot"), height = "auto"),
-    tags$br()
+    fluidRow(uiOutput(outputId = ns("cell_anatogram_gene_plot"), height = "auto")),
+    tags$br(),
+    fluidRow(ddh::make_legend("make_cellanatogram"))
   )
 }
 
@@ -788,14 +791,13 @@ cellAnatogramPlotServer <- function(id, data) {
                      width = "100%") %>%
             withSpinnerColor(plot_type = data()$type)
         }
-        fluidRow(ddh::make_legend("make_cellanatogram"))
       })
       output$cell_anatogram_gene_plot_image <- renderUI({
         div(tags$img(src = load_image(input = data(), fun_name = "make_cellanatogram", card = FALSE), 
                      width = "100%"))
       })
       output$cell_anatogram_gene_plot_render <- renderPlot({
-        make_cellanatogram(input = data())
+        ddh::make_cellanatogram(input = data())
       })
     }
   )
@@ -804,11 +806,15 @@ cellAnatogramPlotServer <- function(id, data) {
 cellAnatogramFacetPlot <- function(id) {
   ns <- NS(id)
   tagList(
-    fluidRow(actionLink(inputId = ns("anato_facet_click"), "View detailed cell anatograms below")),
+    tags$br(),
+    fluidRow(actionLink(inputId = ns("anato_facet_click"), "View facet cell anatograms")),
     tags$br(),
     conditionalPanel(condition = paste0("input['", ns("anato_facet_click"), "'] != 0"),
-                     plotOutput(ns("cell_anatogram_gene_facet"))),
-    tags$br(),
+                     fluidRow(h4(textOutput(ns("cell_anatogram_facet_plot_text")))),
+                     fluidRow(plotOutput(ns("cell_anatogram_gene_facet"))),
+                     tags$br(),
+                     fluidRow(ddh::make_legend("make_cellanatogramfacet"))
+                     )
   )
 }
 
@@ -816,12 +822,15 @@ cellAnatogramFacetPlotServer <- function(id, data) {
   moduleServer(
     id,
     function(input, output, session) {
+      output$cell_anatogram_facet_plot_text <- renderText({
+        paste0("Subcellular expression of ", str_c(data()$content, collapse = ", "))
+      })
       output$cell_anatogram_gene_facet <- renderPlot({
         #check to see if data are there
         shiny::validate(
           shiny::need(c("gene_subcell") %in% data()$validate, "No data found."))
         #render plot
-        make_cellanatogramfacet(input = data())
+        ddh::make_cellanatogramfacet(input = data())
       })
     }
   )
@@ -829,7 +838,7 @@ cellAnatogramFacetPlotServer <- function(id, data) {
 
 maleAnatogramPlot <- function(id) {
   ns <- NS(id)
-  uiOutput(outputId = ns("male_anatogram_gene_plot"))
+  fluidRow(uiOutput(outputId = ns("male_anatogram_gene_plot")))
 }
 
 maleAnatogramPlotServer <- function(id, data) {
@@ -863,7 +872,7 @@ maleAnatogramPlotServer <- function(id, data) {
 
 femaleAnatogramPlot <- function(id) {
   ns <- NS(id)
-  uiOutput(outputId = ns("female_anatogram_gene_plot"))
+  fluidRow(uiOutput(outputId = ns("female_anatogram_gene_plot")))
 }
 
 femaleAnatogramPlotServer <- function(id, data) {
@@ -898,7 +907,8 @@ femaleAnatogramPlotServer <- function(id, data) {
 tissuePlot <- function(id) {
   ns <- NS(id)
   tagList(
-    uiOutput(outputId = ns("tissue_gene_plot"), height = "auto"),
+    fluidRow(h4(textOutput(ns("tissue_barplot_text")))),
+    fluidRow(uiOutput(outputId = ns("tissue_gene_plot"), height = "auto")),
     tags$br(),
     fluidRow(ddh::make_legend("make_tissue"))
   )
@@ -908,6 +918,9 @@ tissuePlotServer <- function(id, data) {
   moduleServer(
     id,
     function(input, output, session) {
+      output$tissue_barplot_text <- renderText({
+        paste0("Tissue barplot for ", str_c(data()$content, collapse = ", "))
+      })
       output$tissue_gene_plot <- renderUI({
         #check to see if data are there
         shiny::validate(
@@ -938,8 +951,9 @@ cellGeneExpressionPlot <- function(id) {
   ns <- NS(id)
   tagList(
     fluidRow(h4(textOutput(ns("expression_gene_plot_text")))),
-    uiOutput(ns("expression_gene_plot")),
-    tags$br()
+    fluidRow(uiOutput(ns("expression_gene_plot"))),
+    tags$br(),
+    fluidRow(ddh::make_legend("make_cellexpression"))
   )
 }
 
@@ -947,7 +961,8 @@ cellGeneExpressionPlotServer <- function(id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$expression_gene_plot_text <- renderText({paste0("Expression values for ", str_c(data()$content, collapse = ", "))})
+      output$expression_gene_plot_text <- renderText({paste0("Expression values for ", 
+                                                             str_c(data()$content, collapse = ", "))})
       output$expression_gene_plot <- renderUI({
         #check to see if data are there
         shiny::validate(
@@ -961,7 +976,6 @@ cellGeneExpressionPlotServer <- function(id, data) {
                      width = "100%") %>%
             withSpinnerColor(plot_type = data()$type)
         }
-        fluidRow(ddh::make_legend("make_cellexpression"))
       })
       output$expression_gene_plot_image <- renderUI({
         div(tags$img(src = load_image(input = data(), fun_name = "make_cellexpression", card = FALSE), 
@@ -977,12 +991,11 @@ cellGeneExpressionPlotServer <- function(id, data) {
 cellProteinExpressionPlot <- function(id) {
   ns <- NS(id)
   tagList(
-    h4(textOutput(outputId = ns("expression_protein_plot_title"))),
-    uiOutput(ns("expression_protein_plot")),
+    fluidRow(h4(textOutput(outputId = ns("expression_protein_plot_title")))),
+    fluidRow(uiOutput(ns("expression_protein_plot"))),
     tags$br(),
     fluidRow(ddh::make_legend("make_cellexpression"))
   )
-  
 }
 
 cellProteinExpressionPlotServer <- function(id, data) {
@@ -1048,8 +1061,7 @@ cellDependenciesPlot <- function(id) {
   tagList(
     shinyjs::useShinyjs(),
     # Scatterplot
-    fluidRow(
-      column(h4(textOutput(ns("cell_dep_plot_text"))), width = 12)), 
+    fluidRow(h4(textOutput(ns("cell_dep_plot_text")))), 
     fluidRow(column(textOutput(ns("essential_num")), width = 9),
              column(actionButton(ns("cell_dep_switch"), label = "Show interactive plot"), width = 3)
     ),
@@ -1068,7 +1080,8 @@ cellDependenciesPlot <- function(id) {
         )
       )
     ),
-    tags$br()
+    tags$br(),
+    fluidRow(ddh::make_legend("make_celldeps"))
   )
 }
 
@@ -1139,10 +1152,10 @@ cellDependenciesPlotServer <- function (id, data) {
 cellDependenciesDensityPlot <- function(id) {
   ns <- NS(id)
   tagList(
-    h4(textOutput(outputId = ns("cell_dep_density_title"))),
-    uiOutput(ns("density_plot_plot")),
+    fluidRow(h4(textOutput(outputId = ns("cell_dep_density_title")))),
+    fluidRow(uiOutput(ns("density_plot_plot"))),
     tags$br(),
-    fluidRow(htmlOutput(outputId = ns("density_plot_legend")))
+    fluidRow(ddh::make_legend("make_cellbins"))
   )
 }
 
@@ -1163,7 +1176,6 @@ cellDependenciesDensityPlotServer <- function(id, data) {
         make_cellbins(input = data())
       },
       height = function() length(data()$content) * 90 + 80)
-      output$density_plot_legend <- renderText({paste0("<strong>Computed Densities.</strong> Kernel density estimate of dependency scores. Dependency scores across all ", ifelse(data()$type == "gene", "cell lines for queried genes", "genes for queried cell lines"), ", revealing overall influence of a gene on cellular fitness. The interval indicates the 95% quantile of the data, the dot indicates the median dependency score. The gray background highlights weak dependency values between -1 and 1.")})
     }
   )
 }
@@ -1171,10 +1183,10 @@ cellDependenciesDensityPlotServer <- function(id, data) {
 cellDependenciesBarPlot <- function(id) {
   ns <- NS(id)
   tagList(
-    h4(textOutput(outputId = ns("cell_dep_barplot_title"))),
-    uiOutput(ns("bar_plot_plot")),
+    fluidRow(h4(textOutput(outputId = ns("cell_dep_barplot_title")))),
+    fluidRow(uiOutput(ns("bar_plot_plot"))),
     tags$br(),
-    fluidRow(htmlOutput(outputId = ns("bar_plot_legend")))
+    fluidRow(ddh::make_legend("make_cellbar"))
   )
 }
 
@@ -1193,7 +1205,6 @@ cellDependenciesBarPlotServer <- function (id, data) {
           shiny::need(c("universal_achilles_long", "cell_expression_meta") %in% data()$validate, "No data found."))
         ggplotly(make_cellbar(input = data()), tooltip = "text")
       })
-      output$bar_plot_legend <- renderText({paste0("<strong>Dependency Bar Plot.</strong> Each bar shows the dependency scores of the queried ", ifelse(data()$type == "gene", "genes in a cell line.", "cell lines in a gene."), " Dependency scores less than -1 indicate a gene that is essential within a cell line. Dependency scores close to 0 mean no changes in fitness when the gene is knocked out. Dependency scores greater than 1 indicate gene knockouts lead to a gain in fitness.")})
     }
   )
 }
@@ -1201,10 +1212,9 @@ cellDependenciesBarPlotServer <- function (id, data) {
 cellDepsLinPlot <- function(id) {
   ns <- NS(id)
   tagList(
-    h4(textOutput(outputId = ns("lineage_title"))),
-    tags$br(),
+    fluidRow(h4(textOutput(outputId = ns("lineage_title")))),
     fluidRow(prettySwitch(inputId = ns("celllin_click_high"), "Show statistically significant"),
-             plotOutput(outputId = ns("cell_deps_lin"),  height = "auto") %>% 
+             plotOutput(outputId = ns("cell_deps_lin"), height = "auto") %>% 
                withSpinnerColor(plot_type = "gene") #see shiny_helper.R
     ),
     tags$br(),
@@ -1224,8 +1234,6 @@ cellDepsLinPlotServer <- function(id, data) {
                      highlight = input$celllin_click_high)
       },
       height = 550)
-      observeEvent(input$sublin_click, { #event to store the 'click'
-      })
     }
   )
 }
@@ -1233,10 +1241,9 @@ cellDepsLinPlotServer <- function(id, data) {
 cellDepsSubLinPlot <- function(id) {
   ns <- NS(id)
   tagList(
-    h4(textOutput(outputId = ns("sublineage_title"))),
-    tags$br(),
+    fluidRow(h4(textOutput(outputId = ns("sublineage_title")))),
     fluidRow(prettySwitch(inputId = ns("cellsublin_click_high"), "Show statistically significant"),
-             plotOutput(outputId = ns("cell_deps_sublin"),  height = "auto") %>% 
+             plotOutput(outputId = ns("cell_deps_sublin"), height = "auto") %>% 
                withSpinnerColor(plot_type = "gene") #see shiny_helper.R
     ),
     tags$br(),
@@ -1264,7 +1271,7 @@ cellDependenciesCorrPlot <- function(id) {
   ns <- NS(id)
   tagList(
     fluidRow(h4(textOutput(ns("gene_correlation_text")))),
-    fluidRow(uiOutput(outputId = ns("gene_correlation_plot"), height = "auto"),align = "center"),
+    fluidRow(uiOutput(outputId = ns("gene_correlation_plot"), height = "auto"), align = "center"),
     tags$br(),
     fluidRow(ddh::make_legend("make_correlation"))
   )
@@ -1318,7 +1325,6 @@ cellCoessentialityPlotServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      
       output$text_cell_coess_plot <- renderText({paste0("Cell co-essentiality plot generated for ", str_c(data()$content, collapse = ", "))})
       output$cell_coessentiality <- renderPlot({
         shiny::validate(
@@ -1333,10 +1339,10 @@ cellCoessentialityPlotServer <- function (id, data) {
 expdepPlot <- function(id) {
   ns <- NS(id)
   tagList(
-    h4(textOutput(outputId = ns("exdep_plot_title"))),
-    uiOutput(ns("exdep_plot_plot")),
+    fluidRow(h4(textOutput(outputId = ns("exdep_plot_title")))),
+    fluidRow(uiOutput(ns("exdep_plot_plot"))),
     tags$br(),
-    fluidRow(htmlOutput(outputId = ns("exdep_plot_legend")))
+    fluidRow(ddh::make_legend("make_expdep"))
   )
 }
 
@@ -1346,7 +1352,7 @@ expdepPlotServer <- function (id, data) {
     function(input, output, session) {
       output$exdep_plot_title <- renderText({paste0("Expression v. dependency plot for ", str_c(data()[[3]], collapse = ", "))})
       output$exdep_plot_plot <- renderUI({
-        fluidRow(plotOutput(outputId = session$ns("cellexpdep"),  height = "500px") %>% 
+        fluidRow(plotOutput(outputId = session$ns("cellexpdep"), height = "500px") %>% 
                    withSpinnerColor(plot_type = data()$type) #see shiny_helper.R
         )
       })
@@ -1355,7 +1361,6 @@ expdepPlotServer <- function (id, data) {
           shiny::need(c("universal_achilles_long", "cell_expression_meta") %in% data()$validate, "No data found."))
         make_expdep(input = data())
       })
-      output$exdep_plot_legend <- renderText({paste0("<strong>Dependency versus Expression.</strong> Each point shows the dependency value compared to the expression value for ", ifelse(data()$type == "gene", "a cell line given a gene.", "a gene given a cell line."))})
     }
   )
 }
@@ -1364,29 +1369,16 @@ expdepPlotServer <- function (id, data) {
 MolecularFeaturesSegmentPlot <- function(id) {
   ns <- NS(id)
   tagList(
-    shinyjs::useShinyjs(),
-    # Scatterplot
-    fluidRow(column(h4(textOutput(ns("mol_feat_seg_plot_text"))), width = 12)),
+    fluidRow(h4(textOutput(ns("mol_feat_seg_plot_text")))),
+    fluidRow(plotOutput(outputId = ns("mol_feat_seg_plot"), height = "auto") %>% 
+               withSpinnerColor(plot_type = "gene")),
     tags$br(),
-    fluidRow(    
-      div(
-        id = ns("mol_feat_seg_plot_id"),
-        style = "padding-left:1%",
-        plotOutput(outputId = ns("mol_feat_seg_plot"), width = "100%") %>% 
-          withSpinnerColor(plot_type = "gene"),
-        fluidRow(ddh::make_legend("make_molecular_features_segments")),
-        actionLink(inputId = ns("segments_table_click"), " View table")
-      )
-    ),
+    fluidRow(
+      ddh::make_legend("make_molecular_features_segments"),
+      actionLink(inputId = ns("segments_table_click"), " View table")),
     conditionalPanel(condition = paste0("input['", ns("segments_table_click"), "'] != 0"),
-                     fluidRow(
-                       div(
-                         id = ns("mol_feat_seg_table_id"),
-                         style = "padding-left:1%",
-                         h4(textOutput(ns("mol_feat_seg_table_text"))),
-                         DT::dataTableOutput(outputId = ns("mol_feat_seg_table"))
-                       )
-                     )
+                     fluidRow(h4(textOutput(ns("mol_feat_seg_table_text")))),
+                     fluidRow(DT::dataTableOutput(outputId = ns("mol_feat_seg_table")))
     )
   )
 }
@@ -1468,8 +1460,7 @@ cellLineGeneProteinPlot <- function(id) {
   tagList(
     fluidRow(h4(textOutput(ns("text_cellLine_gene_protein_plot")))),
     fluidRow(plotOutput(outputId = ns("cellLine_gene_protein_plot")) %>% 
-               withSpinnerColor(plot_type = "gene") #see shiny_helper.R
-    ),
+               withSpinnerColor(plot_type = "gene")),
     tags$br(),
     fluidRow(ddh::make_legend("make_cellgeneprotein"))
   )
@@ -1507,7 +1498,6 @@ cellCoexpressionPlotServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      
       output$text_cell_coexp_plot <- renderText({paste0("Cell co-expression plot generated for ", str_c(data()$content, collapse = ", "))})
       output$cell_coexpression <- renderPlot({
         shiny::validate(
@@ -1536,10 +1526,9 @@ cellFunctionalPlot <- function(id) {
     ),
     fluidRow(plotlyOutput(outputId = ns("functional_plot"),  height = "auto") %>% 
                withSpinnerColor(plot_type = "cell")
-    ), #see shiny_helper.R
+    ),
     tags$br(),
-    fluidRow(ddh::make_legend("make_functional_cell")),
-    tags$br()
+    fluidRow(ddh::make_legend("make_functional_cell"))
   )
 }
 
@@ -1569,13 +1558,14 @@ cellMetadataPlot <- function(id) {
                             "Metadata factor:",
                             choices = c("Lineage" = "lineage",
                                         "Sublineage" = "sublineage")
-    ),
-    sliderInput(ns("bonferroni_cutoff"), 
-                "Bonferroni cutoff",
-                min = 0.01, max = 1, value = 0.05)),
+                            ),
+             sliderInput(ns("bonferroni_cutoff"), 
+                         "Bonferroni cutoff",
+                         min = 0.01, max = 1, value = 0.05)
+             ),
     fluidRow(plotOutput(outputId = ns("metadata_plot"),  height = "auto") %>% 
                withSpinnerColor(plot_type = "cell")
-    ), #see shiny_helper.R
+    ),
     tags$br(),
     fluidRow(ddh::make_legend("make_metadata_cell"))
   )
@@ -1604,7 +1594,7 @@ cellMetadataPlotServer <- function (id, data, type) {
 compoundStructure <- function(id) {
   ns <- NS(id)
   tagList(
-    uiOutput(outputId = ns("compound_structure"), height = "auto"),
+    fluidRow(uiOutput(outputId = ns("compound_structure"), height = "auto")),
     tags$br(),
     fluidRow(ddh::make_legend("make_molecule_structure"))
   )
@@ -1702,8 +1692,7 @@ compoundLinPlot <- function(id) {
                withSpinnerColor(plot_type = "compound") #see shiny_helper.R
     ),
     tags$br(),
-    fluidRow(tags$strong(ddh::make_legend("make_lineage"))
-    )
+    fluidRow(ddh::make_legend("make_lineage"))
   )
 }
 
@@ -1726,13 +1715,17 @@ compoundLinPlotServer <- function(id, data) {
 compoundSubLinPlot <- function(id) {
   ns <- NS(id)
   tagList(
+    tags$br(),
     fluidRow(actionLink(inputId = ns("compound_sublin_click"), "View plot split into sublineages")),
     tags$br(),
     conditionalPanel(condition = paste0("input['", ns("compound_sublin_click"), "'] != 0"),
                      tags$br(),
                      fluidRow(plotOutput(outputId = ns("compound_sublin"),  height = "auto") %>% 
-                                withSpinnerColor(plot_type = "compound") #see shiny_helper.R
-                     ))
+                                withSpinnerColor(plot_type = "compound")
+                              ),
+                     tags$br(),
+                     fluidRow(ddh::make_legend("make_sublineage"))
+                     )
   )
 }
 
@@ -1757,7 +1750,7 @@ compoundCorrelationPlot <- function(id) {
   tagList(
     fluidRow(h4(textOutput(ns("text_compoundcorr_plot")))),
     fluidRow(plotOutput(outputId = ns("compound_correlations")) %>% 
-               withSpinnerColor(plot_type = "compound") #see shiny_helper.R
+               withSpinnerColor(plot_type = "compound")
     ),
     tags$br(),
     fluidRow(ddh::make_legend("make_correlation"))
