@@ -164,16 +164,27 @@ genePage <- function (id, subtype) {
       ## EXPRESSION (place)-----
       navbarMenu(title = "EXPRESSION",
                  tabPanel("Sub-cellular", value = "expression_sub",
-                          cellAnatogramPlot(ns("exp")),
-                          cellAnatogramFacetPlot(ns("exp")),
-                          cellAnatogramTable(ns("exp"))
+                          fluidRow(
+                            div(
+                              id = ns("subcellular_tabcard"),
+                              style = "padding-left:1%",
+                              cellAnatogramPlot(ns("exp")),
+                              cellAnatogramFacetPlot(ns("exp")),
+                              cellAnatogramTable(ns("exp")),
+                              tags$br()
+                            )
+                          )
                  ), 
                  tabPanel("Cell Line", value = "expression_cell", 
                           shinyjs::useShinyjs(),
-                          #summary plot
-                          # fluidRow(
-                            cellGeneExpressionPlot(ns("cell_gene")),
-                          # ),
+                          # summary plot
+                          fluidRow(
+                            div(
+                              id = ns("cell_line_expression_tabcard"),
+                              style = "padding-left:1%",
+                              cellGeneExpressionPlot(ns("cell_gene"))
+                            )
+                          ),
                           tags$hr(),
                           # cards in a fluid row
                           fluidRow(
@@ -224,7 +235,6 @@ genePage <- function (id, subtype) {
                               div(
                                 id = ns("gene_protein_plot_tabcard"),
                                 style = "padding-left:1%",
-                                #plots go here
                                 cellGeneProteinPlot(ns("cell_geneprotein")),
                                 tags$br()
                               )
@@ -274,22 +284,50 @@ genePage <- function (id, subtype) {
       # COMPOUNDS (thing)-----
       navbarMenu(title = "COMPOUNDS",
                  tabPanel("Drugs", value = "drugs",
-                          private(geneDrugsTable(ns("gene_drugs"))), 
-                          private_msg()),
+                          fluidRow(
+                            div(
+                              id = ns("gene_drugs_tabcard"),
+                              style = "padding-left:1%",
+                              private(geneDrugsTable(ns("gene_drugs"))), 
+                              private_msg(),
+                              tags$br()
+                              )
+                            )
+                 ),
                  tabPanel("Metabolites", value = "metabolites",
-                          private(metabolitesTable(ns("gene_metabolites"))), 
-                          private_msg()),
+                          fluidRow(
+                            div(
+                              id = ns("gene_metabolites_tabcard"),
+                              style = "padding-left:1%",
+                              private(metabolitesTable(ns("gene_metabolites"))),
+                              private_msg(),
+                              tags$br()
+                            )
+                          )
+                 ),
                  tabPanel("Graph", value = "gene_bipartite_graph",
-                          private(geneBipartiteGraph(ns("gene_bipartite_graph"))), 
-                          private_msg())
+                          fluidRow(
+                            div(
+                              id = ns("gene_bipartite_tabcard"),
+                              style = "padding-left:1%",
+                              private(geneBipartiteGraph(ns("gene_bipartite_graph"))), 
+                              private_msg(),
+                              tags$br()
+                            )
+                          )
+                 )
       ),
       ## DEPENDENCIES (action)-----
       navbarMenu(title = "DEPENDENCIES",
                  tabPanel("Data", value = "dependencies_plots", 
                           shinyjs::useShinyjs(),
-                          #summary plot
+                          # summary plot
                           fluidRow(
-                            cellDependenciesPlot(ns("dep"))
+                            div(
+                              id = ns("cell_dependencies_tabcard"),
+                              style = "padding-left:1%",
+                              cellDependenciesPlot(ns("dep"))
+                            )
                           ),
                           tags$hr(),
                           # cards in a fluid row
@@ -373,8 +411,13 @@ genePage <- function (id, subtype) {
                  ),
                  tabPanel("Co-essentiality", value = "dependencies_co-essentiality",
                           shinyjs::useShinyjs(),
-                          #summary plot
-                          fluidRow(cellDependenciesCorrPlot(ns("corrplot"))
+                          # summary plot
+                          fluidRow(
+                            div(
+                              id = ns("coessentiality_tabcard"),
+                              style = "padding-left:1%",
+                              cellDependenciesCorrPlot(ns("corrplot"))
+                            )
                           ),
                           tags$hr(),
                           # cards in a fluid row
@@ -445,14 +488,27 @@ genePage <- function (id, subtype) {
                           )
                  ), # end of tabPanel
                  tabPanel("Drugs", value = "dependencies_drugs", 
-                          private(geneDrugsCorTable(ns("gene_drugs_cor"))), 
-                          private_msg()),
-                 
+                          fluidRow(
+                            div(
+                              id = ns("drugs_tabcard"),
+                              style = "padding-left:1%",
+                              private(geneDrugsCorTable(ns("gene_drugs_cor"))), 
+                              private_msg(),
+                              tags$br()
+                            )
+                          )
+                 ),
                  tabPanel("Molecular Features", value = "molecular_features",
                           shinyjs::useShinyjs(),
-                          #summary plot
-                          private(fluidRow(MolecularFeaturesSegmentPlot(ns("mol_feat_segments")))),
-                          private_msg(),
+                          # summary plot
+                          fluidRow(
+                            div(
+                              id = ns("molecular_features_segments_tabcard"),
+                              style = "padding-left:1%",
+                              private(MolecularFeaturesSegmentPlot(ns("mol_feat_segments"))),
+                              private_msg()
+                            )
+                          ),
                           tags$hr(),
                           # cards in a fluid row
                           fluidRow(
