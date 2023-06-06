@@ -165,9 +165,9 @@ genePage <- function (id, subtype) {
                  tabPanel("Cell Line", value = "expression_cell", 
                           shinyjs::useShinyjs(),
                           #summary plot
-                          fluidRow(
-                            cellGeneExpressionPlot(ns("cell_gene"))
-                          ),
+                          # fluidRow(
+                            cellGeneExpressionPlot(ns("cell_gene")),
+                          # ),
                           tags$hr(),
                           # cards in a fluid row
                           fluidRow(
