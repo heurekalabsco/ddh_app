@@ -150,10 +150,16 @@ genePage <- function (id, subtype) {
                           )
                  ), #end tab panel
                  tabPanel(title = "Literature", value = "about_literature",
-                          #co-citation graph? 
-                          pubmedPlot(ns("pubmed")),  #Summary stats
-                          pubmedTable(ns("pubmed"))
-                 )
+                          fluidRow(
+                            div(
+                              id = ns("literature_tabcard"),
+                              style = "padding-left:1%",
+                              pubmedPlot(ns("pubmed")), 
+                              pubmedTable(ns("pubmed")),
+                              tags$br()
+                              )
+                            )
+                          )
       ),
       ## EXPRESSION (place)-----
       navbarMenu(title = "EXPRESSION",
