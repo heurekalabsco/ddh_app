@@ -657,8 +657,8 @@ similarGenesTableServer <- function (id, data) {
         
         DT::datatable(
           ddh::make_censor_table(input = data(), 
-                            censor = censor_status$censor, 
-                            greater_than = censor_status$num_sim_genes) %>%
+                                 censor = censor_status$censor, 
+                                 greater_than = censor_status$num_sim_genes) %>%
             dplyr::rename("Query" = "id", "Gene" = "gene", "Name" = "gene_name",
                           "R^2" = "r2", "Z-Score" = "z_score", "Co-publication Count" = "concept_count", "Co-publication Index" = "concept_index") %>%
             dplyr::select("Query", "Gene", "Name", input$vars_dep_top) %>%
@@ -1097,11 +1097,10 @@ metabolitesTableServer <- function(id, data) {
         if(data()$type == "gene") {
           shiny::validate(
             shiny::need(c("compound_hmdb_proteins") %in% data()$validate, "No compound data for this gene"))
-          DT::datatable(make_metabolite_table(input = data()) %>% 
-                          dplyr::mutate(metabolite_name = map_chr(metabolite_name, metabolite_linkr)) %>% 
-                          dplyr::select('Gene Name' = gene_name, 
-                                        'Metabolite' = metabolite_name,
-                                        'HMDB ID' = metabolite_accession),
+          DT::datatable(ddh::make_metabolite_table(input = data()) %>% 
+                          dplyr::mutate(metabolite = map_chr(metabolite, metabolite_linkr)) %>% 
+                          dplyr::select('Gene Name' = id, 
+                                        'Metabolite' = metabolite),
                         escape = FALSE,
                         options = list(pageLength = 10))
         } else if(data()$type == "cell") {
@@ -1109,7 +1108,7 @@ metabolitesTableServer <- function(id, data) {
             shiny::need(c("cell_metabolites") %in% data()$validate, "No compound data for this cell line"))
           DT::datatable(make_metabolite_table(input = data()) %>%
                           dplyr::mutate(metabolite = map_chr(metabolite, metabolite_linkr)) %>% 
-                          dplyr::select('Cell Line' = cell_line, 
+                          dplyr::select('Cell Line' = id, 
                                         'Metabolite' = metabolite, 
                                         'Value' = value) %>% 
                           mutate(Value = round(Value, 3)),
@@ -1137,15 +1136,15 @@ geneDrugsTableServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$title_gene_drugs_table <- renderText({paste0("Drug sensitivity table for ", str_c(data()$content, collapse = ", "))})
-      output$text_gene_drugs_table <- renderText({paste0("Drugs annotated for ", str_c(data()$content, collapse = ", "))})
+      output$title_gene_drugs_table <- renderText({paste0("Drug table for ", stringr::str_c(data()$content, collapse = ", "))})
+      output$text_gene_drugs_table <- renderText({paste0("Drugs annotated to target ", stringr::str_c(data()$content, collapse = ", "))})
       output$gene_drugs_table <- DT::renderDataTable({
         shiny::validate(
           shiny::need(c("gene_drugs_table") %in% data()$validate, "No compound data for this gene"))
-        DT::datatable(make_gene_drugs_table(input = data()) %>% 
+        DT::datatable(ddh::make_gene_drugs_table(input = data()) %>% 
                         dplyr::mutate(fav_drug = map_chr(fav_drug, drug_linkr), 
                                       moa = map_chr(moa, moa_linkr)) %>% #from fun_helper.R
-                        dplyr::rename(Gene = fav_gene, Drug = fav_drug, Mechanism = moa), 
+                        dplyr::rename(Gene = id, Drug = fav_drug, Mechanism = moa), 
                       escape = FALSE)
       })
     }
