@@ -583,7 +583,8 @@ tissuePlotTextServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$tissueplot_text <- renderText({paste0("Human tissue expression for ", str_c(data()$content, collapse = ", "))})
+      output$tissueplot_text <- renderText({paste0("Human tissue expression for ", 
+                                                   str_c(data()$content, collapse = ", "))})
     }
   )
 }
