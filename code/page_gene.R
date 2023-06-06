@@ -49,14 +49,18 @@ genePage <- function (id, subtype) {
                           shinyjs::useShinyjs(),
                           #summary
                           fluidRow(
-                            column(8, gene_var), #summary variable for alt descriptions
-                            column(4, ideogramPlot(ns("chromo")))
+                            div(
+                              id = ns("gene_summary_tabcard"),
+                              style = "padding-left:1%",
+                              column(8, gene_var), #summary variable for alt descriptions
+                              column(4, ideogramPlot(ns("chromo")))
+                            )
                           ),
                           tags$hr(),
                           # cards in a fluid row
                           fluidRow(
                             cardLayout(
-                              barcodeTab(ns("barcodetab")),
+                              barcodeTab(ns("barcode_tabcard")),
                               actionLink(inputId = ns("go_click"), geneGoTableTab(ns("gotab"))) 
                             )
                           ),
@@ -78,8 +82,12 @@ genePage <- function (id, subtype) {
                           shinyjs::useShinyjs(),
                           #summary
                           fluidRow(
-                            column(8, protein_summary),
-                            column(4, proteinStructurePlot(ns("structure")))
+                            div(
+                              id = ns("protein_summary_tabcard"),
+                              style = "padding-left:1%",
+                              column(8, protein_summary),
+                              column(4, proteinStructurePlot(ns("structure")))
+                            )
                           ),
                           #"ADD: seq, blastP link, pfam, "
                           tags$hr(),
@@ -243,10 +251,20 @@ genePage <- function (id, subtype) {
                  ), #end tab panel
                  tabPanel("Tissue", value = "expression_tissue", 
                           shinyjs::useShinyjs(),
-                          fluidRow(tissuePlotText(ns("tissue_text"))),
                           fluidRow(
-                            column(6, maleAnatogramPlot(ns("male_anatogram"))),
-                            column(6, femaleAnatogramPlot(ns("female_anatogram")))
+                            div(
+                              id = ns("tissue_text_tabcard"),
+                              style = "padding-left:1%",
+                              fluidRow(tissuePlotText(ns("tissue_text")))
+                            )
+                          ),
+                          fluidRow(
+                            div(
+                              id = ns("tissue_summary_plot_tabcard"),
+                              style = "padding-left:1%",
+                              column(6, maleAnatogramPlot(ns("male_anatogram"))),
+                              column(6, femaleAnatogramPlot(ns("female_anatogram")))
+                            )
                           ),
                           tags$hr(),
                           # cards in a fluid row

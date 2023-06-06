@@ -5,7 +5,7 @@ ideogramPlot <- function(id) {
   ns <- NS(id)
   tagList(
     fluidRow(h4(textOutput(ns("ideogram_plot_text")))),
-    uiOutput(outputId = ns("ideogram_plot"), height = "auto"),
+    fluidRow(uiOutput(outputId = ns("ideogram_plot"), height = "auto")),
     tags$br(),
     fluidRow(ddh::make_legend("make_ideogram"))
   )
