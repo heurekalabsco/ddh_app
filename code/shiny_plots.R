@@ -1062,9 +1062,9 @@ cellDependenciesPlot <- function(id) {
     shinyjs::useShinyjs(),
     # Scatterplot
     fluidRow(h4(textOutput(ns("cell_dep_plot_text")))), 
-    fluidRow(column(textOutput(ns("essential_num")), width = 9),
-             column(actionButton(ns("cell_dep_switch"), label = "Show interactive plot"), width = 3)
-    ),
+    fluidRow(textOutput(ns("essential_num")),
+             actionButton(ns("cell_dep_switch"), label = "Show interactive plot")
+             ),
     tags$br(),
     fluidRow(align = "center",
       div(
@@ -1107,7 +1107,8 @@ cellDependenciesPlotServer <- function (id, data) {
       })
       
       # Scatterplot
-      output$cell_dep_plot_text <- renderText({paste0("Dependency plots generated for ", str_c(data()$content, collapse = ", "))})
+      output$cell_dep_plot_text <- renderText({paste0("Dependency plots generated for ", 
+                                                      str_c(data()$content, collapse = ", "))})
       output$essential_num <- renderText({
         get_essential(input = data())
         #paste0("Essential in ", get_essential(input = data()), " cell lines")
@@ -1165,7 +1166,7 @@ cellDependenciesDensityPlotServer <- function(id, data) {
     function(input, output, session) {
       output$cell_dep_density_title <- renderText({paste0("Dependency density plot for ", str_c(data()$content, collapse = ", "))})
       output$density_plot_plot <- renderUI({
-        fluidRow(plotOutput(outputId = session$ns("cell_deps_density"),  height = "auto") %>% 
+        fluidRow(plotOutput(outputId = session$ns("cell_deps_density"), height = "auto") %>% 
                    withSpinnerColor(plot_type = data()$type) #see shiny_helper.R
         )
         
@@ -1196,7 +1197,7 @@ cellDependenciesBarPlotServer <- function (id, data) {
     function(input, output, session) {
       output$cell_dep_barplot_title <- renderText({paste0("Dependency barplot for ", str_c(data()$content, collapse = ", "))})
       output$bar_plot_plot <- renderUI({
-        fluidRow(plotlyOutput(outputId = session$ns("cell_bar"),  height = "auto") %>% 
+        fluidRow(plotlyOutput(outputId = session$ns("cell_bar"), height = "auto") %>% 
                    withSpinnerColor(plot_type = data()$type) #see shiny_helper.R
         )
       })

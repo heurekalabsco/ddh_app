@@ -255,7 +255,7 @@ genePage <- function (id, subtype) {
                             div(
                               id = ns("tissue_text_tabcard"),
                               style = "padding-left:1%",
-                              fluidRow(tissuePlotText(ns("tissue_text")))
+                              tissuePlotText(ns("tissue_text"))
                             )
                           ),
                           fluidRow(
