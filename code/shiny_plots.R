@@ -190,6 +190,7 @@ proteinStructurePlot3dServer <- function (id, data) {
                           'Name' = title, 
                           'Organism' = organism) %>% 
             dplyr::filter(Query == input$gene3dstructure),
+          rownames = FALSE,
           escape = FALSE,
           options = list(pageLength = 10),
           selection = c("single"),

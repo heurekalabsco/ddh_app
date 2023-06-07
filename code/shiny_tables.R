@@ -21,6 +21,7 @@ pathwayListServer <- function(id, data) {
                                       gs_name = purrr::map_chr(gs_name, clean_pathway_names), 
                                       gs_description = purrr::map_chr(gs_description, clean_pathway_descriptions)) %>% 
                         dplyr::select(ID = gs_id, Pathway = gs_name, Description = gs_description, `Pathway Size` = pathway_size),
+                      rownames = FALSE,
                       escape = FALSE,
                       options = list(paging = FALSE, 
                                      searching = FALSE))
@@ -48,6 +49,7 @@ pathwayGeneListServer <- function(id, data) {
         DT::datatable(make_pathway_genes(go_id = data()$query) %>% 
                         dplyr::mutate(gene = map_chr(gene, internal_link))  %>% #from fun_helper.R
                         dplyr::select(Gene = gene, Name = approved_name, AKA = aka),
+                      rownames = FALSE,
                       escape = FALSE,
                       options = list(paging = FALSE, 
                                      searching = FALSE))
@@ -109,6 +111,7 @@ proteinClusterTableServer <- function(id, data) {
           DT::datatable(make_signature_clusters_table(input = data()) %>%
                           dplyr::filter(Gene %in% data()$content) %>% 
                           dplyr::mutate(Gene = map_chr(Gene, internal_link)),
+                        rownames = FALSE,
                         escape = FALSE,
                         options = list(pageLength = 10))
         })
@@ -228,6 +231,7 @@ pubmedTableServer <- function(id, data) {
                           dplyr::mutate(pmcid = map_chr(pmcid, pmc_linkr) #from fun_helper.R
                           ) %>% 
                           dplyr::rename(Name = id, 'Pubmed ID' = pmid, Year = year, PMCID = pmcid),
+                        rownames = FALSE,
                         escape = FALSE,
                         options = list(pageLength = 10))
         })
@@ -260,6 +264,8 @@ cellAnatogramTableServer <- function(id, data) {
                                       Location = main_location,
                                       Expression = value, 
                                       Reliability = reliability),
+                      rownames = FALSE,
+                      escape = FALSE,
                       options = list(pageLength = 10))
       })
     }
@@ -285,6 +291,8 @@ tissueTableServer <- function(id, data) {
           shiny::need(c("gene_subcell") %in% data()$validate, "No tissue data for this gene"))
         DT::datatable(make_humananatogram_table(input = data()),
                       filter = if(input$tissue_filter_click == FALSE) {'none'} else {'top'},
+                      rownames = FALSE,
+                      escape = FALSE,
                       options = list(pageLength = 10))
       })
     }
@@ -311,6 +319,7 @@ cellGeneExpressionTableServer <- function (id, data) {
           DT::datatable(
             make_expression_table(input = data(), var = "gene") %>%
               dplyr::mutate(`Cell Line` = map_chr(`Cell Line`, cell_linkr, type = "cell")),
+            rownames = FALSE,
             escape = FALSE)
           
         } else if(data()$type == "cell") {
@@ -319,6 +328,7 @@ cellGeneExpressionTableServer <- function (id, data) {
           DT::datatable(
             make_expression_table(input = data(), var = "gene") %>%
               dplyr::mutate(Gene = map_chr(Gene, internal_link)),
+            rownames = FALSE,
             escape = FALSE)
         }
       })
@@ -345,6 +355,7 @@ cellProteinExpressionTableServer <- function (id, data) {
           DT::datatable(
             make_expression_table(input = data(), var = "protein") %>%
               dplyr::mutate(`Cell Line` = map_chr(`Cell Line`, cell_linkr, type = "cell")),
+            rownames = FALSE,
             escape = FALSE)
           
         } else if(data()$type == "cell") {
@@ -353,6 +364,7 @@ cellProteinExpressionTableServer <- function (id, data) {
           DT::datatable(
             make_expression_table(input = data(), var = "protein") %>%
               dplyr::mutate(Gene = map_chr(Gene, internal_link)),
+            rownames = FALSE,
             escape = FALSE)
         }
       })
@@ -380,6 +392,7 @@ cellDependenciesTableServer <- function (id, data) {
         DT::datatable(make_dep_table(input = data()) %>%
                         dplyr::mutate(`Cell Line` = map_chr(`Cell Line`, cell_linkr, type = "cell")), 
                       filter = if(input$dep_filter_click == FALSE) {'none'} else {'top'}, 
+                      rownames = FALSE,
                       escape = FALSE,
                       options = list(pageLength = 10))
       })
@@ -405,6 +418,8 @@ compoundDependenciesTableServer <- function (id, data) {
           shiny::need(c("universal_achilles_long") %in% data()$validate, "No viability data for this compound"))
         DT::datatable(make_dep_table(input = data()), 
                       filter = if(input$compound_dep_filter_click == FALSE) {'none'} else {'top'}, 
+                      rownames = FALSE,
+                      escape = FALSE,
                       options = list(pageLength = 10))
       })
     }
@@ -434,6 +449,7 @@ cellLineDependenciesTableServer <- function (id, data) {
                         dplyr::rename("Gene" = "gene", "Name" = "approved_name", "Unique Essential" = "unique_essential", "Pan Essential" = "common_essential") %>%
                         dplyr::mutate(Gene = map_chr(Gene, internal_link)) %>%  #from fun_helper.R
                         dplyr::select("Gene", "Name", contains(data()$content), input$vars_essentials),
+                      rownames = FALSE,
                       escape = FALSE, 
                       filter = if(input$dep_cell_line_filter_click == FALSE) {'none'} else {'top'}, 
                       options = list(pageLength = 10))
@@ -466,6 +482,8 @@ cellLineDrugDependenciesTableServer <- function (id, data) {
                         dplyr::rename("Drug" = "name", "MOA" = "moa", "Uniquely Toxic" = "unique_toxic") %>%
                         dplyr::select("Drug", "MOA", "log2fc", input$vars_toxic_drugs), 
                       filter = if(input$dep_cell_line_drug_filter_click == FALSE) {'none'} else {'top'}, 
+                      rownames = FALSE,
+                      escape = FALSE,
                       options = list(pageLength = 10))
       })
     }
@@ -660,6 +678,7 @@ similarGenesTableServer <- function (id, data) {
             dplyr::select("Query", "Gene", "Name", input$vars_dep_top) %>%
             dplyr::mutate_if(is.numeric, ~ signif(., digits = 3)) %>% 
             dplyr::mutate(Gene = map_chr(Gene, internal_link, linkout_img = FALSE)),
+          rownames = FALSE,
           escape = FALSE,
           options = list(pageLength = 25)
         )
@@ -700,6 +719,8 @@ GenePathwayEnrichmentTableServer <- function (id, data) {
           shiny::need(c("universal_achilles_long") %in% data()$validate, "No dependency data for this gene"))
         DT::datatable(ddh::make_gene_dependency_enrichment_table(input = data()) %>% 
                         dplyr::mutate_if(is.numeric, ~ signif(., digits = 3)),
+                      rownames = FALSE,
+                      escape = FALSE,
                       options = list(pageLength = 10))
       })
       # CLICKABLE PLOT
@@ -760,6 +781,7 @@ similarCellsTableServer <- function (id, data) {
             dplyr::arrange(Bonferroni) %>% 
             dplyr::select(Query, Cell, input$vars_cells_dep_top) %>% 
             dplyr::mutate_if(is.numeric, ~ signif(., digits = 3)),
+          rownames = FALSE,
           escape = FALSE,
           options = list(pageLength = 25))
       })
@@ -804,6 +826,7 @@ similarExpCellsTableServer <- function (id, data) {
             dplyr::arrange(Bonferroni) %>% 
             dplyr::select(Query, Cell, input$vars_cells_exp_top) %>% 
             dplyr::mutate_if(is.numeric, ~ signif(., digits = 3)),
+          rownames = FALSE,
           escape = FALSE,
           options = list(pageLength = 25))
       })
@@ -840,6 +863,7 @@ similarCompoundsTableServer <- function (id, data) {
             ) %>% 
             dplyr::rename("R^2" = "r2", "Z-Score" = "z_score", "Mechanism" = "moa") %>% 
             dplyr::select("Query" = "fav_drug", "Drug" = "name", input$vars_compound_dep_top),
+          rownames = FALSE,
           escape = FALSE,
           options = list(pageLength = 25))
       })
@@ -879,6 +903,7 @@ dissimilarGenesTableServer <- function (id, data) {
             dplyr::select("Query", "Gene", "Name", input$vars_dep_bottom) %>%
             dplyr::mutate_if(is.numeric, ~ signif(., digits = 3)) %>% 
             dplyr::mutate(Gene = map_chr(Gene, internal_link, linkout_img = FALSE)),
+          rownames = FALSE,
           escape = FALSE,
           options = list(pageLength = 25))
       })
@@ -920,6 +945,7 @@ dissimilarCellsTableServer <- function (id, data) {
             dplyr::arrange(Bonferroni) %>% 
             dplyr::select(Query, Cell, input$vars_cells_dep_bottom) %>% 
             dplyr::mutate_if(is.numeric, ~ signif(., digits = 3)),
+          rownames = FALSE,
           escape = FALSE,
           options = list(pageLength = 25))
       })
@@ -964,6 +990,7 @@ dissimilarExpCellsTableServer <- function (id, data) {
             dplyr::arrange(Bonferroni) %>% 
             dplyr::select(Query, Cell, input$vars_cells_exp_bottom) %>% 
             dplyr::mutate_if(is.numeric, ~ signif(., digits = 3)),
+          rownames = FALSE,
           escape = FALSE,
           options = list(pageLength = 25))
       })
@@ -1000,6 +1027,7 @@ dissimilarCompoundsTableServer <- function (id, data) {
             ) %>% 
             dplyr::rename("R^2" = "r2", "Z-Score" = "z_score", "Mechanism" = "moa") %>% 
             dplyr::select("Query" = "fav_drug", "Drug" = "name", input$vars_compound_dep_bottom),
+          rownames = FALSE,
           escape = FALSE,
           options = list(pageLength = 25))
       })
@@ -1090,6 +1118,7 @@ metabolitesTableServer <- function(id, data) {
                           dplyr::mutate(metabolite = map_chr(metabolite, metabolite_linkr)) %>% 
                           dplyr::select('Gene Name' = id, 
                                         'Metabolite' = metabolite),
+                        rownames = FALSE,
                         escape = FALSE,
                         options = list(pageLength = 10))
         } else if(data()$type == "cell") {
@@ -1101,6 +1130,7 @@ metabolitesTableServer <- function(id, data) {
                                         'Metabolite' = metabolite, 
                                         'Value' = value) %>% 
                           mutate(Value = round(Value, 3)),
+                        rownames = FALSE,
                         escape = FALSE,
                         options = list(pageLength = 10))
         }
@@ -1134,6 +1164,7 @@ geneDrugsTableServer <- function (id, data) {
                         dplyr::mutate(fav_drug = map_chr(fav_drug, drug_linkr), 
                                       moa = map_chr(moa, moa_linkr)) %>% #from fun_helper.R
                         dplyr::rename(Gene = id, Drug = fav_drug, Mechanism = moa), 
+                      rownames = FALSE,
                       escape = FALSE)
       })
     }
@@ -1163,6 +1194,7 @@ cellDrugsTableServer <- function (id, data) {
                         dplyr::mutate(name = map_chr(name, drug_linkr),
                                       log2fc = round(log2fc, 3)) %>% #from fun_helper.R
                         dplyr::rename(`Cell Line` = cell_line, Drug = name, LogFC = log2fc), 
+                      rownames = FALSE,
                       escape = FALSE)
       })
     }
@@ -1207,6 +1239,7 @@ geneDrugsCorTableServer <- function (id, data) {
                         ) %>% 
                         dplyr::rename(Gene = fav_gene, Drug = drug, Mechanism = moa, 'Known' = known, 'Z-Score' = z_score, 'R^2'=r2) %>% 
                         dplyr::select("Gene", "Drug", "Mechanism", input$vars_gene_drugs_cor_table), 
+                      rownames = FALSE,
                       escape = FALSE)
       })
     }
@@ -1233,6 +1266,7 @@ cellSummaryTableServer <- function(id, data) {
         DT::datatable(
           make_cell_line_table(input = data()) %>% 
             dplyr::mutate(`Cell Line` = map_chr(`Cell Line`, cell_linkr, type = "cell")),
+          rownames = FALSE,
           escape = FALSE,
           options = list(paging = FALSE, 
                          searching = FALSE,
@@ -1267,6 +1301,7 @@ pubmedCompoundTableServer <- function(id, data) {
                           dplyr::mutate(pmcid = map_chr(pmcid, pmc_linkr) #from fun_helper.R
                           ) %>% 
                           dplyr::rename(Name = name, 'Pubmed ID' = pmid, Year = year, PMCID = pmcid),
+                        rownames = FALSE,
                         escape = FALSE,
                         options = list(pageLength = 10))
         })
@@ -1298,6 +1333,7 @@ pubmedCellLineTableServer <- function(id, data) {
                           dplyr::mutate(pmcid = map_chr(pmcid, pmc_linkr) #from fun_helper.R
                           ) %>% 
                           dplyr::rename(Name = name, 'Pubmed ID' = pmid, Year = year, PMCID = pmcid),
+                        rownames = FALSE,
                         escape = FALSE,
                         options = list(pageLength = 10))
         })
@@ -1330,6 +1366,7 @@ drugGenesTableServer <- function (id, data) {
         DT::datatable(make_drug_genes_table(data()$content) %>% 
                         dplyr::mutate(fav_gene = map_chr(fav_gene, internal_link)) %>% #from fun_helper.R
                         dplyr::rename(Drug = fav_drug, Gene = fav_gene, Name = approved_name), 
+                      rownames = FALSE,
                       escape = FALSE)
       })
     }
@@ -1372,6 +1409,7 @@ drugGenesCorTableServer <- function (id, data) {
                         ) %>% 
                         dplyr::rename(Drug = fav_drug, Gene = gene, Name = approved_name, 'Known' = known, 'Z-Score' = z_score, 'R^2'=r2) %>% 
                         dplyr::select("Drug", "Gene", "Name", input$vars_drug_genes_cor_table), 
+                      rownames = FALSE,
                       escape = FALSE)
       })
     }
@@ -1398,6 +1436,7 @@ metaboliteGenesTableServer <- function(id, data) {
         DT::datatable(make_metabolite_table(input = data()) %>% 
                         dplyr::mutate(gene_name = map_chr(gene_name, internal_link)) %>% 
                         dplyr::select('Metabolite' = metabolite_name, 'Gene Name' = gene_name),
+                      rownames = FALSE,
                       escape = FALSE,
                       options = list(pageLength = 10))
       })
