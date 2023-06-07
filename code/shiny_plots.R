@@ -1397,7 +1397,7 @@ MolecularFeaturesSegmentPlotServer <- function (id, data) {
         shiny::validate(
           shiny::need(c("universal_achilles_long") %in% data()$validate, "No data found."))
         #plot
-        ggplotly(ddh::make_molecular_features_segments(input = data()), tooltip = "text")
+        plotly::ggplotly(ddh::make_molecular_features_segments(input = data()))
       })
       output$mol_feat_seg_table_text <- renderText({paste0("Dependency segments table for ", 
                                                            str_c(data()$content, collapse = ", "))})
