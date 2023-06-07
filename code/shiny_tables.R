@@ -1157,7 +1157,8 @@ geneDrugsTableServer <- function (id, data) {
       output$title_gene_drugs_table <- renderText({paste0("Drugs annotated to target ", stringr::str_c(data()$content, collapse = ", "))})
       output$gene_drugs_table <- DT::renderDataTable({
         shiny::validate(
-          shiny::need(c("gene_drugs_table") %in% data()$validate, "No compound data for this gene"))
+          shiny::need(c("gene_drugs_table") %in% data()$validate, 
+                      "No drugs annotated for this query"))
         DT::datatable(ddh::make_gene_drugs_table(input = data()) %>% 
                         dplyr::mutate(fav_drug = map_chr(fav_drug, drug_linkr), 
                                       moa = map_chr(moa, moa_linkr)) %>% #from fun_helper.R
@@ -1173,9 +1174,7 @@ cellDrugsTable <- function(id) {
   ns <- NS(id)
   tagList(
     fluidRow(h4(textOutput(ns("title_cell_drugs_table")))),
-    fluidRow(DT::dataTableOutput(outputId = ns("cell_drugs_table"))), 
-    tags$br(),
-    fluidRow(textOutput(ns("text_cell_drugs_table")))
+    fluidRow(DT::dataTableOutput(outputId = ns("cell_drugs_table")))
   )
 }
 
@@ -1183,11 +1182,11 @@ cellDrugsTableServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$title_cell_drugs_table <- renderText({paste0("Drug sensitivity table for ", str_c(data()$content, collapse = ", "))})
-      output$text_cell_drugs_table <- renderText({paste0("Drugs annotated for ", str_c(data()$content, collapse = ", "))})
+      output$title_cell_drugs_table <- renderText({paste0("Drugs annotated for ", str_c(data()$content, collapse = ", "))})
       output$cell_drugs_table <- DT::renderDataTable({
         shiny::validate(
-          shiny::need(c("universal_prism_long") %in% data()$validate, "No compound data for this cell line"))
+          shiny::need(c("universal_prism_long") %in% data()$validate, 
+                      "No drugs annotated for this query"))
         DT::datatable(make_cell_drugs_table(input = data()) %>% 
                         dplyr::mutate(name = map_chr(name, drug_linkr),
                                       log2fc = round(log2fc, 3)) %>% #from fun_helper.R
@@ -1220,10 +1219,11 @@ geneDrugsCorTableServer <- function (id, data) {
     id,
     function(input, output, session) {
       output$title_gene_drugs_cor_table <- renderText({glue::glue('Drug correlation table for {str_c(data()$content, collapse = ", ")}')})
-      output$text_gene_drugs_cor_table <- renderText({glue::glue('When {str_c(data()$content, collapse = ", ")} is knocked out, a subset of cells die. These are the drugs that show the same cell killing profile.')})
+      output$text_gene_drugs_cor_table <- renderText({glue::glue('When knocking out {str_c(data()$content, collapse = ", ")}, a subset of cells die. These are the drugs that show the same cell killing profile.')})
       output$gene_drugs_cor_table <- DT::renderDataTable({
         shiny::validate(
-          shiny::need(c("gene_drugs_cor_table") %in% data()$validate, "No compound data for this gene"))
+          shiny::need(c("gene_drugs_cor_table") %in% data()$validate, 
+                      "No drugs associated with this query"))
         
         #gene_drug_list will grab a char vec of drugs known to target genes, so we can check if corr's are known; added ifelse logic so index grab doesn't break
         gene_drug_tibble <- gene_drugs_table %>% filter(fav_gene %in% data()$content)
