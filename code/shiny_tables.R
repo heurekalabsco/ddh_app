@@ -1096,12 +1096,11 @@ geneCCATableServer <- function(id, data) {
 
 ##Metabolites-----
 #module that displays a table for metabolites
-
 metabolitesTable <- function(id) {
   ns <- NS(id)
   tagList(
     fluidRow(h4(textOutput(ns("title_metabolites_table")))),
-    DT::dataTableOutput(outputId = ns("metabolites_table"))
+    fluidRow(DT::dataTableOutput(outputId = ns("metabolites_table")))
   )
 }
 
@@ -1113,7 +1112,8 @@ metabolitesTableServer <- function(id, data) {
       output$metabolites_table <- DT::renderDataTable({
         if(data()$type == "gene") {
           shiny::validate(
-            shiny::need(c("compound_hmdb_proteins") %in% data()$validate, "No compound data for this gene"))
+            shiny::need(c("compound_hmdb_proteins") %in% data()$validate, 
+                        "No metabolites associated with this query"))
           DT::datatable(ddh::make_metabolite_table(input = data()) %>% 
                           dplyr::mutate(metabolite = map_chr(metabolite, metabolite_linkr)) %>% 
                           dplyr::select('Gene Name' = id, 
@@ -1123,7 +1123,8 @@ metabolitesTableServer <- function(id, data) {
                         options = list(pageLength = 10))
         } else if(data()$type == "cell") {
           shiny::validate(
-            shiny::need(c("cell_metabolites") %in% data()$validate, "No compound data for this cell line"))
+            shiny::need(c("cell_metabolites") %in% data()$validate, 
+                        "No metabolites associated for this query"))
           DT::datatable(make_metabolite_table(input = data()) %>%
                           dplyr::mutate(metabolite = map_chr(metabolite, metabolite_linkr)) %>% 
                           dplyr::select('Cell Line' = id, 
@@ -1145,9 +1146,7 @@ geneDrugsTable <- function(id) { #GENE QUERY
   ns <- NS(id)
   tagList(
     fluidRow(h4(textOutput(ns("title_gene_drugs_table")))),
-    fluidRow(DT::dataTableOutput(outputId = ns("gene_drugs_table"))), 
-    tags$br(),
-    fluidRow(textOutput(ns("text_gene_drugs_table")))
+    fluidRow(DT::dataTableOutput(outputId = ns("gene_drugs_table")))
   )
 }
 
@@ -1155,15 +1154,14 @@ geneDrugsTableServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$title_gene_drugs_table <- renderText({paste0("Drug table for ", stringr::str_c(data()$content, collapse = ", "))})
-      output$text_gene_drugs_table <- renderText({paste0("Drugs annotated to target ", stringr::str_c(data()$content, collapse = ", "))})
+      output$title_gene_drugs_table <- renderText({paste0("Drugs annotated to target ", stringr::str_c(data()$content, collapse = ", "))})
       output$gene_drugs_table <- DT::renderDataTable({
         shiny::validate(
           shiny::need(c("gene_drugs_table") %in% data()$validate, "No compound data for this gene"))
         DT::datatable(ddh::make_gene_drugs_table(input = data()) %>% 
                         dplyr::mutate(fav_drug = map_chr(fav_drug, drug_linkr), 
                                       moa = map_chr(moa, moa_linkr)) %>% #from fun_helper.R
-                        dplyr::rename(Gene = id, Drug = fav_drug, Mechanism = moa), 
+                        dplyr::rename(Gene = id, Drug = fav_drug, `Mechanism of Action` = moa), 
                       rownames = FALSE,
                       escape = FALSE)
       })
@@ -1432,7 +1430,8 @@ metaboliteGenesTableServer <- function(id, data) {
       output$metabolite_genes_text <- renderText({paste0("Metabolite table for ", str_c(data()$content, collapse = ", "))})
       output$metabolite_genes_table <- DT::renderDataTable({
         shiny::validate(
-          shiny::need(c("compound_hmdb_metabolites") %in% data()$validate, "No gene data for this compound"))
+          shiny::need(c("compound_hmdb_metabolites") %in% data()$validate, 
+                      "No metabolites associated with this query"))
         DT::datatable(make_metabolite_table(input = data()) %>% 
                         dplyr::mutate(gene_name = map_chr(gene_name, internal_link)) %>% 
                         dplyr::select('Metabolite' = metabolite_name, 'Gene Name' = gene_name),
