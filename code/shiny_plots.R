@@ -71,7 +71,7 @@ proteinSizePlotServer <- function (id, data) {
         } else {
           plotOutput(outputId = session$ns("protein_size_plot_render"), 
                      width = "100%") %>%
-            withSpinnerColor(plot_type = data()$type)
+            withSpinnerColor(plot_type = "protein")
         }
       })
       output$protein_size_plot_image <- renderUI({
@@ -1371,7 +1371,7 @@ MolecularFeaturesSegmentPlot <- function(id) {
   ns <- NS(id)
   tagList(
     fluidRow(h4(textOutput(ns("mol_feat_seg_plot_text")))),
-    fluidRow(plotOutput(outputId = ns("mol_feat_seg_plot"), height = "auto") %>% 
+    fluidRow(plotlyOutput(outputId = ns("mol_feat_seg_plot")) %>% 
                withSpinnerColor(plot_type = "gene")),
     tags$br(),
     fluidRow(
@@ -1391,12 +1391,12 @@ MolecularFeaturesSegmentPlotServer <- function (id, data) {
       # Scatterplot
       output$mol_feat_seg_plot_text <- renderText({paste0("Dependency segments for ", 
                                                           str_c(data()$content, collapse = ", "))})
-      output$mol_feat_seg_plot <- renderPlot({
+      output$mol_feat_seg_plot <- renderPlotly({
         #check to see if data are there
         shiny::validate(
           shiny::need(c("universal_achilles_long") %in% data()$validate, "No data found."))
         #plot
-        ddh::make_molecular_features_segments(input = data())
+        ggplotly(ddh::make_molecular_features_segments(input = data()), tooltip = "text")
       })
       output$mol_feat_seg_table_text <- renderText({paste0("Dependency segments table for ", 
                                                            str_c(data()$content, collapse = ", "))})

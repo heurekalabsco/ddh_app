@@ -39,8 +39,8 @@ genePage <- function (id, subtype) {
                  actionLink(inputId = ns("link_to_tissueAnatogramPlotDash"), tissueAnatogramPlotDash(ns("tissueanatogramdash"))),
                  actionLink(inputId = ns("link_to_cellDependenciesPlotDash"), cellDependenciesPlotDash(ns("depdash"))),
                  actionLink(inputId = ns("link_to_cellDependenciesTableDash"), cellDependenciesTableDash(ns("deptabledash"))),
-                 private(actionLink(inputId = ns("link_to_geneMolecularFeaturesTableDash"), geneMolecularFeaturesTableDash(ns("molfeattabledash")))),
-                 private(actionLink(inputId = ns("link_to_geneDrugsCorTableDash"), geneDrugsCorTableDash(ns("genedrugscortabledash"))))
+                 private(actionLink(inputId = ns("link_to_geneDrugsCorTableDash"), geneDrugsCorTableDash(ns("genedrugscortabledash")))),
+                 private(actionLink(inputId = ns("link_to_geneMolecularFeaturesTableDash"), geneMolecularFeaturesTableDash(ns("molfeattabledash"))))
                )
       ),
       ## INFO (person)-----
@@ -670,7 +670,7 @@ genePageServer <- function(id, subtype) {
         updateNavbarPage(session, inputId = "geneNavBar", selected = "expression_tissue")
       })
       tissueAnatogramPlotDashServer("tissueanatogramdash", data)
-      
+
       #dep plot
       observeEvent(input$link_to_cellDependenciesPlotDash, {
         updateNavbarPage(session, inputId = "geneNavBar", selected = "dependencies_plots")
@@ -683,18 +683,17 @@ genePageServer <- function(id, subtype) {
       })
       cellDependenciesTableDashServer("deptabledash", data)
       
+      #dep drugs
+      observeEvent(input$link_to_geneDrugsCorTableDash, {
+        updateNavbarPage(session, inputId = "geneNavBar", selected = "dependencies_drugs")
+      })
+      private(geneDrugsCorTableDashServer("genedrugscortabledash", data))
+      
       #molecular features table
       observeEvent(input$link_to_geneMolecularFeaturesTableDash, {
         updateNavbarPage(session, inputId = "geneNavBar", selected = "molecular_features")
       })
       geneMolecularFeaturesTableDashServer("molfeattabledash", data)
-      
-      #dep drugs
-      #do i need a wrapper around this observent event too?
-      observeEvent(input$link_to_geneDrugsCorTableDash, {
-        updateNavbarPage(session, inputId = "geneNavBar", selected = "dependencies_drugs")
-      })
-      private(geneDrugsCorTableDashServer("genedrugscortabledash", data))
       
       ## INFO SERVER-----
       #name pulls from if/else variables above
