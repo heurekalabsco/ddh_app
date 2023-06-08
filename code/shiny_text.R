@@ -154,7 +154,8 @@ proteinTextServer <- function(id, data) {
     id,
     function(input, output, session) {
       output$protein_summary <- renderText({
-        make_summary_protein(input = data())
+        make_summary_protein(input = data()) %>%
+          lit_linkr(summary_table = universal_gene_summary)
       })
     }
   )

@@ -624,7 +624,7 @@ genePageServer <- function(id, subtype) {
         })
         title_var <- customListTitleServer("title_var", data)
         gene_var <- customListTextServer("gene_var", data)
-        protein_summary <- customListTextServer("protein_summary", data)
+        protein_summary <- proteinTextServer("protein_summary", data)
         summary_table <- pathwayListServer("gene_pathways", data)
       } else {
         stop("fix your summary argument")
