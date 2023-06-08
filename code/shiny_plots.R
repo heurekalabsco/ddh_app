@@ -1407,9 +1407,11 @@ MolecularFeaturesSegmentPlotServer <- function (id, data) {
           shiny::need(c("universal_achilles_long") %in% data()$validate, "No data found."))
         #table
         DT::datatable(ddh::make_molecular_features_segments_table(input = data()) %>% 
-                        dplyr::select(Query, `Cell Line` = cell_name, Segment = group, Lineage = lineage, 
+                        dplyr::arrange(depscore) %>% 
+                        dplyr::mutate(depscore = signif(depscore, digits = 3)) %>% 
+                        dplyr::select(Query, `Cell Line` = cell_name, Segment = group, 
+                                      `Dependency Score` = depscore, Lineage = lineage, 
                                       Sublineage = lineage_subtype, Sex = sex, Age = age) %>%
-                        dplyr::arrange(dplyr::desc(Segment)) %>% 
                         dplyr::mutate(`Cell Line` = map_chr(`Cell Line`, cell_linkr, type = "cell")),
                       rownames = FALSE,
                       escape = FALSE,
