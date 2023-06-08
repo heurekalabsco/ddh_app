@@ -3,7 +3,7 @@ cellPage <- function (id, subtype) {
   
   if (subtype == "cell") {
     title_var <- cellTitle(ns("title"))
-    summary_var <- summaryListText(ns("summary"))
+    summary_var <- customListText(ns("summary"))
   } else if (subtype == "lineage") {
     title_var <- lineageTitle(ns("title"))
     summary_var <- lineageSummaryText(ns("summary"))
@@ -11,8 +11,8 @@ cellPage <- function (id, subtype) {
     title_var <- lineageSubtypeTitle(ns("title"))
     summary_var <- lineageSubtypeSummaryText(ns("summary"))
   } else if (subtype == "cell_list") {
-    title_var <- summaryListTitle(ns("title"))
-    summary_var <- summaryListText(ns("summary"))
+    title_var <- customListTitle(ns("title"))
+    summary_var <- customListText(ns("summary"))
   } else {
     stop("call your summary argument")
   }
@@ -369,7 +369,7 @@ cellPageServer <- function(id, subtype) {
           )
         })
         title_var <- cellTitleServer("title", data)
-        summary_var <- summaryListTextServer("summary", data)
+        summary_var <- customListTextServer("summary", data)
       } else if(subtype == "lineage") {
         data <- reactive({
           lineage_str <- getQueryString()$query
@@ -414,8 +414,8 @@ cellPageServer <- function(id, subtype) {
             content=cell_lines
           )
         })
-        title_var <- summaryListTitleServer("title", data) 
-        summary_var <- summaryListTextServer("summary", data)
+        title_var <- customListTitleServer("title", data) 
+        summary_var <- customListTextServer("summary", data)
       } else {
         stop("fix your summary argument")
       }

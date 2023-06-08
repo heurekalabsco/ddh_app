@@ -6,7 +6,7 @@ genePage <- function (id, subtype) {
   #this block is the logic to define the summary_var variable, to display the proper summary module
   if(subtype == "gene"){
     title_var <- geneTitle(ns("title_var"))
-    gene_var <- summaryListText(ns("gene_var"))
+    gene_var <- customListText(ns("gene_var"))
     protein_summary <- proteinText(ns("protein_summary"))
     summary_table <- pathwayList(ns("gene_pathways"))
   } else if (subtype == "pathway"){
@@ -15,9 +15,9 @@ genePage <- function (id, subtype) {
     protein_summary <- pathwayText(ns("protein_summary"))
     summary_table <- pathwayGeneList(ns("gene_pathways"))
   } else if (subtype == "gene_list") {
-    title_var <- summaryListTitle(ns("title_var"))
-    gene_var <- summaryListText(ns("gene_var"))
-    protein_summary <- summaryListText(ns("protein_summary"))
+    title_var <- customListTitle(ns("title_var"))
+    gene_var <- customListText(ns("gene_var"))
+    protein_summary <- proteinText(ns("protein_summary"))
     summary_table <- pathwayList(ns("gene_pathways"))
   } else {
     stop("call your summary argument")
@@ -52,7 +52,7 @@ genePage <- function (id, subtype) {
                             div(
                               id = ns("gene_summary_tabcard"),
                               style = "padding-left:1%",
-                              column(8, gene_var), #summary variable for alt descriptions
+                              column(8, gene_var), # summary variable for alt descriptions
                               column(4, ideogramPlot(ns("chromo")))
                             )
                           ),
@@ -588,7 +588,7 @@ genePageServer <- function(id, subtype) {
           )
         })
         title_var <- geneTitleServer("title_var", data)
-        gene_var <- summaryListTextServer("gene_var", data)
+        gene_var <- customListTextServer("gene_var", data)
         protein_summary <- proteinTextServer("protein_summary", data)
         summary_table <- pathwayListServer("gene_pathways", data)
       } else if (subtype == "pathway"){
@@ -622,9 +622,9 @@ genePageServer <- function(id, subtype) {
             validate=validation_datasets
           )
         })
-        title_var <- summaryListTitleServer("title_var", data)
-        gene_var <- summaryListTextServer("gene_var", data)
-        protein_summary <- summaryListTextServer("protein_summary", data)
+        title_var <- customListTitleServer("title_var", data)
+        gene_var <- customListTextServer("gene_var", data)
+        protein_summary <- customListTextServer("protein_summary", data)
         summary_table <- pathwayListServer("gene_pathways", data)
       } else {
         stop("fix your summary argument")
