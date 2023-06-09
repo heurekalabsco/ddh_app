@@ -149,7 +149,8 @@ proteinStructurePlot3d <- function(id) {
     ),
     tags$br(),
     fluidRow(ddh::make_legend("make_structure3d"),
-             actionLink(inputId = ns("pdb_table_click"), " View more PDB models for my protein/s")),
+             actionLink(inputId = ns("pdb_table_click"), 
+                        " View all PDB models for this query")),
     ## TABLE
     conditionalPanel(condition = paste0("input['", ns("pdb_table_click"), "'] != 0"),
                      fluidRow(h4(textOutput(ns("title_structure3d_table")))),
@@ -177,7 +178,8 @@ proteinStructurePlot3dServer <- function (id, data) {
       })
       
       ## TABLE
-      output$title_structure3d_table <- renderText({paste0("PDB table for ", str_c(input$gene3dstructure, collapse = ", "))})
+      output$title_structure3d_table <- renderText({paste0("PDB table for ",
+                                                           str_c(input$gene3dstructure, collapse = ", "))})
       output$structure3d_table <- DT::renderDataTable({
         shiny::validate(
           shiny::need(c("gene_pdb_table") %in% data()$validate, "No PDB data found."))
@@ -198,7 +200,7 @@ proteinStructurePlot3dServer <- function (id, data) {
       })
       
       ## PLOT
-      rv <- reactiveValues(#gene3dstructure = NULL,
+      rv <- reactiveValues(gene3dstructure = NULL,
                            pdb3dstructure = NULL,
                            color3dstructure = FALSE,
                            ribbon3dstructure = FALSE,
@@ -218,7 +220,7 @@ proteinStructurePlot3dServer <- function (id, data) {
           pdb3dstructure <- NULL
         }
         
-        #rv$gene3dstructure <- input$gene3dstructure 
+        rv$gene3dstructure <- input$gene3dstructure
         rv$pdb3dstructure <- pdb3dstructure
         rv$color3dstructure <- input$color3dstructure
         rv$ribbon3dstructure <- input$ribbon3dstructure
@@ -228,8 +230,7 @@ proteinStructurePlot3dServer <- function (id, data) {
       })
       
       plot3dprotein <- reactive({
-        ddh::make_structure3d(input = data(),
-                              #gene_id = rv$gene3dstructure,
+        ddh::make_structure3d(input = list(content = input$gene3dstructure),
                               pdb_id = rv$pdb3dstructure,
                               color = rv$color3dstructure,
                               ribbon = rv$ribbon3dstructure,
@@ -238,7 +239,8 @@ proteinStructurePlot3dServer <- function (id, data) {
                               chain = rv$chain)
       })
       
-      output$text_protein_structure3d <- renderText({paste0("Predicted 3D Structure for ", str_c(input$gene3dstructure, collapse = ", "))})
+      output$text_protein_structure3d <- renderText({paste0("Predicted 3D Structure for ",
+                                                            str_c(input$gene3dstructure, collapse = ", "))})
       output$protein_structure3D <- r3dmol::renderR3dmol({
         shiny::validate(
           shiny::need(c("gene_pdb_table") %in% data()$validate, "No data found."))
