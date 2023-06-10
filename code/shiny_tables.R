@@ -74,10 +74,12 @@ proteinSeqServer <- function (id, data) {
     id,
     function(input, output, session) {
       output$text_protein_sequence <- renderText({paste0("Protein Sequence for ", str_c(data()$content, collapse = ", "))})
-      output$protein_sequence <- renderText(make_summary_protein(input = data(), var = "sequence"))
+      output$protein_sequence <- renderText({paste0(paste0(str_c(data()$content, ": ", 
+                                                                 make_protein_sequence(input = data())
+                                                                 )), collapse = "\n")})
       output$text_protein_length <- renderText({paste0("Protein Length for ", str_c(data()$content, collapse = ", "))})
       output$protein_length <- renderText({paste0(paste0(str_c(data()$content, ": ", 
-                                                               stringr::str_count(make_summary_protein(input = data(), var = "sequence")), 
+                                                               stringr::str_count(make_protein_sequence(input = data())), 
                                                                " AA")), collapse = ", ")})
     }
   )
