@@ -31,8 +31,13 @@ pathwayTitleServer <- function(id, data) {
       output$pathway_title <- renderText({
         paste0("Pathway: ", 
                make_summary_pathway(input = data(), var = "gs_name"), 
-               " (Source:", make_summary_pathway(input = data(), 
-                                                 var = "gs_exact_source"), ")")})
+               " (", 
+               make_summary_pathway(input = data(), var = "gs_cat"), 
+               "/",
+               make_summary_pathway(input = data(), var = "gs_subcat"), 
+               ")"
+        )
+      })
     }
   )
 }
