@@ -125,26 +125,16 @@ customListTextServer <- function(id, data) {
 
 pathwayText <- function (id) {
   ns <- NS(id)
-  tagList(
-    fluidRow(h3(textOutput(outputId = ns("pathway_title")))),
-    fluidRow(
-      tags$dl(
-        tags$dt("Genes"), tags$dd(htmlOutput(outputId = ns("pathway_gene_symbols"))),
-        tags$dt("Pathway Description"), tags$dd(textOutput(outputId = ns("pathway_def")))
-        )
-      )
-  )
+  fluidRow(htmlOutput(outputId = ns("pathway_summary")))
 }
 
 pathwayTextServer <- function(id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$pathway_title <- renderText({paste0("Pathway: ",
-                                                 make_summary_pathway(input = data(), var = "pathway"), " (GO:", 
-                                                 make_summary_pathway(input = data(), var = "go"), ")")})
-      output$pathway_gene_symbols <- renderText({make_summary_pathway(input = data(), var = "data") %>% internal_link()})
-      output$pathway_def <- renderText({make_summary_pathway(input = data(), var = "def")})
+      output$pathway_summary <- renderText({
+        make_summary_text(input = data())
+      })
     }
   )
 }
