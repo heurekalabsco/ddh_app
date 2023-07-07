@@ -61,11 +61,23 @@ proteinSeqServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$text_protein_sequence <- renderText({paste0("Protein Sequence for ", str_c(data()$content, collapse = ", "))})
+      output$text_protein_sequence <- renderText({paste0("Protein sequence of ", 
+                                                         ifelse(data()$subtype == "pathway",
+                                                                "pathway genes",
+                                                                str_c(data()$content, collapse = ", ")
+                                                         )
+      )
+      })
       output$protein_sequence <- renderText({paste0(paste0(str_c(data()$content, ": ", 
                                                                  make_protein_sequence(input = data())
                                                                  )), collapse = "\n")})
-      output$text_protein_length <- renderText({paste0("Protein Length for ", str_c(data()$content, collapse = ", "))})
+      output$text_protein_length <- renderText({paste0("Protein length of ", 
+                                                       ifelse(data()$subtype == "pathway",
+                                                              "pathway genes",
+                                                              str_c(data()$content, collapse = ", ")
+                                                       )
+      )
+      })
       output$protein_length <- renderText({paste0(paste0(str_c(data()$content, ": ", 
                                                                stringr::str_count(make_protein_sequence(input = data())), 
                                                                " AA")), collapse = ", ")})
@@ -92,8 +104,13 @@ proteinClusterTableServer <- function(id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$text_cluster_table <- renderText({paste0("Amino Acid Signature Clusters for ", 
-                                                      str_c(data()$content, collapse = ", "))})
+      output$text_cluster_table <- renderText({paste0("Amino acid signature clusters of ", 
+                                                      ifelse(data()$subtype == "pathway",
+                                                             "pathway genes",
+                                                             str_c(data()$content, collapse = ", ")
+                                                      )
+      )
+      })
       output$prot_clust_table <- DT::renderDataTable({
         shiny::validate(
           shiny::need(c("gene_signature_clusters") %in% data()$validate, "No cluster data for this protein"))
@@ -210,7 +227,13 @@ pubmedTableServer <- function(id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$text_pubmed_table <- renderText({paste0("Publication history table for ", str_c(data()$content, collapse = ", "))})
+      output$text_pubmed_table <- renderText({paste0("Publication history table of ", 
+                                                     ifelse(data()$subtype == "pathway",
+                                                            "pathway genes",
+                                                            str_c(data()$content, collapse = ", ")
+                                                     )
+      )
+      })
       output$pubmed_table <- DT::renderDataTable({
         shiny::validate(
           shiny::need(c("universal_pubmed") %in% data()$validate, "No literature data for this query"))
@@ -244,7 +267,13 @@ cellAnatogramTableServer <- function(id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$text_subcell_table <- renderText({paste0("Subcellular expression table for ", str_c(data()$content, collapse = ", "))})
+      output$text_subcell_table <- renderText({paste0("Subcellular expressions of ", 
+                                                      ifelse(data()$subtype == "pathway",
+                                                             "pathway genes",
+                                                             str_c(data()$content, collapse = ", ")
+                                                      )
+      )
+      })
       output$cellanatogram_table <- DT::renderDataTable({
         shiny::validate(
           shiny::need(c("gene_subcell") %in% data()$validate, "")) #intentionally left blank; redundant with plot
@@ -275,7 +304,13 @@ tissueTableServer <- function(id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$text_tissue_table <- renderText({paste0("Human tissue expression table for ", str_c(data()$content, collapse = ", "))})
+      output$text_tissue_table <- renderText({paste0("Human tissue expression of ", 
+                                                     ifelse(data()$subtype == "pathway",
+                                                            "pathway genes",
+                                                            str_c(data()$content, collapse = ", ")
+                                                     )
+      )
+      })
       output$tissueanatogram_table <- DT::renderDataTable({
         shiny::validate(
           shiny::need(c("gene_subcell") %in% data()$validate, "No tissue data for this gene"))
@@ -301,7 +336,13 @@ cellGeneExpressionTableServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$text_cell_gene_table <- renderText({paste0("Gene expression table for ", str_c(data()$content, collapse = ", "))})
+      output$text_cell_gene_table <- renderText({paste0("Gene expression of ", 
+                                                        ifelse(data()$subtype == "pathway",
+                                                               "pathway genes",
+                                                               str_c(data()$content, collapse = ", ")
+                                                        )
+      )
+      })
       output$cell_gene_table <- DT::renderDataTable({
         if(data()$type == "gene") {
           shiny::validate(
@@ -337,7 +378,13 @@ cellProteinExpressionTableServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$text_cell_protein_table <- renderText({paste0("Protein expression table for ", str_c(data()$content, collapse = ", "))})
+      output$text_cell_protein_table <- renderText({paste0("Protein expressions of ", 
+                                                           ifelse(data()$subtype == "pathway",
+                                                                  "pathway genes",
+                                                                  str_c(data()$content, collapse = ", ")
+                                                           )
+      )
+      })
       output$cell_protein_table <- DT::renderDataTable({
         if(data()$type == "gene") {
           shiny::validate(
@@ -375,7 +422,13 @@ cellDependenciesTableServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$text_cell_dep_table <- renderText({paste0("Dependency table for ", str_c(data()$content, collapse = ", "))})
+      output$text_cell_dep_table <- renderText({paste0("Dependency table of ", 
+                                                       ifelse(data()$subtype == "pathway",
+                                                              "pathway genes",
+                                                              str_c(data()$content, collapse = ", ")
+                                                       )
+      )
+      })
       output$target_achilles <- DT::renderDataTable({
         shiny::validate(
           shiny::need(c("universal_achilles_long") %in% data()$validate, "No dependency data for this gene"))
@@ -402,7 +455,13 @@ compoundDependenciesTableServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$text_compound_dep_table <- renderText({paste0("Dependency table generated for ", str_c(data()$content, collapse = ", "))})
+      output$text_compound_dep_table <- renderText({paste0("Dependency table of ", 
+                                                           ifelse(data()$subtype == "pathway",
+                                                                  "pathway genes",
+                                                                  str_c(data()$content, collapse = ", ")
+                                                           )
+      )
+      })
       output$compound_dep_table <- DT::renderDataTable({
         shiny::validate(
           shiny::need(c("universal_achilles_long") %in% data()$validate, "No viability data for this compound"))
@@ -431,7 +490,13 @@ cellLineDependenciesTableServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$text_cell_line_dep_table <- renderText({paste0("Dependency table generated for ", str_c(data()$content, collapse = ", "))})
+      output$text_cell_line_dep_table <- renderText({paste0("Dependency table of ", 
+                                                            ifelse(data()$subtype == "pathway",
+                                                                   "pathway genes",
+                                                                   str_c(data()$content, collapse = ", ")
+                                                            )
+      )
+      })
       output$cell_line_achilles <- DT::renderDataTable({
         shiny::validate(
           shiny::need(c("universal_achilles_long") %in% data()$validate, "No dependency data for this cell line"))
@@ -464,7 +529,13 @@ cellLineDrugDependenciesTableServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$text_cell_line_drug_dep_table <- renderText({paste0("Drug dependency table generated for ", str_c(data()$content, collapse = ", "))})
+      output$text_cell_line_drug_dep_table <- renderText({paste0("Drug dependency table of ", 
+                                                                 ifelse(data()$subtype == "pathway",
+                                                                        "pathway genes",
+                                                                        str_c(data()$content, collapse = ", ")
+                                                                 )
+      )
+      })
       output$cell_line_drug_prism <- DT::renderDataTable({
         shiny::validate(
           shiny::need(c("universal_achilles_long") %in% data()$validate, "No viability data for this cell line"))
@@ -511,7 +582,12 @@ MolecularFeaturesTableServer <- function(id, data) {
     id,
     function(input, output, session) {
       output$mol_feat_table_text <- renderText({paste0("Molecular features associated with with sensitivity to ", 
-                                                       str_c(data()$content, collapse = ", "), " ablation")})
+                                                       ifelse(data()$subtype == "pathway",
+                                                              "pathway genes",
+                                                              str_c(data()$content, collapse = ", ")
+                                                             ),
+                                                       " ablation")
+      })
       output$mol_feat_table <- DT::renderDataTable({
         #check to see if data are there
         shiny::validate(
@@ -524,8 +600,13 @@ MolecularFeaturesTableServer <- function(id, data) {
                       options = list(pageLength = 10))
       })
       # Conditional barplot
-      output$mol_feat_plot_text <- renderText({paste0("Molecular features barplot for ", 
-                                                      str_c(data()$content, collapse = ", "))})
+      output$mol_feat_plot_text <- renderText({paste0("Molecular features barplot of ", 
+                                                      ifelse(data()$subtype == "pathway",
+                                                             "pathway genes",
+                                                             str_c(data()$content, collapse = ", ")
+                                                      )
+      )
+      })
       output$mol_feat_plot <- renderPlot({
         #check to see if data are there
         shiny::validate(
@@ -566,8 +647,13 @@ MolecularFeaturesPathwaysTableServer <- function(id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$mol_feat_pth_table_text <- renderText({paste0("Pathways associated with with sensitivity to ", 
-                                                           str_c(data()$content, collapse = ", "), " ablation")})
+      output$mol_feat_pth_table_text <- renderText({paste0("Pathways associated with sensitivity to ", 
+                                                           ifelse(data()$subtype == "pathway",
+                                                                  "pathway genes",
+                                                                  str_c(data()$content, collapse = ", ")
+                                                           ),
+                                                           " ablation")
+      })
       output$mol_feat_pth_table <- DT::renderDataTable({
         #check to see if data are there
         shiny::validate(
@@ -579,8 +665,13 @@ MolecularFeaturesPathwaysTableServer <- function(id, data) {
                       options = list(pageLength = 10))
       })
       # Conditional barplot
-      output$mol_feat_pth_plot_text <- renderText({paste0("Pathways barplot for ", 
-                                                          str_c(data()$content, collapse = ", "))})
+      output$mol_feat_pth_plot_text <- renderText({paste0("Pathways barplot of ", 
+                                                          ifelse(data()$subtype == "pathway",
+                                                                 "pathway genes",
+                                                                 str_c(data()$content, collapse = ", ")
+                                                          )
+      )
+      })
       output$mol_feat_pth_plot <- renderPlot({
         #check to see if data are there
         shiny::validate(
@@ -624,8 +715,13 @@ similarGenesTableServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) { 
-      output$text_dep_top <- renderText({paste0(censor_status$num, " genes with similar dependencies as ", str_c(data()$content, collapse = ", "))})      
-      
+      output$text_dep_top <- renderText({paste0(censor_status$num, " genes with similar dependencies as ", 
+                                                ifelse(data()$subtype == "pathway",
+                                                       "pathway genes",
+                                                       str_c(data()$content, collapse = ", ")
+                                                       )
+                                                )
+      })
       #censor reactive values
       censor_status <- reactiveValues(censor = FALSE, 
                                       num_sim_genes = 1000)
@@ -703,7 +799,13 @@ GenePathwayEnrichmentTableServer <- function (id, data) {
     id,
     function(input, output, session) {
       # TABLE
-      output$text_gene_path_coessentiality <- renderText({paste0("Enriched pathways for ", str_c(data()$content, collapse = ", "))})
+      output$text_gene_path_coessentiality <- renderText({paste0("Enriched pathways for ", 
+                                                                 ifelse(data()$subtype == "pathway",
+                                                                        "pathway genes",
+                                                                        str_c(data()$content, collapse = ", ")
+                                                                 )
+      )
+      })
       output$genes_pathways <- DT::renderDataTable({
         shiny::validate(
           shiny::need(c("universal_achilles_long") %in% data()$validate, "No dependency data for this gene"))
@@ -756,7 +858,12 @@ similarCellsTableServer <- function (id, data) {
     function(input, output, session) { 
       output$text_cells_dep_top <- renderText({paste0(nrow(make_cell_sim_table(input = data())$top_table),
                                                       " cells with similar dependency profiles as ", 
-                                                      str_c(data()$content, collapse = ", "))})      
+                                                      ifelse(data()$subtype == "pathway",
+                                                             "pathway genes",
+                                                             str_c(data()$content, collapse = ", ")
+                                                             )
+                                                      )
+        })     
       output$cells_dep_top <- DT::renderDataTable({
         shiny::validate(
           shiny::need(c("cell_dependency_sim") %in% data()$validate, "No dependency data for this cell line"))
@@ -800,7 +907,12 @@ similarExpCellsTableServer <- function (id, data) {
       output$text_cells_exp_top <- renderText({paste0(nrow(make_cell_sim_table(input = data(),
                                                                                similarity = "expression")$top_table),
                                                       " cells with similar gene expression profiles as ", 
-                                                      str_c(data()$content, collapse = ", "))})      
+                                                      ifelse(data()$subtype == "pathway",
+                                                             "pathway genes",
+                                                             str_c(data()$content, collapse = ", ")
+                                                             )
+                                                      )
+        })    
       output$cells_exp_top <- DT::renderDataTable({
         shiny::validate(
           shiny::need(c("cell_dependency_exp") %in% data()$validate, "No expression data for this cell line"))
@@ -881,7 +993,12 @@ dissimilarGenesTableServer <- function (id, data) {
     function(input, output, session) { 
       output$text_dep_bottom <- renderText({paste0(nrow(make_bottom_table(input = data())), 
                                                    " genes with dissimilar dependencies as ", 
-                                                   str_c(data()$content, collapse = ", "))})      
+                                                   ifelse(data()$subtype == "pathway",
+                                                             "pathway genes",
+                                                             str_c(data()$content, collapse = ", ")
+                                                             )
+                                                      )
+        })     
       output$dep_bottom <- DT::renderDataTable({
         shiny::validate(
           shiny::need(c("gene_master_bottom_table") %in% data()$validate, "No dependency data for this gene"))
@@ -920,7 +1037,13 @@ dissimilarCellsTableServer <- function (id, data) {
     id,
     function(input, output, session) { 
       output$text_cells_dep_bottom <- renderText({paste0(nrow(make_cell_sim_table(input = data())$bottom_table), 
-                                                         " cells with dissimilar dependency profiles as ", str_c(data()$content, collapse = ", "))})      
+                                                         " cells with dissimilar dependency profiles as ",
+                                                         ifelse(data()$subtype == "pathway",
+                                                             "pathway genes",
+                                                             str_c(data()$content, collapse = ", ")
+                                                             )
+                                                      )
+        })   
       output$cells_dep_bottom <- DT::renderDataTable({
         shiny::validate(
           shiny::need(c("cell_dependency_sim") %in% data()$validate, "No dependency data for this cell line"))
@@ -964,7 +1087,12 @@ dissimilarExpCellsTableServer <- function (id, data) {
       output$text_cells_exp_bottom <- renderText({paste0(nrow(make_cell_sim_table(input = data(),
                                                                                   similarity = "expression")$bottom_table),
                                                          " cells with dissimilar expression profiles as ", 
-                                                         str_c(data()$content, collapse = ", "))})      
+                                                         ifelse(data()$subtype == "pathway",
+                                                             "pathway genes",
+                                                             str_c(data()$content, collapse = ", ")
+                                                             )
+                                                      )
+        })    
       output$cells_exp_bottom <- DT::renderDataTable({
         shiny::validate(
           shiny::need(c("cell_dependency_exp") %in% data()$validate, "No expression data for this cell line"))
@@ -1056,8 +1184,13 @@ geneCCATableServer <- function(id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$cca_table_text <- renderText({paste0("Co-essential pathways for ",
-                                                  str_c(data()$content, collapse = ", "))})
+      output$cca_table_text <- renderText({paste0("Co-essential pathways for ", 
+                                                  ifelse(data()$subtype == "pathway",
+                                                         "pathway genes",
+                                                         str_c(data()$content, collapse = ", ")
+                                                  )
+      )
+      })
       output$cca_table <- DT::renderDataTable({
         #check to see if data are there
         shiny::validate(
@@ -1071,8 +1204,13 @@ geneCCATableServer <- function(id, data) {
                       options = list(pageLength = 10))
       })
       # Conditional plot
-      output$cca_plot_text <- renderText({paste0("Co-essential pathways plot for ",
-                                                 str_c(data()$content, collapse = ", "))})
+      output$cca_plot_text <- renderText({paste0("Co-essential pathways for ", 
+                                                 ifelse(data()$subtype == "pathway",
+                                                        "pathway genes",
+                                                        str_c(data()$content, collapse = ", ")
+                                                 )
+      )
+      })
       output$cca_plot <- renderPlot({
         #check to see if data are there
         shiny::validate(
@@ -1098,7 +1236,13 @@ metabolitesTableServer <- function(id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$title_metabolites_table <- renderText({paste0("Metabolite table for ", str_c(data()$content, collapse = ", "))})
+      output$title_metabolites_table <- renderText({paste0("Metabolite table for ", 
+                                                           ifelse(data()$subtype == "pathway",
+                                                                  "pathway genes",
+                                                                  str_c(data()$content, collapse = ", ")
+                                                           )
+      )
+      })
       output$metabolites_table <- DT::renderDataTable({
         if(data()$type == "gene") {
           shiny::validate(
@@ -1144,7 +1288,13 @@ geneDrugsTableServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$title_gene_drugs_table <- renderText({paste0("Drugs annotated to target ", stringr::str_c(data()$content, collapse = ", "))})
+      output$title_gene_drugs_table <- renderText({paste0("Drugs annotated to target ",
+                                                          ifelse(data()$subtype == "pathway",
+                                                             "pathway genes",
+                                                             str_c(data()$content, collapse = ", ")
+                                                             )
+                                                      )
+        })
       output$gene_drugs_table <- DT::renderDataTable({
         shiny::validate(
           shiny::need(c("gene_drugs_table") %in% data()$validate, 
@@ -1172,7 +1322,13 @@ cellDrugsTableServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$title_cell_drugs_table <- renderText({paste0("Drugs annotated for ", str_c(data()$content, collapse = ", "))})
+      output$title_cell_drugs_table <- renderText({paste0("Drugs annotated for ", 
+                                                          ifelse(data()$subtype == "pathway",
+                                                                 "pathway genes",
+                                                                 str_c(data()$content, collapse = ", ")
+                                                          )
+      )
+      })
       output$cell_drugs_table <- DT::renderDataTable({
         shiny::validate(
           shiny::need(c("universal_prism_long") %in% data()$validate, 
@@ -1208,8 +1364,21 @@ geneDrugsCorTableServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$title_gene_drugs_cor_table <- renderText({glue::glue('Drug correlation table for {str_c(data()$content, collapse = ", ")}')})
-      output$text_gene_drugs_cor_table <- renderText({glue::glue('When knocking out {str_c(data()$content, collapse = ", ")}, a subset of cells die. These are the drugs that show the same cell killing profile.')})
+      output$title_gene_drugs_cor_table <- renderText({paste0("Drug correlation table for ", 
+                                                      ifelse(data()$subtype == "pathway",
+                                                             "pathway genes",
+                                                             str_c(data()$content, collapse = ", ")
+                                                             )
+                                                      )
+        })
+      output$text_gene_drugs_cor_table <- renderText({paste0("When knocking out ", 
+                                                             ifelse(data()$subtype == "pathway",
+                                                                    "pathway genes",
+                                                                    str_c(data()$content, collapse = ", ")
+                                                             ),
+                                                             " a subset of cells die. These are the drugs that show the same cell killing profile."
+      )
+      })
       output$gene_drugs_cor_table <- DT::renderDataTable({
         shiny::validate(
           shiny::need(c("gene_drugs_cor_table") %in% data()$validate, 
@@ -1247,7 +1416,13 @@ cellSummaryTableServer <- function(id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$cell_sumary_title <- renderText({paste0("Lineage table for ", str_c(data()$content, collapse = ", "))})
+      output$cell_sumary_title <- renderText({paste0("Lineage table for ", 
+                                                     ifelse(data()$subtype == "pathway",
+                                                            "pathway genes",
+                                                            str_c(data()$content, collapse = ", ")
+                                                     )
+      )
+      })
       output$cell_table <- DT::renderDataTable({
         shiny::validate(
           shiny::need(c("cell_expression_meta") %in% data()$validate, "No summary data for this cell line"))
@@ -1278,7 +1453,13 @@ pubmedCompoundTableServer <- function(id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$pubmed_compound_title <- renderText({paste0("Literature table for ", str_c(data()$content, collapse = ", "))})
+      output$pubmed_compound_title <- renderText({paste0("Literature table for ", 
+                                                         ifelse(data()$subtype == "pathway",
+                                                                "pathway genes",
+                                                                str_c(data()$content, collapse = ", ")
+                                                         )
+      )
+      })
       output$pubmed_compound_table <- DT::renderDataTable({
         shiny::validate(
           shiny::need(c("universal_pubmed") %in% data()$validate, ""))
@@ -1310,7 +1491,13 @@ pubmedCellLineTableServer <- function(id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$pubmed_cell_line_title <- renderText({paste0("Literature table for ", str_c(data()$content, collapse = ", "))})
+      output$pubmed_cell_line_title <- renderText({paste0("Literature table for ", 
+                                                          ifelse(data()$subtype == "pathway",
+                                                                 "pathway genes",
+                                                                 str_c(data()$content, collapse = ", ")
+                                                          )
+      )
+      })
       output$pubmed_cell_line_table <- DT::renderDataTable({
         shiny::validate(
           shiny::need(c("universal_pubmed") %in% data()$validate, ""))
@@ -1331,7 +1518,6 @@ pubmedCellLineTableServer <- function(id, data) {
 }
 
 ##Drugs-----
-
 drugGenesTable <- function(id) { #DRUG QUERY
   ns <- NS(id)
   tagList(
@@ -1346,8 +1532,20 @@ drugGenesTableServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$title_drug_genes_table <- renderText({glue::glue('Gene target table for {str_c(data()$content, collapse = ", ")}')})
-      output$text_drug_genes_table <- renderText({glue::glue('Genes annotated to be targeted by {str_c(data()$content, collapse = ", ")}')})
+      output$title_drug_genes_table <- renderText({paste0("Gene target table for ", 
+                                                          ifelse(data()$subtype == "pathway",
+                                                                 "pathway genes",
+                                                                 str_c(data()$content, collapse = ", ")
+                                                          )
+      )
+      })
+      output$text_drug_genes_table <- renderText({paste0("Genes annotated to be targeted by ", 
+                                                         ifelse(data()$subtype == "pathway",
+                                                                "pathway genes",
+                                                                str_c(data()$content, collapse = ", ")
+                                                         )
+      )
+      })
       output$drug_genes_table <- DT::renderDataTable({
         shiny::validate(
           shiny::need(c("compound_genes_table") %in% data()$validate, "No gene data for this compound"))
@@ -1380,8 +1578,21 @@ drugGenesCorTableServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$title_drug_genes_cor_table <- renderText({glue::glue('Gene correlation table for {str_c(data()$content, collapse = ", ")}')})
-      output$text_drug_genes_cor_table <- renderText({glue::glue('When {str_c(data()$content, collapse = ", ")} is placed on cells, a subset dies. These are the genes that show the same cell dependency profile.')})
+      output$title_drug_genes_cor_table <- renderText({paste0("Gene correlation table for ", 
+                                                              ifelse(data()$subtype == "pathway",
+                                                                     "pathway genes",
+                                                                     str_c(data()$content, collapse = ", ")
+                                                              )
+      )
+      })
+      output$text_drug_genes_cor_table <- renderText({paste0("When ", 
+                                                             ifelse(data()$subtype == "pathway",
+                                                                    "pathway genes",
+                                                                    str_c(data()$content, collapse = ", ")
+                                                             ),
+                                                             " is/are placed on cells, a subset dies. These are the genes that show the same cell dependency profile."
+      )
+      })
       output$drug_genes_cor_table <- DT::renderDataTable({
         shiny::validate(
           shiny::need(c("compound_genes_cor_table") %in% data()$validate, "No gene data for this compound"))
@@ -1417,7 +1628,13 @@ metaboliteGenesTableServer <- function(id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$metabolite_genes_text <- renderText({paste0("Metabolite table for ", str_c(data()$content, collapse = ", "))})
+      output$metabolite_genes_text <- renderText({paste0("Metabolite table for ", 
+                                                         ifelse(data()$subtype == "pathway",
+                                                                "pathway genes",
+                                                                str_c(data()$content, collapse = ", ")
+                                                         )
+      )
+      })
       output$metabolite_genes_table <- DT::renderDataTable({
         shiny::validate(
           shiny::need(c("compound_hmdb_metabolites") %in% data()$validate, 
