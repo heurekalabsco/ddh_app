@@ -15,13 +15,13 @@ ideogramPlotServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$ideogram_plot_text <- renderText({paste0("Chromosomal Location of ", 
-                         ifelse(data()$subtype == "pathway",
-                                "Pathway Genes",
-                                str_c(data()$content, collapse = ", ")
-                                )
-                         )
-      })
+      output$ideogram_plot_text <- renderText({paste0("Chromosomal location of ", 
+                                                      ifelse(data()$subtype == "pathway",
+                                                             "pathway genes",
+                                                             str_c(data()$content, collapse = ", ")
+                                                             )
+                                                      )
+        })
       
       output$ideogram_plot <- renderUI({
         #check to see if data are there
@@ -64,7 +64,13 @@ proteinSizePlotServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$protein_size_plot_text <- renderText({paste0("Protein size for ", str_c(data()$content, collapse = ", "))})
+      output$protein_size_plot_text <- renderText({paste0("Protein size of ", 
+                                                          ifelse(data()$subtype == "pathway",
+                                                                 "pathway genes",
+                                                                 str_c(data()$content, collapse = ", ")
+                                                          )
+      )
+      })
       output$protein_size_plot <- renderUI({
         #check to see if data are there
         shiny::validate(
@@ -105,7 +111,13 @@ proteinStructurePlotServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$text_protein_structure <- renderText({paste0(str_c(data()$content[[1]], " Predicted Structure", collapse = ", "))})
+      output$text_protein_structure <- renderText({paste0("Predicted structure of ", 
+                                                          ifelse(data()$subtype == "pathway",
+                                                                 "pathway genes",
+                                                                 str_c(data()$content[1], collapse = ", ")
+                                                          )
+      )
+      })
       output$protein_structure <- renderUI({
         div(
           tags$img(src = make_structure(input = data(), card = FALSE), 
@@ -183,7 +195,7 @@ proteinStructurePlot3dServer <- function (id, data) {
       })
       
       ## TABLE
-      output$title_structure3d_table <- renderText({paste0("PDB table for ",
+      output$title_structure3d_table <- renderText({paste0("PDB table of ",
                                                            str_c(input$gene3dstructure, collapse = ", "))})
       output$structure3d_table <- DT::renderDataTable({
         shiny::validate(
@@ -244,7 +256,7 @@ proteinStructurePlot3dServer <- function (id, data) {
                               chain = rv$chain)
       })
       
-      output$text_protein_structure3d <- renderText({paste0("Predicted 3D Structure for ",
+      output$text_protein_structure3d <- renderText({paste0("Predicted 3D structure of ",
                                                             str_c(input$gene3dstructure, collapse = ", "))})
       output$protein_structure3D <- r3dmol::renderR3dmol({
         shiny::validate(
@@ -274,7 +286,13 @@ radialPlotServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$text_radial_plot <- renderText({paste0("Amino Acid Signature for ", str_c(data()$content, collapse = ", "))})
+      output$text_radial_plot <- renderText({paste0("Amino acid signature of ", 
+                                                    ifelse(data()$subtype == "pathway",
+                                                           "pathway genes",
+                                                           str_c(data()$content, collapse = ", ")
+                                                    )
+      )
+      })
       output$radial_plot <- renderPlot({
         shiny::validate(
           shiny::need(c("universal_proteins") %in% data()$validate, "No data found."))
@@ -313,7 +331,13 @@ AABarPlotServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$text_aa_bar_plot <- renderText({paste0("Amino Acid Signature for ", str_c(data()$content, collapse = ", "))})
+      output$text_aa_bar_plot <- renderText({paste0("Amino acid signature of ", 
+                                                    ifelse(data()$subtype == "pathway",
+                                                           "pathway genes",
+                                                           str_c(data()$content, collapse = ", ")
+                                                    )
+      )
+      })
       output$aa_bar_plot <- renderPlot({
         shiny::validate(
           shiny::need(c("universal_proteins") %in% data()$validate, "No data found."))
@@ -358,7 +382,7 @@ clusterRadialPlotServer <- function (id, data) {
         shiny::validate(
           shiny::need(c("gene_signature_clusters") %in% data()$validate, "No data found."))
         
-        title_text <- paste0("Amino Acid Signature for Cluster ", 
+        title_text <- paste0("Amino acid signature of cluster ", 
                              str_c(clust_num, collapse = ", "))
         
         return(title_text)
@@ -415,7 +439,7 @@ clusterAABarPlotServer <- function (id, data) {
         shiny::validate(
           shiny::need(c("gene_signature_clusters") %in% data()$validate, "No data found."))
         
-        title_text <- paste0("Amino Acid Signature for Cluster ", 
+        title_text <- paste0("Amino acid signature of cluster ", 
                              str_c(clust_num, collapse = ", "))
         
         return(title_text)
@@ -466,7 +490,7 @@ UMAPPlotServer <- function (id, data) {
         
         clust_num <- ddh::get_cluster(input = data())
         
-        title_text <- glue::glue('Amino Acid Signature Emdeddings (clusters {stringr::str_c(clust_num, collapse = ", ")})')
+        title_text <- glue::glue('Amino acid signature emdeddings (clusters {stringr::str_c(clust_num, collapse = ", ")})')
         
         return(title_text)
       })
@@ -581,13 +605,13 @@ proteinDomainPlotServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$text_protein_domain_plot <- renderText({paste0("Protein Domain Plot for ", 
+      output$text_protein_domain_plot <- renderText({paste0("Protein domains of ", 
                                                             ifelse(data()$subtype == "pathway",
-                                                                   "the Pathway Genes",
+                                                                   "pathway genes",
                                                                    str_c(data()$content, collapse = ", ")
-                                                                   )
                                                             )
-        })
+      )
+      })
       output$dom_choice <- renderUI({
         prots_dr <-
           get_data_object(object_names = data()$content,
@@ -656,7 +680,13 @@ pubmedPlotServer <- function (id, data, session) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$pubmed_plot_title <- renderText({paste0("Publication history for ", str_c(data()$content, collapse = ", "))})
+      output$pubmed_plot_title <- renderText({paste0("Publication history of ", 
+                                                     ifelse(data()$subtype == "pathway",
+                                                            "pathway genes",
+                                                            str_c(data()$content, collapse = ", ")
+                                                     )
+      )
+      })
       output$pubmed_plot_text <- renderText({
         num <- make_pubmed_table(input = data())
         glue::glue('{nrow(num)} annotated papers')
@@ -700,7 +730,13 @@ pubmedCompoundPlotServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$pubmed_compound_plot_title <- renderText({paste0("Publication history for ", str_c(data()$content, collapse = ", "))})
+      output$pubmed_compound_plot_title <- renderText({paste0("Publication history of ", 
+                                                              ifelse(data()$subtype == "pathway",
+                                                                     "pathway genes",
+                                                                     str_c(data()$content, collapse = ", ")
+                                                              )
+      )
+      })
       output$pubmed_compound_plot_text <- renderText({
         num <- make_pubmed_table(input = data())
         glue::glue('{nrow(num)} annotated papers')
@@ -744,7 +780,13 @@ pubmedCellLinePlotServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$pubmed_cell_plot_title <- renderText({paste0("Publication history for ", str_c(data()$content, collapse = ", "))})
+      output$pubmed_cell_plot_title <- renderText({paste0("Publication history of ", 
+                                                          ifelse(data()$subtype == "pathway",
+                                                                 "pathway genes",
+                                                                 str_c(data()$content, collapse = ", ")
+                                                          )
+      )
+      })
       output$pubmed_cell_plot_text <- renderText({
         num <- make_pubmed_table(input = data())
         glue::glue('{nrow(num)} annotated papers')
@@ -790,7 +832,12 @@ cellAnatogramPlotServer <- function(id, data) {
     id,
     function(input, output, session) {
       output$cell_anatogram_gene_plot_text <- renderText({
-        paste0("Subcellular expression of ", str_c(data()$content, collapse = ", "))
+        paste0("Subcellular expression of ", 
+               ifelse(data()$subtype == "pathway",
+                      "pathway genes",
+                      str_c(data()$content, collapse = ", ")
+               )
+        )
       })
       output$cell_anatogram_gene_plot <- renderUI({
         #check to see if data are there
@@ -837,7 +884,12 @@ cellAnatogramFacetPlotServer <- function(id, data) {
     id,
     function(input, output, session) {
       output$cell_anatogram_facet_plot_text <- renderText({
-        paste0("Subcellular expression of ", str_c(data()$content, collapse = ", "))
+        paste0("Subcellular expression of ", 
+               ifelse(data()$subtype == "pathway",
+                      "pathway genes",
+                      str_c(data()$content, collapse = ", ")
+               )
+        )
       })
       output$cell_anatogram_gene_facet <- renderPlot({
         #check to see if data are there
@@ -933,7 +985,12 @@ tissuePlotServer <- function(id, data) {
     id,
     function(input, output, session) {
       output$tissue_barplot_text <- renderText({
-        paste0("Tissue barplot for ", str_c(data()$content, collapse = ", "))
+        paste0("Tissue gene expression of ", 
+               ifelse(data()$subtype == "pathway",
+                      "pathway genes",
+                      str_c(data()$content, collapse = ", ")
+               )
+        )
       })
       output$tissue_gene_plot <- renderUI({
         #check to see if data are there
@@ -975,8 +1032,13 @@ cellGeneExpressionPlotServer <- function(id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$expression_gene_plot_text <- renderText({paste0("Expression values for ", 
-                                                             str_c(data()$content, collapse = ", "))})
+      output$expression_gene_plot_text <- renderText({paste0("Expression values of ", 
+                                                             ifelse(data()$subtype == "pathway",
+                                                                    "pathway genes",
+                                                                    str_c(data()$content, collapse = ", ")
+                                                             )
+      )
+      })
       output$expression_gene_plot <- renderUI({
         #check to see if data are there
         shiny::validate(
@@ -1016,7 +1078,13 @@ cellProteinExpressionPlotServer <- function(id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$expression_protein_plot_title <- renderText({paste0("Expression values for ", str_c(data()$content, collapse = ", "))})
+      output$expression_protein_plot_title <- renderText({paste0("Expression values of ", 
+                                                                 ifelse(data()$subtype == "pathway",
+                                                                        "pathway genes",
+                                                                        str_c(data()$content, collapse = ", ")
+                                                                 )
+      )
+      })
       output$expression_protein_plot <- renderUI({
         #check to see if data are there
         shiny::validate(
@@ -1058,7 +1126,13 @@ cellGeneProteinPlotServer <- function(id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$text_cell_gene_protein_plot <- renderText({paste0("Gene vs. protein expression of ", str_c(data()$content, collapse = ", "))})
+      output$text_cell_gene_protein_plot <- renderText({paste0("Gene vs. protein expression of ", 
+                                                               ifelse(data()$subtype == "pathway",
+                                                                      "pathway genes",
+                                                                      str_c(data()$content, collapse = ", ")
+                                                               )
+      )
+      })
       output$cell_gene_protein_plot <- renderPlot({
         shiny::validate(
           shiny::need(c("universal_expression_long") %in% data()$validate, "No data found."))
@@ -1121,8 +1195,13 @@ cellDependenciesPlotServer <- function (id, data) {
       })
       
       # Scatterplot
-      output$cell_dep_plot_text <- renderText({paste0("Dependency plots generated for ", 
-                                                      str_c(data()$content, collapse = ", "))})
+      output$cell_dep_plot_text <- renderText({paste0("Dependencies of ", 
+                                                      ifelse(data()$subtype == "pathway",
+                                                             "pathway genes",
+                                                             str_c(data()$content, collapse = ", ")
+                                                      )
+      )
+      })
       output$essential_num <- renderText({
         get_essential(input = data())
         #paste0("Essential in ", get_essential(input = data()), " cell lines")
@@ -1178,7 +1257,13 @@ cellDependenciesDensityPlotServer <- function(id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$cell_dep_density_title <- renderText({paste0("Dependency density plot for ", str_c(data()$content, collapse = ", "))})
+      output$cell_dep_density_title <- renderText({paste0("Dependency distributions of ", 
+                                                          ifelse(data()$subtype == "pathway",
+                                                                 "pathway genes",
+                                                                 str_c(data()$content, collapse = ", ")
+                                                          )
+      )
+      })
       output$density_plot_plot <- renderUI({
         fluidRow(plotOutput(outputId = session$ns("cell_deps_density"), height = "auto") %>% 
                    withSpinnerColor(plot_type = data()$type) #see shiny_helper.R
@@ -1209,7 +1294,13 @@ cellDependenciesBarPlotServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$cell_dep_barplot_title <- renderText({paste0("Dependency barplot for ", str_c(data()$content, collapse = ", "))})
+      output$cell_dep_barplot_title <- renderText({paste0("Dependency barplot of ", 
+                                                          ifelse(data()$subtype == "pathway",
+                                                                 "pathway genes",
+                                                                 str_c(data()$content, collapse = ", ")
+                                                          )
+      )
+      })
       output$bar_plot_plot <- renderUI({
         fluidRow(plotlyOutput(outputId = session$ns("cell_bar"), height = "auto") %>% 
                    withSpinnerColor(plot_type = data()$type) #see shiny_helper.R
@@ -1241,7 +1332,13 @@ cellDepsLinPlotServer <- function(id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$lineage_title <- renderText({paste0("Dependency lineage plot for ", str_c(data()$content, collapse = ", "))})
+      output$lineage_title <- renderText({paste0("Lineage dependencies of ", 
+                                                 ifelse(data()$subtype == "pathway",
+                                                        "pathway genes",
+                                                        str_c(data()$content, collapse = ", ")
+                                                 )
+      )
+      })
       output$cell_deps_lin <- renderPlot({
         shiny::validate(
           shiny::need(c("universal_achilles_long") %in% data()$validate, "No data found."))
@@ -1270,7 +1367,13 @@ cellDepsSubLinPlotServer <- function(id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$sublineage_title <- renderText({paste0("Dependency sublineage plot for ", str_c(data()$content, collapse = ", "))})
+      output$sublineage_title <- renderText({paste0("Sublineage dependencies of ", 
+                                                    ifelse(data()$subtype == "pathway",
+                                                           "pathway genes",
+                                                           str_c(data()$content, collapse = ", ")
+                                                    )
+      )
+      })
       output$cell_deps_sublin <- renderPlot({
         shiny::validate(
           shiny::need(c("universal_achilles_long") %in% data()$validate, "No data found."))
@@ -1297,7 +1400,12 @@ cellDependenciesCorrPlotServer <- function (id, data) {
     id,
     function(input, output, session) {
       output$gene_correlation_text <- renderText({
-        paste0("Gene correlation plot generated for ", str_c(data()$content, collapse = ", "))
+        paste0("Gene correlations of ", 
+               ifelse(data()$subtype == "pathway",
+                      "pathway genes",
+                      str_c(data()$content, collapse = ", ")
+               )
+        )
       })
       output$gene_correlation_plot <- renderUI({
         #check to see if data are there
@@ -1340,7 +1448,13 @@ cellCoessentialityPlotServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$text_cell_coess_plot <- renderText({paste0("Cell co-essentiality plot generated for ", str_c(data()$content, collapse = ", "))})
+      output$text_cell_coess_plot <- renderText({paste0("Cell co-essentialities of ", 
+                                                        ifelse(data()$subtype == "pathway",
+                                                               "pathway genes",
+                                                               str_c(data()$content, collapse = ", ")
+                                                        )
+      )
+      })
       output$cell_coessentiality <- renderPlot({
         shiny::validate(
           shiny::need(c("cell_dependency_sim") %in% data()$validate, "No data found."))
@@ -1365,7 +1479,13 @@ expdepPlotServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$exdep_plot_title <- renderText({paste0("Expression v. dependency plot for ", str_c(data()[[3]], collapse = ", "))})
+      output$exdep_plot_title <- renderText({paste0("Expression vs. dependency of ", 
+                                                    ifelse(data()$subtype == "pathway",
+                                                           "pathway genes",
+                                                           str_c(data()$content, collapse = ", ")
+                                                    )
+      )
+      })
       output$exdep_plot_plot <- renderUI({
         fluidRow(plotOutput(outputId = session$ns("cellexpdep"), height = "500px") %>% 
                    withSpinnerColor(plot_type = data()$type) #see shiny_helper.R
@@ -1403,8 +1523,13 @@ MolecularFeaturesSegmentPlotServer <- function (id, data) {
     id,
     function(input, output, session) {
       # Scatterplot
-      output$mol_feat_seg_plot_text <- renderText({paste0("Dependency segments for ", 
-                                                          str_c(data()$content, collapse = ", "))})
+      output$mol_feat_seg_plot_text <- renderText({paste0("Dependency segments of ", 
+                                                          ifelse(data()$subtype == "pathway",
+                                                                 "pathway genes",
+                                                                 str_c(data()$content, collapse = ", ")
+                                                          )
+      )
+      })
       output$mol_feat_seg_plot <- renderPlotly({
         #check to see if data are there
         shiny::validate(
@@ -1412,8 +1537,13 @@ MolecularFeaturesSegmentPlotServer <- function (id, data) {
         #plot
         plotly::ggplotly(ddh::make_molecular_features_segments(input = data()))
       })
-      output$mol_feat_seg_table_text <- renderText({paste0("Dependency segments table for ", 
-                                                           str_c(data()$content, collapse = ", "))})
+      output$mol_feat_seg_table_text <- renderText({paste0("Dependency segments table of ", 
+                                                           ifelse(data()$subtype == "pathway",
+                                                                  "pathway genes",
+                                                                  str_c(data()$content, collapse = ", ")
+                                                           )
+      )
+      })
       output$mol_feat_seg_table <- DT::renderDataTable({
         #check to see if data are there
         shiny::validate(
@@ -1451,7 +1581,7 @@ cellImageServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$text_cell_title <- renderText({paste0(str_c(data()$content[[1]], " Cell Line Images"))})
+      output$text_cell_title <- renderText({paste0(str_c(data()$content[1], " Cell Line Images"))})
       output$text_cell_attribution <- renderText({
         if(file.exists(make_cell_image(input = data()))){
           atcc_id <- 
@@ -1487,7 +1617,13 @@ cellLineGeneProteinPlotServer <- function(id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$text_cellLine_gene_protein_plot <- renderText({paste0("Gene vs. protein expression of ", str_c(data()$content, collapse = ", "))})
+      output$text_cellLine_gene_protein_plot <- renderText({paste0("Gene vs. protein expression of ", 
+                                                                   ifelse(data()$subtype == "pathway",
+                                                                          "pathway genes",
+                                                                          str_c(data()$content, collapse = ", ")
+                                                                   )
+      )
+      })
       output$cellLine_gene_protein_plot <- renderPlot({
         shiny::validate(
           shiny::need(c("cell_expression_names") %in% data()$validate, "No data found."))
@@ -1515,7 +1651,13 @@ cellCoexpressionPlotServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$text_cell_coexp_plot <- renderText({paste0("Cell co-expression plot generated for ", str_c(data()$content, collapse = ", "))})
+      output$text_cell_coexp_plot <- renderText({paste0("Cell co-expression of ", 
+                                                        ifelse(data()$subtype == "pathway",
+                                                               "pathway genes",
+                                                               str_c(data()$content, collapse = ", ")
+                                                        )
+      )
+      })
       output$cell_coexpression <- renderPlot({
         shiny::validate(
           shiny::need(c("cell_expression_sim") %in% data()$validate, "No data found."))
@@ -1553,7 +1695,13 @@ cellFunctionalPlotServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$title_functional_plot <- renderText({paste0("Differential pathway expression plot for ", str_c(data()$content, collapse = ", "))})
+      output$title_functional_plot <- renderText({paste0("Differential pathway expression of ", 
+                                                         ifelse(data()$subtype == "pathway",
+                                                                "pathway genes",
+                                                                str_c(data()$content, collapse = ", ")
+                                                         )
+      )
+      })
       output$functional_plot <- renderPlotly({
         ggplotly(
           make_functional_cell(input = data(),
@@ -1592,7 +1740,13 @@ cellMetadataPlotServer <- function (id, data, type) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$title_metadata_plot <- renderText({paste0("Lineage similarity plot for ", str_c(data()$content, collapse = ", "))})
+      output$title_metadata_plot <- renderText({paste0("Lineage similarity plot of ", 
+                                                       ifelse(data()$subtype == "pathway",
+                                                              "pathway genes",
+                                                              str_c(data()$content, collapse = ", ")
+                                                       )
+      )
+      })
       output$metadata_plot <- renderPlot({
         shiny::validate(
           shiny::need(c("cell_expression_sim") %in% data()$validate, "No data found."))
@@ -1665,7 +1819,13 @@ compoundDependenciesPlotServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$text_compound_dep_plot <- renderText({paste0("Viability plots generated for ", str_c(data()$content, collapse = ", "))})
+      output$text_compound_dep_plot <- renderText({paste0("Viability plots of ", 
+                                                          ifelse(data()$subtype == "pathway",
+                                                                 "pathway genes",
+                                                                 str_c(data()$content, collapse = ", ")
+                                                          )
+      )
+      })
       output$essential_num_compound <- renderText({
         paste0("Toxic in ", get_essential(input = data()), " cell lines")})
       output$cell_deps <- renderPlotly({
@@ -1778,7 +1938,13 @@ compoundCorrelationPlotServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$text_compoundcorr_plot <- renderText({paste0("Compound correlation plot generated for ", str_c(data()$content, collapse = ", "))})
+      output$text_compoundcorr_plot <- renderText({paste0("Compound correlations of ", 
+                                                          ifelse(data()$subtype == "pathway",
+                                                                 "pathway genes",
+                                                                 str_c(data()$content, collapse = ", ")
+                                                          )
+      )
+      })
       output$compound_correlations <- renderPlot({
         shiny::validate(
           shiny::need(c("compound_prism_cor_nest") %in% data()$validate, "No data found."))
