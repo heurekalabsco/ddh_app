@@ -1,7 +1,7 @@
 # GENE QUERY-----
 ## GENE----
 ## Ideogram --------------------------------------------------------
-ideogramPlot <- function(id) {
+ideogramPlot <- function (id) {
   ns <- NS(id)
   tagList(
     fluidRow(h4(textOutput(ns("ideogram_plot_text")))),
@@ -15,9 +15,14 @@ ideogramPlotServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$ideogram_plot_text <- renderText({
-        paste0("Chromosomal location for ", stringr::str_c(data()$content, collapse = ", "))
+      output$ideogram_plot_text <- renderText({paste0("Chromosomal Location of ", 
+                         ifelse(data()$subtype == "pathway",
+                                "Pathway Genes",
+                                str_c(data()$content, collapse = ", ")
+                                )
+                         )
       })
+      
       output$ideogram_plot <- renderUI({
         #check to see if data are there
         shiny::validate(
@@ -576,7 +581,13 @@ proteinDomainPlotServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$text_protein_domain_plot <- renderText({paste0("Protein Domain Plot for ", str_c(data()$content, collapse = ", "))})
+      output$text_protein_domain_plot <- renderText({paste0("Protein Domain Plot for ", 
+                                                            ifelse(data()$subtype == "pathway",
+                                                                   "the Pathway Genes",
+                                                                   str_c(data()$content, collapse = ", ")
+                                                                   )
+                                                            )
+        })
       output$dom_choice <- renderUI({
         prots_dr <-
           get_data_object(object_names = data()$content,

@@ -12,48 +12,22 @@ pathwayListServer <- function(id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$text_pathway_list <- renderText({paste0("Pathways containing ", str_c(data()$content, collapse = ", "))})
+      output$text_pathway_list <- renderText({paste0("Pathways containing ", 
+                                                     str_c(data()$content, collapse = ", "))})
       output$pathway_list <- DT::renderDataTable({
-        shiny::validate(
-          shiny::need(c("universal_gene_pathways") %in% data()$validate, "No pathway data for this gene"))
-        DT::datatable(make_pathway_list(input = data()) %>% 
-                        dplyr::mutate(gs_id = map_chr(gs_id, internal_link), #from fun_helper.R
-                                      gs_name = purrr::map_chr(gs_name, clean_pathway_names), 
-                                      gs_description = purrr::map_chr(gs_description, clean_pathway_descriptions)) %>% 
-                        dplyr::select(ID = gs_id, Pathway = gs_name, Description = gs_description, `Pathway Size` = pathway_size),
+        # shiny::validate(
+        #   shiny::need(c("universal_gene_pathways") %in% data()$validate, "No pathway data for this gene"))
+        DT::datatable(make_pathway_table(input = data()), #%>% 
+                        # dplyr::mutate(gs_id = map_chr(gs_id, internal_link), #from fun_helper.R
+                        #               gs_name = purrr::map_chr(gs_name, clean_pathway_names), 
+                        #               gs_description = purrr::map_chr(gs_description, clean_pathway_descriptions)) %>% 
+                        # dplyr::select(ID = gs_id, Pathway = gs_name, Description = gs_description,
+                        #               `Pathway Size` = pathway_size),
                       rownames = FALSE,
                       escape = FALSE,
                       options = list(paging = FALSE, 
                                      searching = FALSE))
-      })      
-    }
-  )
-}
-
-pathwayGeneList <- function (id) {
-  ns <- NS(id)
-  tagList(
-    fluidRow(h4(textOutput(ns("text_pathway_gene_list")))),
-    fluidRow(DT::dataTableOutput(outputId = ns("pathway_gene_list")))
-  )
-}
-
-pathwayGeneListServer <- function(id, data) {
-  moduleServer(
-    id,
-    function(input, output, session) {
-      output$text_pathway_gene_list <- renderText({paste0("Genes for GO Biological Processes ", data()$query)})
-      output$pathway_gene_list <- DT::renderDataTable({
-        shiny::validate(
-          shiny::need(c("universal_pathways") %in% data()$validate, "No gene data for this pathway"))
-        DT::datatable(make_pathway_genes(go_id = data()$query) %>% 
-                        dplyr::mutate(gene = map_chr(gene, internal_link))  %>% #from fun_helper.R
-                        dplyr::select(Gene = gene, Name = approved_name, AKA = aka),
-                      rownames = FALSE,
-                      escape = FALSE,
-                      options = list(paging = FALSE, 
-                                     searching = FALSE))
-      })      
+      })
     }
   )
 }

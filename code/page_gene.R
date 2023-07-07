@@ -13,7 +13,7 @@ genePage <- function (id, subtype) {
     title_var <- pathwayTitle(ns("title_var"))
     gene_var <- pathwayText(ns("gene_var"))
     protein_summary <- pathwayText(ns("protein_summary"))
-    summary_table <- pathwayGeneList(ns("gene_pathways"))
+    summary_table <- pathwayList(ns("gene_pathways"))
   } else if (subtype == "gene_list") {
     title_var <- customListTitle(ns("title_var"))
     gene_var <- customListText(ns("gene_var"))
@@ -61,7 +61,7 @@ genePage <- function (id, subtype) {
                           fluidRow(
                             cardLayout(
                               barcodeTab(ns("barcode_tabcard")),
-                              actionLink(inputId = ns("go_click"), geneGoTableTab(ns("gotab"))) 
+                              actionLink(inputId = ns("go_click"), pathwaysTableTab(ns("gotab"))) 
                             )
                           ),
                           tags$br(),
@@ -608,7 +608,7 @@ genePageServer <- function(id, subtype) {
         title_var <- pathwayTitleServer("title_var", data)
         gene_var <- pathwayTextServer("gene_var", data)
         protein_summary <- pathwayTextServer("protein_summary", data)
-        summary_table <- pathwayGeneListServer("gene_pathways", data)
+        summary_table <- pathwayListServer("gene_pathways", data)
       } else if (subtype == "gene_list") {
         data <- reactive({
           custom_gene_list <- getQueryString()$query
@@ -709,10 +709,9 @@ genePageServer <- function(id, subtype) {
       # CONDITIONAL GO PATHWAY
       observeEvent(input$go_click, { #store click
         shinyjs::show("go_tabcard")
-        # shinyjs::hide("sequence_tabcard") #template for when we add more
       })
       #serves the card for the image
-      geneGoTableTabServer("gotab", data)
+      pathwaysTableTabServer("gotab", data)
       
       # PROTEIN
       protein_summary
