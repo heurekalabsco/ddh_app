@@ -12,21 +12,35 @@ pathwayListServer <- function(id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$text_pathway_list <- renderText({paste0("Pathways containing ", 
-                                                     str_c(data()$content, collapse = ", "))})
+      output$text_pathway_list <- renderText({
+        if(data()$subtype != "pathway") {
+          paste0("Pathways containing ", str_c(data()$content, collapse = ", "))
+        } else {
+          "Pathway genes"
+        }
+      })
       output$pathway_list <- DT::renderDataTable({
-        # shiny::validate(
-        #   shiny::need(c("universal_gene_pathways") %in% data()$validate, "No pathway data for this gene"))
-        DT::datatable(make_pathway_table(input = data()), #%>% 
-                        # dplyr::mutate(gs_id = map_chr(gs_id, internal_link), #from fun_helper.R
-                        #               gs_name = purrr::map_chr(gs_name, clean_pathway_names), 
-                        #               gs_description = purrr::map_chr(gs_description, clean_pathway_descriptions)) %>% 
-                        # dplyr::select(ID = gs_id, Pathway = gs_name, Description = gs_description,
-                        #               `Pathway Size` = pathway_size),
-                      rownames = FALSE,
-                      escape = FALSE,
-                      options = list(paging = FALSE, 
-                                     searching = FALSE))
+        if(data()$subtype != "pathway") {
+          shiny::validate(
+            shiny::need(c("universal_gene_pathways") %in% data()$validate, "No pathway data for this gene"))
+          DT::datatable(make_pathway_table(input = data()) %>% 
+                        dplyr::mutate(gs_id = map_chr(gs_id, internal_link), #from fun_helper.R
+                                      gs_name = purrr::map_chr(gs_name, clean_pathway_names),
+                                      gs_description = purrr::map_chr(gs_description, clean_pathway_descriptions)) %>%
+                        dplyr::select(Gene = human_gene_symbol, ID = gs_id, Pathway = gs_name, Description = gs_description,
+                                      `Pathway Size` = pathway_size),
+                        rownames = FALSE,
+                        escape = FALSE,
+                        options = list(paging = FALSE, 
+                                       searching = FALSE))
+        } else {
+          DT::datatable(make_pathway_table(input = data()) %>% 
+                        dplyr::mutate(Gene = map_chr(Gene, internal_link)),
+                        rownames = FALSE,
+                        escape = FALSE,
+                        options = list(paging = FALSE, 
+                                       searching = FALSE))
+        }
       })
     }
   )

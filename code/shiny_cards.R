@@ -829,10 +829,19 @@ pathwaysTableTabServer <- function(id, data) {
         shiny::validate(
           shiny::need(c("universal_gene_pathways") %in% data()$validate, 
                       "No pathway data for this query"))
-        gt::gt(make_pathway_table(input = data()) %>% 
-                 # dplyr::mutate(gs_name = purrr::map_chr(gs_name, clean_pathway_names)) %>% #from shiny_helper.R
-                 # dplyr::select(Pathway = gs_name, ID = gs_id) %>% 
-                 dplyr::slice(1:3))
+        
+        if(data()$subtype != "pathway") {
+          gt::gt(make_pathway_table(input = data()) %>% 
+                   dplyr::mutate(gs_name = purrr::map_chr(gs_name, clean_pathway_names)) %>% #from shiny_helper.R
+                   dplyr::select(Pathway = gs_name, ID = gs_id) %>%
+                   dplyr::slice(1:3)
+          )
+        } else {
+          gt::gt(make_pathway_table(input = data()) %>% 
+                   dplyr::select(1:2) %>%
+                   dplyr::slice(1:5)
+          )
+        }
       },
       height = card_contents_height,
       width = card_contents_width
