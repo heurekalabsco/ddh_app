@@ -1196,12 +1196,23 @@ geneCCATableServer <- function(id, data) {
         shiny::validate(
           shiny::need(c("universal_achilles_long") %in% data()$validate, "No data found."))
         #render table
-        DT::datatable(ddh::make_cca_genes_table(input = data()) %>%
-                        dplyr::mutate_if(is.numeric, ~ signif(., digits = 3)) %>% 
-                        dplyr::rename(Correlation = CC),
-                      rownames = FALSE,
-                      escape = FALSE,
-                      options = list(pageLength = 10))
+        if (data()$subtype != "pathway") {
+          DT::datatable(ddh::make_cca_genes_table(input = data()) %>%
+                          dplyr::mutate_if(is.numeric, ~ signif(., digits = 3)) %>% 
+                          dplyr::rename(Correlation = CC),
+                        rownames = FALSE,
+                        escape = FALSE,
+                        options = list(pageLength = 10)
+                        )
+        } else {
+          DT::datatable(ddh::make_cca_pathways_table(input = data()) %>%
+                          dplyr::mutate_if(is.numeric, ~ signif(., digits = 3)) %>% 
+                          dplyr::rename(Correlation = CC),
+                        rownames = FALSE,
+                        escape = FALSE,
+                        options = list(pageLength = 10)
+                        )
+        }
       })
       # Conditional plot
       output$cca_plot_text <- renderText({paste0("Co-essential pathways for ", 
@@ -1216,7 +1227,11 @@ geneCCATableServer <- function(id, data) {
         shiny::validate(
           shiny::need(c("universal_achilles_long") %in% data()$validate, "No data found."))
         #plot
-        ddh::make_cca_genes(input = data())
+        if (data()$subtype != "pathway") {
+          ddh::make_cca_genes(input = data())
+        } else {
+          ddh::make_cca_pathways(input = data())
+        }
       })
     }
   )

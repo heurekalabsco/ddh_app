@@ -1610,10 +1610,20 @@ geneCCATableTabServer <- function (id, data) {
         shiny::validate(
           shiny::need(c("universal_achilles_long") %in% data()$validate, 
                       "No dependency data for this query"))
-        gt::gt(ddh::make_cca_genes_table(input = data()) %>%
-                 dplyr::mutate("Rank" = row_number()) %>%
-                 dplyr::select(Rank, Pathway) %>%
-                 dplyr::slice(1:5))
+        
+        if (data()$subtype != "pathway") {
+          gt::gt(ddh::make_cca_genes_table(input = data()) %>%
+                   dplyr::mutate("Rank" = row_number()) %>%
+                   dplyr::select(Rank, Pathway) %>%
+                   dplyr::slice(1:5)
+          )
+        } else {
+          gt::gt(ddh::make_cca_pathways_table(input = data()) %>%
+                   dplyr::mutate("Rank" = row_number()) %>%
+                   dplyr::select(Rank, Pathway) %>%
+                   dplyr::slice(1:5)
+          )
+        }
       },
       height = card_contents_height,
       width = card_contents_width
