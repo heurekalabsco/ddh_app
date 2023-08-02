@@ -28,7 +28,12 @@ source(here::here("code", "shiny_download.R"), local = TRUE)
 source(here::here("code", "shiny_search.R"), local = TRUE)
 
 # HEAD----
-head_tags <- tags$head(includeCSS("styles.css")) # includeHTML("gtag.html") 
+if(privateMode == TRUE) {
+  head_tags <- tags$head(includeCSS("styles.css"),
+                         tags$script(src="outseta.js"))
+} else {
+  head_tags <- tags$head(includeCSS("styles.css"))
+}
 
 ### universal elements
 main_title <- HTML('<a href="." style="color:black;">DATA-DRIVEN HYPOTHESIS</a>')
