@@ -532,6 +532,10 @@ clusterEnrichmentPlotServer <- function (id, data) {
                                                                 )
       })
       output$cluster_enrichment_plot <- renderPlot({
+        cluster_enrichment_table <- ddh::make_cluster_enrichment_table(input = data())
+        shiny::validate(
+          shiny::need(nrow(cluster_enrichment_table) > 0, 
+                      "No enriched pathways for this gene/s cluster"))
         make_cluster_enrichment(input = data())
       })
     }

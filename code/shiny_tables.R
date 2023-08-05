@@ -148,7 +148,12 @@ proteinClusterEnrichmentTableServer <- function(id, data) {
       )
       })
       output$cluster_enrichment_table <- DT::renderDataTable({
-        DT::datatable(ddh::make_cluster_enrichment_table(input = data()),
+        cluster_enrichment_table <- ddh::make_cluster_enrichment_table(input = data())
+        shiny::validate(
+          shiny::need(nrow(cluster_enrichment_table) > 0, 
+                      "No enriched pathways for this gene/s cluster"))
+        
+        DT::datatable(cluster_enrichment_table,
                       rownames = FALSE,
                       escape = FALSE,
                       options = list(pageLength = 10))
@@ -180,7 +185,8 @@ pubmedTableServer <- function(id, data) {
       })
       output$pubmed_table <- DT::renderDataTable({
         shiny::validate(
-          shiny::need(c("universal_pubmed") %in% data()$validate, "No literature data for this query"))
+          shiny::need(c("universal_pubmed") %in% data()$validate, 
+                      "No literature data for this query"))
         withProgress(message = 'Building a smart table...', {
           DT::datatable(make_pubmed_table(input = data()) %>% 
                           dplyr::mutate(pmid = map_chr(pmid, pubmed_linkr, number_only = TRUE) #from fun_helper.R
