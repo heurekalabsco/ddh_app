@@ -131,8 +131,8 @@ genePage <- function (id, subtype) {
                                 id = ns("signature_tabcard"),
                                 style = "padding-left:1%",
                                 private_msg(),
-                                private(radialPlot(ns("radial_plot"))),
                                 private(AABarPlot(ns("aa_bar_plot"))),
+                                private(radialPlot(ns("radial_plot"))),
                                 tags$br(),
                                 fluidRow(
                                   div(

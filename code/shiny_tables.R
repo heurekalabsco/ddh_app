@@ -98,25 +98,20 @@ proteinClusterTableServer <- function(id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$text_cluster_table <- renderText({paste0("Amino acid signature clusters of ", 
-                                                      ifelse(data()$subtype == "pathway",
-                                                             "pathway genes",
-                                                             str_c(data()$content, collapse = ", ")
-                                                      )
-      )
-      })
+      output$text_cluster_table <- renderText({paste0("Protein members of selected clusters")})
       output$prot_clust_table <- DT::renderDataTable({
         shiny::validate(
           shiny::need(c("gene_signature_clusters") %in% data()$validate, 
                       "No cluster data for this protein"))
         withProgress(message = 'Building a smart clustering table...', {
           DT::datatable(make_signature_clusters_table(input = data()) %>%
-                          dplyr::slice(1:10) %>% # for testing 
+                          dplyr::slice(1:100) %>% # for testing 
                           dplyr::mutate(Gene = map_chr(Gene, internal_link)),
                         rownames = FALSE,
                         escape = FALSE,
                         filter = "none",
-                        options = list(pageLength = 10))
+                        options = list(dom = 't', pageLength = 12, scrollY = "500px")
+                        )
         })
       })
     }

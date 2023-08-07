@@ -267,17 +267,61 @@ proteinStructurePlot3dServer <- function (id, data) {
   )
 }
 
+## AA bar plot --------------------------------------------------------
+AABarPlot <- function(id) {
+  ns <- NS(id)
+  tagList(
+    fluidRow(h4(textOutput(ns("text_aa_bar_plot")))),
+    fluidRow(shinyWidgets::prettySwitch(inputId = ns("bar_mean_relative"), 
+                                        "Show relative frequency to the mean", 
+                                        value = TRUE),
+             plotOutput(outputId = ns("aa_bar_plot"), height = "auto") %>% 
+               withSpinnerColor(plot_type = "protein"))
+  )
+}
+
+AABarPlotServer <- function (id, data) {
+  moduleServer(
+    id,
+    function(input, output, session) {
+      output$text_aa_bar_plot <- renderText({paste0("Amino acid signature of ", 
+                                                    ifelse(data()$subtype == "pathway",
+                                                           "pathway genes",
+                                                           str_c(data()$content, collapse = ", ")
+                                                    )
+      )
+      })
+      output$aa_bar_plot <- renderPlot({
+        shiny::validate(
+          shiny::need(c("universal_proteins") %in% data()$validate, "No data found."))
+        make_radial(input = data(),
+                    relative = input$bar_mean_relative,
+                    cluster = FALSE,
+                    barplot = TRUE)
+      },
+      height = 550)
+    }
+  )
+}
+
 ## AA radial plot --------------------------------------------------------
 radialPlot <- function(id) {
   ns <- NS(id)
   tagList(
-    fluidRow(h4(textOutput(ns("text_radial_plot")))),
-    fluidRow(
-      shinyWidgets::prettySwitch(inputId = ns("mean_relative"), 
-                                 "Show relative frequency to the mean", 
-                                 value = TRUE),
-      plotOutput(outputId = ns("radial_plot"), height = "auto") %>% 
-        withSpinnerColor(plot_type = "protein")
+    fluidRow(ddh::make_legend("make_radial_bar"), # this belongs to BAR PLOT
+             actionLink(inputId = ns("aa_bar_click"), " View amino acid signatures radial plot")),
+    tags$br(),
+    conditionalPanel(condition = paste0("input['", ns("aa_bar_click"), "'] != 0"),
+                     fluidRow(h4(textOutput(ns("text_radial_plot")))),
+                     fluidRow(
+                       shinyWidgets::prettySwitch(inputId = ns("mean_relative"), 
+                                                  "Show relative frequency to the mean", 
+                                                  value = TRUE),
+                       plotOutput(outputId = ns("radial_plot"), height = "auto") %>% 
+                         withSpinnerColor(plot_type = "protein")
+                     ),
+                     fluidRow(ddh::make_legend("make_radial")),
+                     tags$br()
     )
   )
 }
@@ -306,85 +350,39 @@ radialPlotServer <- function (id, data) {
   )
 }
 
-## AA bar plot --------------------------------------------------------
-AABarPlot <- function(id) {
-  ns <- NS(id)
-  tagList(
-    tags$br(),
-    fluidRow(ddh::make_legend("make_radial"), # this belongs to RADIAL PLOT
-             actionLink(inputId = ns("aa_bar_click"), " View bar plot of amino acid signatures")),
-    tags$br(), 
-    conditionalPanel(condition = paste0("input['", ns("aa_bar_click"), "'] != 0"), 
-                     fluidRow(h4(textOutput(ns("text_aa_bar_plot")))),
-                     fluidRow(shinyWidgets::prettySwitch(inputId = ns("bar_mean_relative"), 
-                                                "Show relative frequency to the mean", 
-                                                value = TRUE),
-                              plotOutput(outputId = ns("aa_bar_plot"), height = "auto") %>% 
-                                withSpinnerColor(plot_type = "protein")),
-                     tags$br(),
-                     fluidRow(ddh::make_legend("make_radial_bar"))
-    )
-  )
-}
-
-AABarPlotServer <- function (id, data) {
-  moduleServer(
-    id,
-    function(input, output, session) {
-      output$text_aa_bar_plot <- renderText({paste0("Amino acid signature of ", 
-                                                    ifelse(data()$subtype == "pathway",
-                                                           "pathway genes",
-                                                           str_c(data()$content, collapse = ", ")
-                                                    )
-      )
-      })
-      output$aa_bar_plot <- renderPlot({
-        shiny::validate(
-          shiny::need(c("universal_proteins") %in% data()$validate, "No data found."))
-        make_radial(input = data(),
-                    relative = input$bar_mean_relative,
-                    cluster = FALSE,
-                    barplot = TRUE)
-      },
-      height = 550)
-    }
-  )
-}
-
 ## cluster AA radial plot --------------------------------------------------------
 clusterRadialPlot <- function(id) {
   ns <- NS(id)
   tagList(
     tags$br(),
     fluidRow(actionLink(inputId = ns("aa_radial_cluster_click"), 
-                        "View cluster signature radial plot")
+                        "View amino acid signature cluster bar plot")
              ),
     conditionalPanel(condition = paste0("input['", ns("aa_radial_cluster_click"), "'] != 0"),
-                     fluidRow(h4(textOutput(ns("cluster_text_radial_plot")))),
+                     fluidRow(h4(textOutput(ns("cluster_text_aa_bar_plot")))),
                      fluidRow(
-                       shinyWidgets::prettySwitch(inputId = ns("cluster_mean_relative"), 
+                       shinyWidgets::prettySwitch(inputId = ns("cluster_bar_mean_relative"), 
                                                   "Show relative frequency to the mean", 
                                                   value = TRUE),
-                       plotOutput(outputId = ns("cluster_radial_plot"), height = "auto") %>% 
+                       plotOutput(outputId = ns("cluster_aa_bar_plot"), height = "auto") %>% 
                          withSpinnerColor(plot_type = "protein")
                      ),
-                     # BARPLOT
-                     tags$br(),
-                     fluidRow(ddh::make_legend("make_radial"),
+                     # RADIAL
+                     fluidRow(ddh::make_legend("make_radial_bar"),
                               actionLink(inputId = ns("aa_bar_cluster_click"), 
-                                         " View bar plot of cluster amino acid signatures")),
+                                         " View amino acid signature cluster radial plot")),
                      tags$br()
     ),
     conditionalPanel(condition = paste0("input['", ns("aa_bar_cluster_click"), "'] != 0"), 
-                     fluidRow(h4(textOutput(ns("cluster_text_aa_bar_plot")))),
-                     fluidRow(shinyWidgets::prettySwitch(inputId = ns("cluster_bar_mean_relative"), 
+                     fluidRow(h4(textOutput(ns("cluster_text_radial_plot")))),
+                     fluidRow(shinyWidgets::prettySwitch(inputId = ns("cluster_mean_relative"), 
                                                          "Show relative frequency to the mean", 
                                                          value = TRUE),
-                              plotOutput(outputId = ns("cluster_aa_bar_plot"), height = "auto") %>% 
+                              plotOutput(outputId = ns("cluster_radial_plot"), height = "auto") %>% 
                                 withSpinnerColor(plot_type = "protein")
                      ),
                      tags$br(),
-                     fluidRow(ddh::make_legend("make_radial_bar"))
+                     fluidRow(ddh::make_legend("make_radial"))
     )
   )
 }
@@ -457,8 +455,8 @@ UMAPPlot <- function(id) {
   tagList(
     fluidRow(h4(textOutput(ns("text_umap_plot")))),
     fluidRow(
-      checkboxInput(inputId = ns("show_all_umap"), label = "Show selected clusters", value = TRUE),
-      checkboxInput(inputId = ns("labels_umap"), label = "Show labels", value = TRUE),
+      # checkboxInput(inputId = ns("show_all_umap"), label = "Show selected clusters", value = TRUE),
+      # checkboxInput(inputId = ns("labels_umap"), label = "Show labels", value = TRUE),
       plotOutput(outputId = ns("umap_plot"), height = "auto") %>% 
         withSpinnerColor(plot_type = "protein")
       ),
@@ -488,8 +486,9 @@ UMAPPlotServer <- function (id, data) {
         clust_num <- ddh::get_cluster(input = data())
         
         make_umap_plot(input = data(),
-                       show_subset = input$show_all_umap,
-                       labels = input$labels_umap)
+                       show_subset = TRUE, #input$show_all_umap,
+                       labels = TRUE #input$labels_umap
+                       )
       },
       height = 550)
     }
