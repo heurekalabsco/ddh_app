@@ -64,3 +64,13 @@ a{
 .navbar-header {
   float: none;
 }
+
+/* Custom styles for the tooltip */
+.tooltip-inner {
+  max-width: 200px; /* Adjust the tooltip width as needed */
+  background-color: #333;
+  color: #fff;
+  border-radius: 4px;
+  padding: 8px;
+}
+

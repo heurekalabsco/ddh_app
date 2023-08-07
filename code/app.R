@@ -104,7 +104,7 @@ querySearchInput <- function(id) {
   ns <- NS(id)
   searchInput(
     inputId = ns("gene_or_pathway"),
-    placeholder = "genes, cells, or compounds", #was genes, pathways, or GO number
+    placeholder = dplyr::if_else(privateMode == TRUE, private_serachbox, "genes, pathways, or a custom list"), #"genes, cells, or compounds"
     btnSearch = icon("search")
   )
 }
@@ -245,9 +245,12 @@ searchPage <- function (id) {
     head_tags,
     ddhNavbarPage(formContent=querySearchInput(ns("search"))),
     h3(textOutput("search_title")),
-    div(div(h3("Results", class="panel-title"), class="panel-heading"),
-        div(uiOutput(ns("genes_search_result")), class="panel-body"),
-        class="bg-info panel panel-default"
+    div(
+      div(id = "search_results_div", class="panel-heading",
+        h3("Search Results", make_tooltip("These are the search results from your query. Click on any link below to see the data about it.")
+           , class="panel-title")),
+      div(uiOutput(ns("genes_search_result")), class="panel-body"),
+      class="bg-info panel panel-default"
     )
   )
 }

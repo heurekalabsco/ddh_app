@@ -12,9 +12,11 @@ cran_pkgs <- c(
   "qs",
   "rmarkdown",
   "shiny",
+  "shinyBS",
   "shinycssloaders",
   "shinyjs",
   "shinyWidgets",
+  "testthat",
   "tidyverse",
   "visNetwork",
   "waiter"
