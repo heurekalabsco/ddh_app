@@ -128,89 +128,38 @@ proteinClusterTableServer <- function(id, data) {
 }
 
 ## Cluster Enrichment ---------------------
-# proteinClusterEnrichmentTable <- function(id) {
-#   ns <- NS(id)
-#   uiOutput(outputId = ns("conditional_clusterenrichmenttable"))
-# }
-# 
-# proteinClusterEnrichmentTableServer <- function(id, data) {
-#   moduleServer(
-#     id,
-#     function(input, output, session) {
-#       output$conditional_clusterenrichmenttable <- renderUI({
-#         
-#         if(!is.null(data()$content)) {
-#           sig_clust <- ddh::get_cluster(input = data())
-#           sig_clust_len <- length(sig_clust)
-#         } else {
-#           sig_clust <- 0
-#           sig_clust_len <- 0
-#         }
-#         
-#         if((sig_clust_len == 1) & (sig_clust != 0)) {
-#           tagList(
-#             tags$br(),
-#             fluidRow(actionLink(inputId = session$ns("cluster_tab_enrich_click"), "View cluster enrichment table")),
-#             tags$br(),
-#             conditionalPanel(condition = paste0("input['", session$ns("cluster_tab_enrich_click"), "'] != 0"), 
-#                              fluidRow(h4(textOutput(session$ns("text_cluster_enrichment_table")))),
-#                              fluidRow(checkboxInput(inputId = session$ns("prot_clust_enrich_table_filter_click"), 
-#                                                     label = "Filter table", value = FALSE)),
-#                              fluidRow(radioButtons(inputId = session$ns("pval_clust_enrich"),
-#                                                    label = "p-value type", 
-#                                                    choices = c("Raw p-value" = "FDR", # inverse because it's a subtraction 
-#                                                                "FDR" = "pvalue"), # idem
-#                                                    inline = TRUE)),
-#                              selectizeInput(session$ns("ontology_info"),
-#                                             "Ontology",
-#                                             choices = c("Biological Process (GO)" = "BP",
-#                                                         "Molecular Function (GO)" = "MF",
-#                                                         "Cellular Component (GO)" = "CC"), 
-#                                             selected = "BP"),
-#                              DT::dataTableOutput(outputId = session$ns("prot_clust_enrich_table")),
-#                              tags$br() 
-#             )
-#           )
-#         } else {
-#           return(NULL)
-#         }
-#       })
-#       output$text_cluster_enrichment_table <- renderText({
-#         
-#         clust_num <- ddh::get_cluster(input = data())
-#         shiny::validate(
-#           shiny::need(c("gene_signature_clusters") %in% data()$validate, "No cluster data for this protein"))
-#         if(length(clust_num) == 1) {
-#           title_text <- glue::glue("Enrichment Analysis for Cluster {clust_num}")
-#         } else{
-#           title_text <- NULL
-#         }
-#         return(title_text)
-#       })
-#       output$prot_clust_enrich_table <- DT::renderDataTable({
-#         
-#         clust_num <- ddh::get_cluster(input = data())
-#         
-#         shiny::validate(
-#           shiny::need(c("gene_signature_clusters") %in% data()$validate, "No cluster data for this protein"), 
-#           shiny::need(length(clust_num) == 1, 
-#                       "More than one cluster identified in the table above. Cluster enrichment analysis is only available for individual gene queries or multiple gene queries belonging to the same cluster."))
-#         withProgress(message = 'Building a smart enrichment table...', {
-#           DT::datatable(make_clustering_enrichment_table(input = data(),
-#                                                          ontology = input$ontology_info) %>%
-#                           dplyr::rename(FDR = p.adjust) %>%
-#                           dplyr::select(-qvalue, -geneID, -Count) %>%
-#                           dplyr::mutate(pvalue = signif(pvalue, digits = 3),
-#                                         FDR = signif(FDR, digits = 3)) %>% 
-#                           dplyr::select_at(vars(-matches(input$pval_clust_enrich))),
-#                         filter = if(input$prot_clust_enrich_table_filter_click == FALSE) {'none'} else {'top'},
-#                         escape = FALSE,
-#                         options = list(pageLength = 10))
-#         })
-#       })
-#     }
-#   )
-# }
+proteinClusterEnrichmentTable <- function(id) {
+  ns <- NS(id)
+  tagList(
+    fluidRow(h4(textOutput(ns("cluster_enrichment_table_text")))),
+    DT::dataTableOutput(outputId = ns("cluster_enrichment_table"))
+  )
+}
+
+proteinClusterEnrichmentTableServer <- function(id, data) {
+  moduleServer(
+    id,
+    function(input, output, session) {
+      output$cluster_enrichment_table_text <- renderText({paste0("Enriched pathways for ", 
+                                                                 ifelse(data()$subtype == "pathway",
+                                                                        "pathway gene signatures",
+                                                                        str_c(data()$content, collapse = ", ")
+                                                                 )
+      )
+      })
+      output$cluster_enrichment_table <- DT::renderDataTable({
+        cluster_enrichment_table <- ddh::make_cluster_enrichment_table(input = data())
+        shiny::validate(
+          shiny::need(nrow(cluster_enrichment_table) > 0, 
+                      "No enriched pathways for this gene/s cluster"))
+        
+        DT::datatable(cluster_enrichment_table,
+                      rownames = FALSE,
+                      escape = FALSE,
+                      options = list(pageLength = 10))
+      })
+    }
+)}
 
 ##Pubmed----
 # module that displays a table for pubmed
@@ -236,7 +185,8 @@ pubmedTableServer <- function(id, data) {
       })
       output$pubmed_table <- DT::renderDataTable({
         shiny::validate(
-          shiny::need(c("universal_pubmed") %in% data()$validate, "No literature data for this query"))
+          shiny::need(c("universal_pubmed") %in% data()$validate, 
+                      "No literature data for this query"))
         withProgress(message = 'Building a smart table...', {
           DT::datatable(make_pubmed_table(input = data()) %>% 
                           dplyr::mutate(pmid = map_chr(pmid, pubmed_linkr, number_only = TRUE) #from fun_helper.R

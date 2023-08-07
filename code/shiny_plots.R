@@ -510,80 +510,36 @@ UMAPPlotServer <- function (id, data) {
 }
 
 ## cluster enrichment --------------------------------------------------------
-# clusterEnrichmentPlot <- function(id) {
-#   ns <- NS(id)
-#   uiOutput(outputId = ns("conditional_clusterenrichmentplot"))
-# }
-# 
-# clusterEnrichmentPlotServer <- function (id, data) {
-#   moduleServer(
-#     id,
-#     function(input, output, session) {
-#       output$conditional_clusterenrichmentplot <- renderUI({
-#         if(!is.null(data()$content)) {
-#           sig_clust <- ddh::get_cluster(input = data())
-#           
-#           sig_clust_len <- 
-#             sig_clust %>% 
-#             length()
-#         } else {
-#           sig_clust <- 0
-#           sig_clust_len <- 0
-#         }
-#         
-#         if((sig_clust_len == 1) & (sig_clust != 0)) {
-#           tagList(
-#             fluidRow(h4(textOutput(session$ns("text_cluster_enrich_plot")))),
-#             selectizeInput(session$ns("ontology_info_plot"),
-#                            "Ontology",
-#                            choices = c("Biological Process (GO)" = "BP",
-#                                        "Molecular Function (GO)" = "MF",
-#                                        "Cellular Component (GO)" = "CC"), 
-#                            selected = "BP"),
-#             sliderInput(session$ns("num_terms"), "Number of terms to show",
-#                         min = 10, max = 40, value = 20),
-#             fluidRow(plotOutput(outputId = session$ns("cluster_enrichment_plot"), height = "auto") %>% 
-#                        withSpinnerColor(plot_type = "protein") #see shiny_helper.R
-#             ),
-#             tags$br(),
-#             fluidRow(ddh::make_legend("make_cluster_enrich"))
-#           )
-#         } else {
-#           return(NULL)
-#         }
-#         
-#       })
-#       output$text_cluster_enrich_plot <- renderText({
-#         shiny::validate(
-#           shiny::need(c("universal_proteins") %in% data()$validate, "No data found."))
-#         
-#         clust_num <- ddh::get_cluster(input = data())
-#         
-#         if(length(clust_num) == 1) {
-#           title_text <- paste0("Enrichment Analysis Plot for Cluster ", 
-#                                clust_num)
-#         } else{
-#           title_text <- NULL
-#         }
-#         
-#         return(title_text)
-#       })
-#       output$cluster_enrichment_plot <- renderPlot({
-#         
-#         clust_num <- ddh::get_cluster(input = data())
-#         
-#         shiny::validate(
-#           shiny::need(c("universal_proteins") %in% data()$validate, "No data found."),
-#           shiny::need(length(clust_num) == 1, 
-#                       "More than one cluster identified in the table above. Cluster enrichment analysis is only available for individual gene queries or multiple gene queries belonging to the same cluster."))
-#         make_cluster_enrich(input = data(),
-#                             ontology = input$ontology_info_plot,
-#                             num_terms = input$num_terms)
-#       },
-#       height = 550)
-#     }
-#   )
-# }
+clusterEnrichmentPlot <- function(id) {
+  ns <- NS(id)
+  tagList(
+    fluidRow(h4(textOutput(ns("cluster_enrichment_plot_text")))),
+    fluidRow(plotOutput(outputId = ns("cluster_enrichment_plot"))),
+    tags$br(),
+    fluidRow(ddh::make_legend("make_cluster_enrichment"))
+  )
+}
+
+clusterEnrichmentPlotServer <- function (id, data) {
+  moduleServer(
+    id,
+    function(input, output, session) {
+      output$cluster_enrichment_plot_text <- renderText({paste0("Enriched pathways for ", 
+                                                                ifelse(data()$subtype == "pathway",
+                                                                       "pathway gene signatures",
+                                                                       str_c(data()$content, collapse = ", ")
+                                                                       )
+                                                                )
+      })
+      output$cluster_enrichment_plot <- renderPlot({
+        cluster_enrichment_table <- ddh::make_cluster_enrichment_table(input = data())
+        shiny::validate(
+          shiny::need(nrow(cluster_enrichment_table) > 0, 
+                      "No enriched pathways for this gene/s cluster"))
+        make_cluster_enrichment(input = data())
+      })
+    }
+)}
 
 ## protein domain --------------------------------------------------------
 proteinDomainPlot <- function(id) {
