@@ -133,13 +133,17 @@ genePage <- function (id, subtype) {
                                 private_msg(),
                                 private(radialPlot(ns("radial_plot"))),
                                 private(AABarPlot(ns("aa_bar_plot"))),
-                                private(tags$hr()),
-                                private(UMAPPlot(ns("umap_plot"))),
+                                tags$br(),
+                                fluidRow(
+                                  div(
+                                    id = ns("signature_tabcard_umap"),
+                                    style = "padding-left:1%",
+                                    column(7, private(UMAPPlot(ns("umap_plot")))),
+                                    column(5, private(proteinClusterTable(ns("prot_clust_table"))))
+                                  )
+                                ),
                                 private(clusterRadialPlot(ns("cluster_radial_plot"))),
-                                private(clusterAABarPlot(ns("cluster_aa_bar_plot"))),
-                                private(proteinClusterTable(ns("prot_clust_table"))),
                                 private(clusterEnrichmentPlot(ns("cluster_enrichment_plot"))),
-                                private(proteinClusterEnrichmentTable(ns("prot_clust_enrich_table"))),
                                 tags$br()
                               )
                             )
@@ -756,10 +760,8 @@ genePageServer <- function(id, subtype) {
       private({AABarPlotServer("aa_bar_plot", data)})
       private({UMAPPlotServer("umap_plot", data)})
       private({clusterRadialPlotServer("cluster_radial_plot", data)})
-      private({clusterAABarPlotServer("cluster_aa_bar_plot", data)})
       private({proteinClusterTableServer("prot_clust_table", data)})
       private({clusterEnrichmentPlotServer("cluster_enrichment_plot", data)})
-      private({proteinClusterEnrichmentTableServer("prot_clust_enrich_table", data)})
       
       # CONDITIONAL STRUCTURE
       observeEvent(input$structure_click, { #store click

@@ -355,13 +355,36 @@ AABarPlotServer <- function (id, data) {
 clusterRadialPlot <- function(id) {
   ns <- NS(id)
   tagList(
-    fluidRow(h4(textOutput(ns("cluster_text_radial_plot")))),
-    fluidRow(
-      shinyWidgets::prettySwitch(inputId = ns("cluster_mean_relative"), 
-                                 "Show relative frequency to the mean", 
-                                 value = TRUE),
-      plotOutput(outputId = ns("cluster_radial_plot"), height = "auto") %>% 
-        withSpinnerColor(plot_type = "protein")
+    tags$br(),
+    fluidRow(actionLink(inputId = ns("aa_radial_cluster_click"), 
+                        "View cluster signature radial plot")
+             ),
+    conditionalPanel(condition = paste0("input['", ns("aa_radial_cluster_click"), "'] != 0"),
+                     fluidRow(h4(textOutput(ns("cluster_text_radial_plot")))),
+                     fluidRow(
+                       shinyWidgets::prettySwitch(inputId = ns("cluster_mean_relative"), 
+                                                  "Show relative frequency to the mean", 
+                                                  value = TRUE),
+                       plotOutput(outputId = ns("cluster_radial_plot"), height = "auto") %>% 
+                         withSpinnerColor(plot_type = "protein")
+                     ),
+                     # BARPLOT
+                     tags$br(),
+                     fluidRow(ddh::make_legend("make_radial"),
+                              actionLink(inputId = ns("aa_bar_cluster_click"), 
+                                         " View bar plot of cluster amino acid signatures")),
+                     tags$br()
+    ),
+    conditionalPanel(condition = paste0("input['", ns("aa_bar_cluster_click"), "'] != 0"), 
+                     fluidRow(h4(textOutput(ns("cluster_text_aa_bar_plot")))),
+                     fluidRow(shinyWidgets::prettySwitch(inputId = ns("cluster_bar_mean_relative"), 
+                                                         "Show relative frequency to the mean", 
+                                                         value = TRUE),
+                              plotOutput(outputId = ns("cluster_aa_bar_plot"), height = "auto") %>% 
+                                withSpinnerColor(plot_type = "protein")
+                     ),
+                     tags$br(),
+                     fluidRow(ddh::make_legend("make_radial_bar"))
     )
   )
 }
@@ -396,37 +419,8 @@ clusterRadialPlotServer <- function (id, data) {
                     barplot = FALSE)
       },
       height = 550)
-    }
-  )
-}
-
-## cluster AA bar plot --------------------------------------------------------
-clusterAABarPlot <- function(id) {
-  ns <- NS(id)
-  tagList(
-    tags$br(),
-    fluidRow(ddh::make_legend("make_radial"), # this belongs to RADIAL PLOT
-             actionLink(inputId = ns("aa_bar_cluster_click"), 
-                        " View bar plot of cluster amino acid signatures")),
-    tags$br(), 
-    conditionalPanel(condition = paste0("input['", ns("aa_bar_cluster_click"), "'] != 0"), 
-                     fluidRow(h4(textOutput(ns("cluster_text_aa_bar_plot")))),
-                     fluidRow(shinyWidgets::prettySwitch(inputId = ns("cluster_bar_mean_relative"), 
-                                                         "Show relative frequency to the mean", 
-                                                         value = TRUE),
-                              plotOutput(outputId = ns("cluster_aa_bar_plot"), height = "auto") %>% 
-                                withSpinnerColor(plot_type = "protein")
-                              ),
-                     tags$br(),
-                     fluidRow(ddh::make_legend("make_radial_bar"))
-    )
-  )
-}
-
-clusterAABarPlotServer <- function (id, data) {
-  moduleServer(
-    id,
-    function(input, output, session) {
+      
+      ## BARPLOT
       output$cluster_text_aa_bar_plot <- renderText({
         
         clust_num <- 
@@ -461,22 +455,15 @@ clusterAABarPlotServer <- function (id, data) {
 UMAPPlot <- function(id) {
   ns <- NS(id)
   tagList(
+    fluidRow(h4(textOutput(ns("text_umap_plot")))),
+    fluidRow(
+      checkboxInput(inputId = ns("show_all_umap"), label = "Show selected clusters", value = TRUE),
+      checkboxInput(inputId = ns("labels_umap"), label = "Show labels", value = TRUE),
+      plotOutput(outputId = ns("umap_plot"), height = "auto") %>% 
+        withSpinnerColor(plot_type = "protein")
+      ),
     tags$br(),
-    fluidRow(actionLink(inputId = ns("umap_click"), " View UMAP plot")),
-    tags$br(), 
-    conditionalPanel(condition = paste0("input['", ns("umap_click"), "'] != 0"),
-                     fluidRow(h4(textOutput(ns("text_umap_plot")))),
-                     fluidRow(
-                       checkboxInput(inputId = ns("show_all_umap"), 
-                                     label = "Show only selected clusters", value = FALSE),
-                       checkboxInput(inputId = ns("labels_umap"), 
-                                     label = "Show labels", value = FALSE),
-                       plotOutput(outputId = ns("umap_plot"), height = "auto") %>% 
-                         withSpinnerColor(plot_type = "protein")
-                     ),
-                     tags$br(),
-                     fluidRow(ddh::make_legend("make_umap_plot"))
-    )
+    fluidRow(ddh::make_legend("make_umap_plot"))
   )
 }
 
@@ -490,7 +477,7 @@ UMAPPlotServer <- function (id, data) {
         
         clust_num <- ddh::get_cluster(input = data())
         
-        title_text <- glue::glue('Amino acid signature emdeddings (clusters {stringr::str_c(clust_num, collapse = ", ")})')
+        title_text <- glue::glue('Amino acid signature emdeddings (cluster {stringr::str_c(clust_num, collapse = ", ")})')
         
         return(title_text)
       })
@@ -516,7 +503,16 @@ clusterEnrichmentPlot <- function(id) {
     fluidRow(h4(textOutput(ns("cluster_enrichment_plot_text")))),
     fluidRow(plotOutput(outputId = ns("cluster_enrichment_plot"))),
     tags$br(),
-    fluidRow(ddh::make_legend("make_cluster_enrichment"))
+    fluidRow(
+      ddh::make_legend("make_cluster_enrichment"),
+      actionLink(inputId = ns("cluster_enrichment_click"), 
+                          " View cluster enrichment table")
+      ),
+      conditionalPanel(condition = paste0("input['", ns("cluster_enrichment_click"), "'] != 0"),
+                       tags$br(), 
+                       fluidRow(h4(textOutput(ns("cluster_enrichment_table_text")))),
+                       DT::dataTableOutput(outputId = ns("cluster_enrichment_table"))
+             )
   )
 }
 
@@ -537,6 +533,26 @@ clusterEnrichmentPlotServer <- function (id, data) {
           shiny::need(nrow(cluster_enrichment_table) > 0, 
                       "No enriched pathways for this gene/s cluster"))
         make_cluster_enrichment(input = data())
+      })
+      
+      ## TABLE
+      output$cluster_enrichment_table_text <- renderText({paste0("Enriched pathways for ", 
+                                                                 ifelse(data()$subtype == "pathway",
+                                                                        "pathway gene signatures",
+                                                                        str_c(data()$content, collapse = ", ")
+                                                                 )
+      )
+      })
+      output$cluster_enrichment_table <- DT::renderDataTable({
+        cluster_enrichment_table <- ddh::make_cluster_enrichment_table(input = data())
+        shiny::validate(
+          shiny::need(nrow(cluster_enrichment_table) > 0, 
+                      "No enriched pathways for this gene/s cluster"))
+        
+        DT::datatable(cluster_enrichment_table,
+                      rownames = FALSE,
+                      escape = FALSE,
+                      options = list(pageLength = 10))
       })
     }
 )}

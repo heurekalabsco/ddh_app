@@ -35,7 +35,7 @@ pathwayListServer <- function(id, data) {
                                        searching = FALSE))
         } else {
           DT::datatable(make_pathway_table(input = data()) %>% 
-                        dplyr::mutate(Gene = map_chr(Gene, internal_link)),
+                          dplyr::mutate(Gene = map_chr(Gene, internal_link)),
                         rownames = FALSE,
                         escape = FALSE,
                         options = list(paging = FALSE, 
@@ -90,12 +90,6 @@ proteinClusterTable <- function(id) {
   ns <- NS(id)
   tagList(
     fluidRow(h4(textOutput(ns("text_cluster_table")))),
-    # checkboxInput(inputId = ns("show_all_clusters_tab"),
-    #               "Show all proteins in the cluster",
-    #               value = FALSE),
-    # checkboxInput(inputId = ns("show_signatures"),
-    #               "Show amino acid frequencies",
-    #               value = FALSE),
     DT::dataTableOutput(outputId = ns("prot_clust_table"))
   )
 }
@@ -113,53 +107,21 @@ proteinClusterTableServer <- function(id, data) {
       })
       output$prot_clust_table <- DT::renderDataTable({
         shiny::validate(
-          shiny::need(c("gene_signature_clusters") %in% data()$validate, "No cluster data for this protein"))
+          shiny::need(c("gene_signature_clusters") %in% data()$validate, 
+                      "No cluster data for this protein"))
         withProgress(message = 'Building a smart clustering table...', {
           DT::datatable(make_signature_clusters_table(input = data()) %>%
-                          dplyr::filter(Gene %in% data()$content) %>% 
+                          dplyr::slice(1:10) %>% # for testing 
                           dplyr::mutate(Gene = map_chr(Gene, internal_link)),
                         rownames = FALSE,
                         escape = FALSE,
+                        filter = "none",
                         options = list(pageLength = 10))
         })
       })
     }
   )
 }
-
-## Cluster Enrichment ---------------------
-proteinClusterEnrichmentTable <- function(id) {
-  ns <- NS(id)
-  tagList(
-    fluidRow(h4(textOutput(ns("cluster_enrichment_table_text")))),
-    DT::dataTableOutput(outputId = ns("cluster_enrichment_table"))
-  )
-}
-
-proteinClusterEnrichmentTableServer <- function(id, data) {
-  moduleServer(
-    id,
-    function(input, output, session) {
-      output$cluster_enrichment_table_text <- renderText({paste0("Enriched pathways for ", 
-                                                                 ifelse(data()$subtype == "pathway",
-                                                                        "pathway gene signatures",
-                                                                        str_c(data()$content, collapse = ", ")
-                                                                 )
-      )
-      })
-      output$cluster_enrichment_table <- DT::renderDataTable({
-        cluster_enrichment_table <- ddh::make_cluster_enrichment_table(input = data())
-        shiny::validate(
-          shiny::need(nrow(cluster_enrichment_table) > 0, 
-                      "No enriched pathways for this gene/s cluster"))
-        
-        DT::datatable(cluster_enrichment_table,
-                      rownames = FALSE,
-                      escape = FALSE,
-                      options = list(pageLength = 10))
-      })
-    }
-)}
 
 ##Pubmed----
 # module that displays a table for pubmed
