@@ -519,13 +519,13 @@ clusterEnrichmentPlotServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$cluster_enrichment_plot_text <- renderText({paste0("Enriched pathways for ", 
-                                                                ifelse(data()$subtype == "pathway",
-                                                                       "pathway gene signatures",
-                                                                       str_c(data()$content, collapse = ", ")
-                                                                       )
-                                                                )
+      output$cluster_enrichment_plot_text <- renderText({
+        
+        clust_num <- ddh::get_cluster(input = data())
+        
+        paste0("Enriched pathways for cluster ", stringr::str_c(clust_num, collapse = ", "))
       })
+      
       output$cluster_enrichment_plot <- renderPlot({
         cluster_enrichment_table <- ddh::make_cluster_enrichment_table(input = data())
         shiny::validate(
@@ -535,20 +535,20 @@ clusterEnrichmentPlotServer <- function (id, data) {
       })
       
       ## TABLE
-      output$cluster_enrichment_table_text <- renderText({paste0("Enriched pathways for ", 
-                                                                 ifelse(data()$subtype == "pathway",
-                                                                        "pathway gene signatures",
-                                                                        str_c(data()$content, collapse = ", ")
-                                                                 )
-      )
+      output$cluster_enrichment_table_text <- renderText({
+        clust_num <- ddh::get_cluster(input = data())
+        
+        paste0("Enriched pathways for cluster ", stringr::str_c(clust_num, collapse = ", "))
       })
+      
       output$cluster_enrichment_table <- DT::renderDataTable({
         cluster_enrichment_table <- ddh::make_cluster_enrichment_table(input = data())
         shiny::validate(
           shiny::need(nrow(cluster_enrichment_table) > 0, 
                       "No enriched pathways for this gene/s cluster"))
         
-        DT::datatable(cluster_enrichment_table,
+        DT::datatable(cluster_enrichment_table %>% 
+                        dplyr::mutate(Genes = map_chr(Genes, internal_link)),
                       rownames = FALSE,
                       escape = FALSE,
                       options = list(pageLength = 10))

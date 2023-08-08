@@ -98,14 +98,23 @@ proteinClusterTableServer <- function(id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$text_cluster_table <- renderText({paste0("Protein members of selected clusters")})
+      output$text_cluster_table <- renderText({
+        cluster_table <- make_signature_clusters_table(input = data())
+        
+        prot_members <- table(cluster_table$Cluster)[table(cluster_table$Cluster) != 0]
+        
+        paste0("Protein members - ", paste0("Cluster ", names(prot_members),
+                                            " (", prot_members, " proteins)", 
+                                            collapse = ", "))
+      })
+      
       output$prot_clust_table <- DT::renderDataTable({
         shiny::validate(
           shiny::need(c("gene_signature_clusters") %in% data()$validate, 
                       "No cluster data for this protein"))
         withProgress(message = 'Building a smart clustering table...', {
           DT::datatable(make_signature_clusters_table(input = data()) %>%
-                          dplyr::slice(1:100) %>% # for testing 
+                          # dplyr::slice(1:100) %>% # for testing 
                           dplyr::mutate(Gene = map_chr(Gene, internal_link)),
                         rownames = FALSE,
                         escape = FALSE,
