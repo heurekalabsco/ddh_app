@@ -114,12 +114,12 @@ proteinClusterTableServer <- function(id, data) {
                       "No cluster data for this protein"))
         withProgress(message = 'Building a smart clustering table...', {
           DT::datatable(make_signature_clusters_table(input = data()) %>%
-                          # dplyr::slice(1:100) %>% # for testing 
                           dplyr::mutate(Gene = map_chr(Gene, internal_link)),
                         rownames = FALSE,
                         escape = FALSE,
                         filter = "none",
-                        options = list(dom = 't', pageLength = 12, scrollY = "500px")
+                        options = list(dom = "ft",
+                                       pageLength = 6)
                         )
         })
       })

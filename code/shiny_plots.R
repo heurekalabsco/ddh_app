@@ -548,7 +548,12 @@ clusterEnrichmentPlotServer <- function (id, data) {
                       "No enriched pathways for this gene/s cluster"))
         
         DT::datatable(cluster_enrichment_table %>% 
-                        dplyr::mutate(Genes = map_chr(Genes, internal_link)),
+                        tidyr::separate_longer_delim(cols = Genes, delim = ", ") %>% 
+                        dplyr::mutate(Genes = map_chr(Genes, internal_link)) %>%
+                        dplyr::group_by(Cluster, Pathway) %>% 
+                        dplyr::mutate(Genes = paste0(Genes, collapse = ", ")) %>% 
+                        dplyr::slice(1) %>% 
+                        dplyr::ungroup(),
                       rownames = FALSE,
                       escape = FALSE,
                       options = list(pageLength = 10))
