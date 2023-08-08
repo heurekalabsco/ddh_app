@@ -118,8 +118,8 @@ proteinClusterTableServer <- function(id, data) {
                         rownames = FALSE,
                         escape = FALSE,
                         filter = "none",
-                        options = list(dom = "ft",
-                                       pageLength = 6)
+                        options = list(pageLength = 8, 
+                                       lengthChange = FALSE)
                         )
         })
       })
