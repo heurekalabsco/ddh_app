@@ -1,31 +1,31 @@
 #LOAD LIBRARIES-----
-source(here::here("code", "install_libraries.R"))
+source(here::here("code", "app", "install_libraries.R"))
 
 #DDH PARAMS-----
-source(here::here("code", "app_params.R"), local = TRUE)
+source(here::here("code", "app", "app_params.R"), local = TRUE)
 
 #ESTABLISH PRIVATE-----
-source(here::here("code", "private.R"))
+source(here::here("code", "app", "private.R"))
 
 #DOWNLOAD/LOAD DATA-----
 # Need to set the cache before loading any data
 # content_cache <- cachem::cache_mem()
-source(here::here("code", "data.R"))
+source(here::here("code", "app", "data.R"))
 
 #FUNCTIONS-----
 # ddh::load_ddh_colors() # No need anymore
-source(here::here("code", "fun_search.R"), local = TRUE)
+source(here::here("code", "app", "fun_search.R"), local = TRUE)
 
 #SHINY FUNCTIONS-----
-source(here::here("code", "shiny_helper.R"), local = TRUE)
-source(here::here("code", "shiny_tables.R"), local = TRUE)
-source(here::here("code", "shiny_plots.R"), local = TRUE)
-source(here::here("code", "shiny_graphs.R"), local = TRUE)
-source(here::here("code", "shiny_reports.R"), local = TRUE)
-source(here::here("code", "shiny_text.R"), local = TRUE)
-source(here::here("code", "shiny_cards.R"), local = TRUE)
-source(here::here("code", "shiny_download.R"), local = TRUE)
-source(here::here("code", "shiny_search.R"), local = TRUE)
+source(here::here("code", "app", "shiny_helper.R"), local = TRUE)
+source(here::here("code", "app", "shiny_tables.R"), local = TRUE)
+source(here::here("code", "app", "shiny_plots.R"), local = TRUE)
+source(here::here("code", "app", "shiny_graphs.R"), local = TRUE)
+source(here::here("code", "app", "shiny_reports.R"), local = TRUE)
+source(here::here("code", "app", "shiny_text.R"), local = TRUE)
+source(here::here("code", "app", "shiny_cards.R"), local = TRUE)
+source(here::here("code", "app", "shiny_download.R"), local = TRUE)
+source(here::here("code", "app", "shiny_search.R"), local = TRUE)
 
 # HEAD----
 if(privateMode == TRUE) {
@@ -104,7 +104,7 @@ querySearchInput <- function(id) {
   ns <- NS(id)
   searchInput(
     inputId = ns("gene_or_pathway"),
-    placeholder = dplyr::if_else(privateMode == TRUE, private_serachbox, "genes, pathways, or a custom list"), #"genes, cells, or compounds"
+    placeholder = dplyr::if_else(privateMode == TRUE, private_searchbox, "genes, pathways, or a custom list"), #"genes, cells, or compounds"
     btnSearch = icon("search")
   )
 }
@@ -141,7 +141,7 @@ exampleSearchesLinkServer <- function(id) {
 
 exampleSearchesPanel <- function(id) {
   ns <- NS(id)
-  source(here::here("code", "examples.R")) #pull out so methods can use it
+  source(here::here("code", "app", "examples.R")) #pull out so methods can use it
   notZeroConditionalPanel(ns("example_click"), #toggle?
                           tagList(
                             tags$br(),
@@ -283,10 +283,10 @@ searchPageServer <- function(id) {
 }
 
 # PAGE MODULES-----
-source(here::here("code", "page_gene.R"), local = TRUE) ### GENE PAGE ----
-source(here::here("code", "page_cell.R"), local = TRUE) ### CELL PAGE ----
-source(here::here("code", "page_compound.R"), local = TRUE) ### COMPOUND PAGE ----
-source(here::here("code", "waiting_quotes.R"), local = TRUE) ### WAITING QUOTES ----
+source(here::here("code", "app", "page_gene.R"), local = TRUE) ### GENE PAGE ----
+source(here::here("code", "app", "page_cell.R"), local = TRUE) ### CELL PAGE ----
+source(here::here("code", "app", "page_compound.R"), local = TRUE) ### COMPOUND PAGE ----
+source(here::here("code", "app", "waiting_quotes.R"), local = TRUE) ### WAITING QUOTES ----
 
 # Create output for our router in main UI of Shiny app.
 ui <- shinyUI(
