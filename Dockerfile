@@ -14,15 +14,17 @@ RUN mkdir /usr/share/fonts/googlefonts \
 RUN R -e 'devtools::install_github("matthewhirschey/ddh")'
 
 WORKDIR /srv
-COPY ./shiny-server.conf /etc/shiny-server/shiny-server.conf
 COPY .here /srv/.here
 COPY code /srv/code
 
 RUN mkdir -p /srv/tests/data
-RUN R -e 'source(here::here("code", "setup.R"))'
+RUN R -e 'source(here::here("code/app", "setup.R"))'
 
 COPY shiny-server.sh /usr/bin/shiny-server.sh
 RUN chmod a+x /usr/bin/shiny-server.sh
+
+COPY ./shiny-server-org.conf /etc/shiny-server/shiny-server-org.conf
+COPY ./shiny-server-com.conf /etc/shiny-server/shiny-server-com.conf
 
 CMD /usr/bin/shiny-server.sh
 
