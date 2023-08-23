@@ -14,7 +14,7 @@ notZeroConditionalPanel <- function(fieldname, ...) {
 #     status = "primary")
 # }
 
-# SPINNERS ----------
+# HELPERS ----------
 withSpinnerColor <- function(ui_element, plot_type, ...) { #plot type = "gene", "cell", "protein", "compound"
   withSpinner(ui_element,
               type = 3, 
@@ -54,6 +54,22 @@ make_validate <- function(object_names = NULL){
     dplyr::distinct(data_set) %>%
     dplyr::pull(data_set)
   return(validate_datasets)
+}
+
+make_tooltip <- function(tip){
+  # Test function to check whether tip is a character
+  test_tooltip_content_type <- function(tip) {
+    testthat::expect_true(is.character(tip), 
+                info = "Tooltip should be a character.")
+  }
+  test_tooltip_content_type(tip)
+  
+  tooltip <- 
+    shiny::icon("info-circle", lib = "font-awesome") %>% 
+    shinyBS::tipify(title = tip, 
+                    placement = "bottom", 
+                    trigger = "hover")
+  return(tooltip)
 }
 
 # PATHWAYS ----------

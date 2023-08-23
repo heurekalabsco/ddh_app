@@ -1,4 +1,4 @@
-source(here::here("code", "app_params.R"), local = TRUE)
+source(here::here("code", "app", "app_params.R"), local = TRUE)
 
 #need to dynamically switch depending on privateMode
 tld <- dplyr::if_else(privateMode == TRUE, "com", "org")
