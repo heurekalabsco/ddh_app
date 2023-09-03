@@ -11,6 +11,7 @@ search_index <- ddh::get_content("search_index", dataset = TRUE)
 #needed for search table; could replace with search_details
 compound_hmdb_names <- ddh::get_content("compound_hmdb_names", dataset = TRUE)
 compound_prism_names <- ddh::get_content("compound_prism_names", dataset = TRUE)
+cell_expression_names <- ddh::get_content("cell_expression_names", dataset = TRUE)
 
 ##methods----
 #download the zip file from S3
