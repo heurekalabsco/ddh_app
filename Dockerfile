@@ -11,7 +11,7 @@ RUN mkdir /usr/share/fonts/googlefonts \
     && unzip -o -d /usr/share/fonts/googlefonts /tmp/NunitoSans.zip \
     && fc-cache -fv
 
-RUN R -e 'devtools::install_github("matthewhirschey/ddh")'
+RUN R -e 'devtools::install_github("heurekalabsorg/ddh")'
 
 WORKDIR /srv
 COPY .here /srv/.here
