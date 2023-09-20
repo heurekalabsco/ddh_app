@@ -2,7 +2,7 @@
 
 
 CONFIG=/etc/shiny-server/shiny-server-org.conf
-if [ "$DDH_PRIVATE" == "Y" ]
+if [ "$DDH_PRIVATE" == "T" ]
 then
    CONFIG=/etc/shiny-server/shiny-server-com.conf
 fi
