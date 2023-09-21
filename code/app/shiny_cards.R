@@ -81,25 +81,42 @@ ideogramPlotDashServer <- function (id, data) {
 }
 
 ##Structure plots-----
-structureDash <- function(id) {
+sequenceDash <- function(id) {
   ns <- NS(id)
   divFlexAlignCenter(
     "Protein",
-    uiOutput(outputId = ns("structure_card"))
+    uiOutput(outputId = ns("sequence_plot_tab"))
   )
 }
 
-structureDashServer <- function (id, data) {
+sequenceDashServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$structure_card <- renderUI({
-        div(
-          tags$img(src = make_structure(input = data(), card = TRUE), 
-                   width = card_contents_width,
-                   height = card_contents_width, #force to square
-                   alt = glue::glue('Protein structure rendering in the style of a black and white line drawing'))
-        )
+      output$sequence_plot_tab <- renderUI({
+        #check to see if data are there
+        shiny::validate(
+          shiny::need(c("universal_proteins") %in% data()$validate, 
+                      "No sequence data for this protein"))
+        #check to see if image exists
+        img_path <- ddh::load_image(input = data(), fun_name = "make_sequence", card = TRUE)
+        if(!is.null(img_path)) {
+          uiOutput(outputId = session$ns("sequence_plot_tab_image"))
+        } else {
+          plotOutput(outputId = session$ns("sequence_plot_tab_render"), 
+                     height = card_contents_height,
+                     width = card_contents_width) %>%
+            withSpinnerColor(plot_type = "protein")
+        }
+      })
+      output$sequence_plot_tab_image <- renderUI({
+        tags$img(src = ddh::load_image(input = data(), fun_name = "make_sequence", card = TRUE),
+                 width = card_contents_width,
+                 height = card_contents_height)
+      })
+      output$sequence_plot_tab_render <- renderPlot({
+        make_sequence(input = data(),
+                      card = TRUE)
       })
     })
 }

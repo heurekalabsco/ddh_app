@@ -119,6 +119,10 @@ proteinStructurePlotServer <- function (id, data) {
       )
       })
       output$protein_structure <- renderUI({
+        #check to see if single gene query
+        shiny::validate(
+          shiny::need(length(data()$content) == 1, "Only single gene queries show a protein structure."))
+        
         div(
           tags$img(src = make_structure(input = data(), card = FALSE), 
                    width = "100%",
