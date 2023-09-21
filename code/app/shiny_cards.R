@@ -346,7 +346,7 @@ cellDependenciesTableDashServer <- function (id, data) {
     function(input, output, session) {
       output$deptabledash <- render_gt({
         shiny::validate(
-          shiny::need(c("universal_achilles_long") %in% data()$validate, 
+          shiny::need(c("gene_master_top_table") %in% data()$validate, 
                       "No dependency data for this query"))
         gt::gt(make_top_table(input = data()) %>% 
                  dplyr::mutate("Rank" = row_number()) %>% 
@@ -387,33 +387,6 @@ geneMolecularFeaturesTableDashServer <- function (id, data) {
       )
     }
   )
-}
-
-##cell dependencies graph-----
-cellDependenciesGraphTab <- function(id) {
-  ns <- NS(id)
-  divFlexAlignCenter(
-    "Co-essentiality Graph",
-    visNetworkOutput(outputId = ns("depgraphtab"))
-  )
-}
-
-cellDependenciesGraphTabServer <- function (id, data) {
-  moduleServer(
-    id,
-    function(input, output, session) {
-      output$depgraphtab <- renderVisNetwork({
-        #check to see if data are there
-        shiny::validate(
-          shiny::need(c("universal_achilles_long") %in% data()$validate, 
-                      "No dependency data for this query"))
-        make_graph(input = data(), 
-                   threshold = 10, 
-                   deg = 2, 
-                   corr_type = "positive", 
-                   card = TRUE)
-      })
-    })
 }
 
 ##cell functional plot-----
@@ -1601,7 +1574,7 @@ genePathwayEnrichmentTableTabServer <- function (id, data) {
     function(input, output, session) {
       output$depgenepathwaystab <- render_gt({
         shiny::validate(
-          shiny::need(c("universal_achilles_long") %in% data()$validate, 
+          shiny::need(c("gene_master_top_table") %in% data()$validate, 
                       "No dependency data for this query"))
         gt::gt(ddh::make_gene_dependency_enrichment_table(input = data()) %>%
                  dplyr::mutate("Rank" = row_number()) %>% 
@@ -1613,6 +1586,33 @@ genePathwayEnrichmentTableTabServer <- function (id, data) {
       )
     }
   )
+}
+
+##cell dependencies graph-----
+cellDependenciesGraphTab <- function(id) {
+  ns <- NS(id)
+  divFlexAlignCenter(
+    "Co-essentiality Graph",
+    visNetworkOutput(outputId = ns("depgraphtab"))
+  )
+}
+
+cellDependenciesGraphTabServer <- function (id, data) {
+  moduleServer(
+    id,
+    function(input, output, session) {
+      output$depgraphtab <- renderVisNetwork({
+        #check to see if data are there
+        shiny::validate(
+          shiny::need(c("gene_master_top_table") %in% data()$validate, 
+                      "No dependency data for this query"))
+        make_graph(input = data(), 
+                   threshold = 10, 
+                   deg = 2, 
+                   corr_type = "positive", 
+                   card = TRUE)
+      })
+    })
 }
 
 geneCCATableTab <- function(id) {
