@@ -1629,8 +1629,7 @@ geneCCATableTabServer <- function (id, data) {
     function(input, output, session) {
       output$cca_genes_tab <- render_gt({
         shiny::validate(
-          shiny::need(c("universal_achilles_long") %in% data()$validate, 
-                      "No dependency data for this query"))
+          shiny::need(c("gene_cca_pathway") %in% data()$validate, "No co-essential pathway data available."))
         
         if (data()$subtype != "pathway") {
           gt::gt(ddh::make_cca_genes_table(input = data()) %>%
