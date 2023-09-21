@@ -43,7 +43,6 @@ variables:
    AWS_SQS_BUCKET_ID: ddh-sqs-logs
    AWS_REPORT_BUCKET_ID: ddh-reports
    AWS_DATA_BUCKET_ID: ddh-data
-   AWS_DATA_PRIVATE_BUCKET_ID: ddh-data-private
    AWS_DATA_BUCKET_ID_TEST: ddh-data-test
    AWS_BARCODE_BUCKET_ID: ddh-barcodes
    AWS_IMAGES_BUCKET_ID: ddh-image
