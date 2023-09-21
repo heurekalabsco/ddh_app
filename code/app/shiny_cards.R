@@ -80,7 +80,7 @@ ideogramPlotDashServer <- function (id, data) {
     })
 }
 
-##Structure plots-----
+##Sequence plots-----
 sequenceDash <- function(id) {
   ns <- NS(id)
   divFlexAlignCenter(
@@ -817,6 +817,10 @@ barcodeTabServer <- function (id, data) {
     id,
     function(input, output, session) {
       output$barcode_tab <- renderUI({
+        #check to see if single gene query
+        shiny::validate(
+          shiny::need(length(data()$content) == 1, "Only single gene queries show a barcode."))
+        
         div(
           tags$a(
             tags$img(src = make_barcode(input = data(), card = TRUE), 

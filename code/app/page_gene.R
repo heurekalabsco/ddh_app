@@ -708,7 +708,7 @@ genePageServer <- function(id, subtype) {
       
       #barcode plot
       #no observe event, because it's just a linkout
-      barcodeTabServer("barcodetab", data)
+      barcodeTabServer("barcode_tabcard", data)
       
       # CONDITIONAL GO PATHWAY
       observeEvent(input$go_click, { #store click
