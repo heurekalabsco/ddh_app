@@ -30,7 +30,7 @@ source(here::here("code", "app", "shiny_search.R"), local = TRUE)
 # HEAD----
 if(privateMode == TRUE) {
   head_tags <- tags$head(includeCSS("styles.css"),
-                         tags$script(src="outseta.js"),
+                         includeHTML(path="outseta.js"),
                          tags$script(src="gtag_com.js"))
 } else {
   head_tags <- tags$head(includeCSS("styles.css"),
