@@ -10,11 +10,11 @@
 
 <!-- Chat Embed -->
 <script>
-  var o_options = {
+  var o_options_chat = {
     domain: 'ddh.outseta.com',
     load: 'chat'
   };
 </script>
 <script src="https://cdn.outseta.com/outseta.min.js"
-        data-options="o_options">
+        data-options="o_options_chat">
 </script>
