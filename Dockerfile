@@ -15,10 +15,12 @@ RUN R -e 'devtools::install_github("matthewhirschey/ddh")'
 
 WORKDIR /srv
 COPY .here /srv/.here
-COPY code/app/*.R /srv/code/app/
+COPY code/app/install_libraries.R /srv/code/app/
 
 RUN mkdir -p /srv/tests/data
-RUN R -e 'source(here::here("code/app", "setup.R"))'
+RUN R -e 'source(here::here("code/app", "install_libraries.R"))'
+
+COPY code/app/*.R /srv/code/app/
 
 COPY shiny-server.sh /usr/bin/shiny-server.sh
 RUN chmod a+x /usr/bin/shiny-server.sh
