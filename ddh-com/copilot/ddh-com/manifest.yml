@@ -55,7 +55,7 @@ secrets:
 environments:
   prod:
      variables:
-       DDH_PRIVATE: T
+       DDH_PRIVATE: Y
      http:
        alias: ["datadrivenhypothesis.com", "www.datadrivenhypothesis.com"]
 
