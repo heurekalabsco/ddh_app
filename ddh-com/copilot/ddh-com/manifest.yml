@@ -1,9 +1,9 @@
-# The manifest for the "ddh-app" service.
+# The manifest for the "ddh-com" service.
 # Read the full specification for the "Load Balanced Web Service" type at:
 #  https://aws.github.io/copilot-cli/docs/manifest/lb-web-service/
 
 # Your service name will be used in naming your resources like log groups, ECS services, etc.
-name: ddh-app
+name: ddh-com
 type: Load Balanced Web Service
 
 # Distribute traffic to your service.
@@ -14,7 +14,7 @@ http:
   # You can specify a custom health check path. The default is "/".
   # healthcheck: '/'
   healthcheck:
-    path: '/ddh_logo.png'
+    path: '/'
     success_codes: '200'
     healthy_threshold: 3
     unhealthy_threshold: 10
@@ -24,7 +24,7 @@ http:
 # Configuration for your containers and service.
 image:
   # Docker build arguments. For additional overrides: https://aws.github.io/copilot-cli/docs/manifest/lb-web-service/#image-build
-  build: Dockerfile
+  build: ../Dockerfile
   # Port exposed through your container to route traffic to it.
   port: 3838
 
@@ -43,7 +43,6 @@ variables:
    AWS_SQS_BUCKET_ID: ddh-sqs-logs
    AWS_REPORT_BUCKET_ID: ddh-reports
    AWS_DATA_BUCKET_ID: ddh-data
-   AWS_DATA_PRIVATE_BUCKET_ID: ddh-data-private
    AWS_DATA_BUCKET_ID_TEST: ddh-data-test
    AWS_BARCODE_BUCKET_ID: ddh-barcodes
    AWS_IMAGES_BUCKET_ID: ddh-image
@@ -53,17 +52,12 @@ secrets:
     AWS_ACCESS_KEY_ID: /copilot/${COPILOT_APPLICATION_NAME}/${COPILOT_ENVIRONMENT_NAME}/secrets/AWS_ACCESS_KEY_ID
     AWS_SECRET_ACCESS_KEY: /copilot/${COPILOT_APPLICATION_NAME}/${COPILOT_ENVIRONMENT_NAME}/secrets/AWS_SECRET_ACCESS_KEY
 
-# You can override any of the values defined above by environment.
-#environments:
-#  test:
-#    count: 2               # Number of tasks to run for the "test" environment.
-#    deployment:            # The deployment strategy for the "test" environment.
-#       rolling: 'recreate' # Stops existing tasks before new ones are started for faster deployments.
-
 environments:
-  test:
+  prod:
+     variables:
+       DDH_PRIVATE: T
      http:
-       alias: www.datadrivenhypothesis.org
+       alias: ["datadrivenhypothesis.com", "www.datadrivenhypothesis.com"]
 
 storage:
   volumes:
