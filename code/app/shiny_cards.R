@@ -106,7 +106,7 @@ sequenceDashServer <- function (id, data) {
           plotOutput(outputId = session$ns("sequence_plot_tab_render"), 
                      height = card_contents_height,
                      width = card_contents_width) %>%
-            withSpinnerColor(plot_type = "protein")
+            withSpinnerColor(plot_type = "gene")
         }
       })
       output$sequence_plot_tab_image <- renderUI({
