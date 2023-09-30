@@ -32,7 +32,7 @@ genePage <- function (id, subtype) {
                title_var,
                cardLayout(
                  actionLink(inputId = ns("link_to_ideogramPlotDash"), ideogramPlotDash(ns("ideogramdash"))),
-                 actionLink(inputId = ns("link_to_structurePlotDash"), structureDash(ns("structuredash"))),
+                 actionLink(inputId = ns("link_to_sequencePlotDash"), sequenceDash(ns("sequencedash"))),
                  actionLink(inputId = ns("link_to_pubmedGenePlotDash"), pubmedPlotDash(ns("pubmedgenedash"))),
                  actionLink(inputId = ns("link_to_cellAnatogramPlotDash"), cellAnatogramPlotDash(ns("cellanatogramdash"))),
                  actionLink(inputId = ns("link_to_cellExpressionPlotDash"), cellExpressionPlotDash(ns("cellexpressiondash"))),
@@ -645,11 +645,11 @@ genePageServer <- function(id, subtype) {
       })
       ideogramPlotDashServer("ideogramdash", data)
       
-      #structure plot
-      observeEvent(input$link_to_structurePlotDash, {
+      #sequence plot
+      observeEvent(input$link_to_sequencePlotDash, {
         updateNavbarPage(session, inputId = "geneNavBar", selected = "about_protein")
       })
-      structureDashServer("structuredash", data)
+      sequenceDashServer("sequencedash", data)
       
       #pubmed gene plot
       observeEvent(input$link_to_pubmedGenePlotDash, {
@@ -708,7 +708,7 @@ genePageServer <- function(id, subtype) {
       
       #barcode plot
       #no observe event, because it's just a linkout
-      barcodeTabServer("barcodetab", data)
+      barcodeTabServer("barcode_tabcard", data)
       
       # CONDITIONAL GO PATHWAY
       observeEvent(input$go_click, { #store click

@@ -80,26 +80,43 @@ ideogramPlotDashServer <- function (id, data) {
     })
 }
 
-##Structure plots-----
-structureDash <- function(id) {
+##Sequence plots-----
+sequenceDash <- function(id) {
   ns <- NS(id)
   divFlexAlignCenter(
     "Protein",
-    uiOutput(outputId = ns("structure_card"))
+    uiOutput(outputId = ns("sequence_plot_tab"))
   )
 }
 
-structureDashServer <- function (id, data) {
+sequenceDashServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$structure_card <- renderUI({
-        div(
-          tags$img(src = make_structure(input = data(), card = TRUE), 
-                   width = card_contents_width,
-                   height = card_contents_width, #force to square
-                   alt = glue::glue('Protein structure rendering in the style of a black and white line drawing'))
-        )
+      output$sequence_plot_tab <- renderUI({
+        #check to see if data are there
+        shiny::validate(
+          shiny::need(c("universal_proteins") %in% data()$validate, 
+                      "No sequence data for this protein"))
+        #check to see if image exists
+        img_path <- ddh::load_image(input = data(), fun_name = "make_sequence", card = TRUE)
+        if(!is.null(img_path)) {
+          uiOutput(outputId = session$ns("sequence_plot_tab_image"))
+        } else {
+          plotOutput(outputId = session$ns("sequence_plot_tab_render"), 
+                     height = card_contents_height,
+                     width = card_contents_width) %>%
+            withSpinnerColor(plot_type = "gene")
+        }
+      })
+      output$sequence_plot_tab_image <- renderUI({
+        tags$img(src = ddh::load_image(input = data(), fun_name = "make_sequence", card = TRUE),
+                 width = card_contents_width,
+                 height = card_contents_height)
+      })
+      output$sequence_plot_tab_render <- renderPlot({
+        make_sequence(input = data(),
+                      card = TRUE)
       })
     })
 }
@@ -329,7 +346,7 @@ cellDependenciesTableDashServer <- function (id, data) {
     function(input, output, session) {
       output$deptabledash <- render_gt({
         shiny::validate(
-          shiny::need(c("universal_achilles_long") %in% data()$validate, 
+          shiny::need(c("gene_master_top_table") %in% data()$validate, 
                       "No dependency data for this query"))
         gt::gt(make_top_table(input = data()) %>% 
                  dplyr::mutate("Rank" = row_number()) %>% 
@@ -370,33 +387,6 @@ geneMolecularFeaturesTableDashServer <- function (id, data) {
       )
     }
   )
-}
-
-##cell dependencies graph-----
-cellDependenciesGraphTab <- function(id) {
-  ns <- NS(id)
-  divFlexAlignCenter(
-    "Co-essentiality Graph",
-    visNetworkOutput(outputId = ns("depgraphtab"))
-  )
-}
-
-cellDependenciesGraphTabServer <- function (id, data) {
-  moduleServer(
-    id,
-    function(input, output, session) {
-      output$depgraphtab <- renderVisNetwork({
-        #check to see if data are there
-        shiny::validate(
-          shiny::need(c("universal_achilles_long") %in% data()$validate, 
-                      "No dependency data for this query"))
-        make_graph(input = data(), 
-                   threshold = 10, 
-                   deg = 2, 
-                   corr_type = "positive", 
-                   card = TRUE)
-      })
-    })
 }
 
 ##cell functional plot-----
@@ -800,6 +790,10 @@ barcodeTabServer <- function (id, data) {
     id,
     function(input, output, session) {
       output$barcode_tab <- renderUI({
+        #check to see if single gene query
+        shiny::validate(
+          shiny::need(length(data()$content) == 1, "Only single gene queries show a barcode."))
+        
         div(
           tags$a(
             tags$img(src = make_barcode(input = data(), card = TRUE), 
@@ -1580,7 +1574,7 @@ genePathwayEnrichmentTableTabServer <- function (id, data) {
     function(input, output, session) {
       output$depgenepathwaystab <- render_gt({
         shiny::validate(
-          shiny::need(c("universal_achilles_long") %in% data()$validate, 
+          shiny::need(c("gene_master_top_table") %in% data()$validate, 
                       "No dependency data for this query"))
         gt::gt(ddh::make_gene_dependency_enrichment_table(input = data()) %>%
                  dplyr::mutate("Rank" = row_number()) %>% 
@@ -1592,6 +1586,33 @@ genePathwayEnrichmentTableTabServer <- function (id, data) {
       )
     }
   )
+}
+
+##cell dependencies graph-----
+cellDependenciesGraphTab <- function(id) {
+  ns <- NS(id)
+  divFlexAlignCenter(
+    "Co-essentiality Graph",
+    visNetworkOutput(outputId = ns("depgraphtab"))
+  )
+}
+
+cellDependenciesGraphTabServer <- function (id, data) {
+  moduleServer(
+    id,
+    function(input, output, session) {
+      output$depgraphtab <- renderVisNetwork({
+        #check to see if data are there
+        shiny::validate(
+          shiny::need(c("gene_master_top_table") %in% data()$validate, 
+                      "No dependency data for this query"))
+        make_graph(input = data(), 
+                   threshold = 10, 
+                   deg = 2, 
+                   corr_type = "positive", 
+                   card = TRUE)
+      })
+    })
 }
 
 geneCCATableTab <- function(id) {
@@ -1608,8 +1629,7 @@ geneCCATableTabServer <- function (id, data) {
     function(input, output, session) {
       output$cca_genes_tab <- render_gt({
         shiny::validate(
-          shiny::need(c("universal_achilles_long") %in% data()$validate, 
-                      "No dependency data for this query"))
+          shiny::need(c("gene_cca_pathway") %in% data()$validate, "No co-essential pathway data available."))
         
         if (data()$subtype != "pathway") {
           gt::gt(ddh::make_cca_genes_table(input = data()) %>%

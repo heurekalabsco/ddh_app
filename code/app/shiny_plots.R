@@ -119,6 +119,10 @@ proteinStructurePlotServer <- function (id, data) {
       )
       })
       output$protein_structure <- renderUI({
+        #check to see if single gene query
+        shiny::validate(
+          shiny::need(length(data()$content) == 1, "Only single gene queries show a protein structure."))
+        
         div(
           tags$img(src = make_structure(input = data(), card = FALSE), 
                    width = "100%",
@@ -195,7 +199,7 @@ proteinStructurePlot3dServer <- function (id, data) {
       })
       
       ## TABLE
-      output$title_structure3d_table <- renderText({paste0("PDB table of ",
+      output$title_structure3d_table <- renderText({paste0("PDB models of ",
                                                            str_c(input$gene3dstructure, collapse = ", "))})
       output$structure3d_table <- DT::renderDataTable({
         shiny::validate(
@@ -256,7 +260,7 @@ proteinStructurePlot3dServer <- function (id, data) {
                               chain = rv$chain)
       })
       
-      output$text_protein_structure3d <- renderText({paste0("Predicted 3D structure of ",
+      output$text_protein_structure3d <- renderText({paste0("Experimental structures of ",
                                                             str_c(input$gene3dstructure, collapse = ", "))})
       output$protein_structure3D <- r3dmol::renderR3dmol({
         shiny::validate(

@@ -1110,7 +1110,7 @@ geneCCATableServer <- function(id, data) {
       output$cca_table <- DT::renderDataTable({
         #check to see if data are there
         shiny::validate(
-          shiny::need(c("universal_achilles_long") %in% data()$validate, "No data found."))
+          shiny::need(c("gene_cca_pathway") %in% data()$validate, "No co-essential pathway data available."))
         #render table
         if (data()$subtype != "pathway") {
           DT::datatable(ddh::make_cca_genes_table(input = data()) %>%
