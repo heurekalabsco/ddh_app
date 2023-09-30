@@ -181,7 +181,7 @@ genePage <- function (id, subtype) {
                               id = ns("subcellular_tabcard"),
                               style = "padding-left:1%",
                               cellAnatogramPlot(ns("exp")),
-                              cellAnatogramFacetPlot(ns("exp")),
+                              # cellAnatogramFacetPlot(ns("exp")),
                               cellAnatogramTable(ns("exp")),
                               tags$br()
                             )
@@ -784,7 +784,7 @@ genePageServer <- function(id, subtype) {
       cellAnatogramPlotServer("exp", data)
       observeEvent(input$anato_facet_click, { #event to store the anatogram facet 'click'
       })
-      cellAnatogramFacetPlotServer("exp", data)
+      # cellAnatogramFacetPlotServer("exp", data)
       cellAnatogramTableServer("exp", data)
       
       # CELL LINE

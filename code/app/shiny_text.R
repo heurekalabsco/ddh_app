@@ -167,8 +167,14 @@ tissuePlotTextServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$tissueplot_text <- renderText({paste0("Human tissue expression for ", 
-                                                   str_c(data()$content, collapse = ", "))})
+      output$tissueplot_text <- renderText({
+        paste0("Human tissue expression of ", 
+               ifelse(data()$subtype == "pathway",
+                      "pathway genes",
+                      str_c(data()$content, collapse = ", ")
+                      )
+               )
+        })
     }
   )
 }

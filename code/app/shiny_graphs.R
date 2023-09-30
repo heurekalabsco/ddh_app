@@ -10,7 +10,13 @@ geneNetworkGraphServer <- function(id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$text_graph <- renderText({paste0("Co-essentiality graph for ", str_c(data()$content, collapse = ", "))})
+      output$text_graph <- renderText({paste0("Co-essentiality graph of ", 
+                                              ifelse(data()$subtype == "pathway",
+                                                     "pathway genes",
+                                                     str_c(data()$content, collapse = ", ")
+                                              )
+      )
+      })
       #establish reactive value
       rv <- reactiveValues(degree = 2, 
                            threshold = 10,
@@ -88,7 +94,13 @@ geneNetworkGraphExpServer <- function(id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$text_graph <- renderText({paste0("Co-expression network graph for ", str_c(data()$content, collapse = ", "))})
+      output$text_graph <- renderText({paste0("Co-expression network graph of ", 
+                                              ifelse(data()$subtype == "pathway",
+                                                     "pathway genes",
+                                                     str_c(data()$content, collapse = ", ")
+                                              )
+      )
+        })
       #establish reactive value
       rv <- reactiveValues(degree = 2, 
                            threshold = 10,
@@ -186,7 +198,13 @@ compoundNetworkGraphServer <- function(id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$text_compound_graph <- renderText({paste0("Network graph for ", str_c(data()$content, collapse = ", "))})
+      output$text_compound_graph <- renderText({paste0("Network graph of ", 
+                                                       ifelse(data()$subtype == "pathway",
+                                                              "pathway genes",
+                                                              str_c(data()$content, collapse = ", ")
+                                                       )
+      )
+        })
       #establish reactive value
       rv <- reactiveValues(degree = 2, 
                            threshold = 10,
@@ -258,7 +276,14 @@ geneBipartiteGraphServer <- function(id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$text_graph <- renderText({paste0("Bipartite network graph for ", str_c(data()$content, collapse = ", "))})
+      output$text_graph <- renderText({paste0("Bipartite network graph of ", 
+                                              ifelse(data()$subtype == "pathway",
+                                                     "pathway genes",
+                                                     str_c(data()$content, collapse = ", ")
+                      
+                                                                             )
+      )
+        })
       
       #event to store the censor 'click'
       observeEvent(input$censor_click, { 
@@ -309,7 +334,13 @@ compoundBipartiteGraphServer <- function(id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$text_graph <- renderText({paste0("Bipartite network graph for ", str_c(data()$content, collapse = ", "))})
+      output$text_graph <- renderText({paste0("Bipartite network graph of ", 
+                                              ifelse(data()$subtype == "pathway",
+                                                     "pathway genes",
+                                                     str_c(data()$content, collapse = ", ")
+                                              )
+      )
+        })
       
       bipartiteNetworkGraph <- reactive({
         make_bipartite_graph(input = data()) %>% 
