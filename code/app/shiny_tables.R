@@ -1102,7 +1102,7 @@ geneCCATableServer <- function(id, data) {
     function(input, output, session) {
       output$cca_table_text <- renderText({paste0("Co-essential pathways for ", 
                                                   ifelse(data()$subtype == "pathway",
-                                                         "pathway genes",
+                                                         "the queried pathway",
                                                          str_c(data()$content, collapse = ", ")
                                                   )
       )
@@ -1133,7 +1133,7 @@ geneCCATableServer <- function(id, data) {
       # Conditional plot
       output$cca_plot_text <- renderText({paste0("Co-essential pathways for ", 
                                                  ifelse(data()$subtype == "pathway",
-                                                        "pathway genes",
+                                                        "the queried pathway",
                                                         str_c(data()$content, collapse = ", ")
                                                  )
       )
