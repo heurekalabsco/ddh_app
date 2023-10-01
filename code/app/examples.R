@@ -2,7 +2,7 @@ source(here::here("code", "app", "app_params.R"), local = TRUE)
 
 #need to dynamically switch depending on privateMode
 tld <- dplyr::if_else(privateMode == TRUE, "com", "org")
-url <- glue::glue('https://www.datadrivenhypothesis.{tld}/')
+url <- glue::glue('https://www.datadrivenhypothesis.{tld}/app/')
 
 #need full urls so works in methods, instead of reference url
 examples <- glue::glue('<h4>Search for genes</h4>

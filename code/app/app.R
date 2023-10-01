@@ -11,6 +11,7 @@ source(here::here("code", "app", "private.R"))
 # Need to set the cache before loading any data
 # content_cache <- cachem::cache_mem()
 source(here::here("code", "app", "data.R"))
+source(here::here("code", "app", "methods.R"))
 
 #FUNCTIONS-----
 # ddh::load_ddh_colors() # No need anymore
@@ -80,7 +81,7 @@ homePage <- function (id) {
     querySearchInput(ns("search")), 
     exampleSearchesLink(ns("examples")), 
     ", ", 
-    HTML("<a href='/methods/start-here.html'>read the manual</a>"),
+    HTML("<a href='/app/methods/start-here.html'>read the manual</a>"),
     ", or",
     getLuckyLink(ns("lucky")),
     HTML("</center>"),
