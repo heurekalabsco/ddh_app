@@ -10,8 +10,8 @@ phases:
       docker: 19
       ruby: 2.6
     commands:
-      - echo "cd into $CODEBUILD_SRC_DIR"
-      - cd $CODEBUILD_SRC_DIR
+      - echo "cd into $CODEBUILD_SRC_DIR/ddh-org"
+      - cd $CODEBUILD_SRC_DIR/ddh-org
       # Download the copilot linux binary.
       - wget -q https://ecs-cli-v2-release.s3.amazonaws.com/copilot-linux-v1.22.1
       - mv ./copilot-linux-v1.22.1 ./copilot-linux
@@ -25,7 +25,10 @@ phases:
     commands:
       - ls -l
       - export COLOR="false"
-      - pipeline=$(cat $CODEBUILD_SRC_DIR/copilot/pipelines/test/manifest.yml | ruby -ryaml -rjson -e 'puts JSON.pretty_generate(YAML.load(ARGF))')
+      - aws ecr get-login-password | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com
+      - docker pull ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/ddh-app-base:latest
+      - docker tag ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/ddh-app-base:latest ddh-app-base:latest      
+      - pipeline=$(cat $CODEBUILD_SRC_DIR/ddh-org/copilot/pipelines/test/manifest.yml | ruby -ryaml -rjson -e 'puts JSON.pretty_generate(YAML.load(ARGF))')
       - pl_envs=$(echo $pipeline | jq -r '.stages[].name')
       # Find all the local services in the workspace.
       - svc_ls_result=$(./copilot-linux svc ls --local --json)
@@ -73,4 +76,4 @@ phases:
       - ls -lah ./infrastructure
 artifacts:
   files:
-    - "infrastructure/*"
+    - "ddh-org/infrastructure/*"
