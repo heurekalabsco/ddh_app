@@ -7,7 +7,7 @@
 
 <body>
   <div align="center">
-    <img src="code/www/ddh_logo.png" alt="ddh_app Logo" width="500" height="200">
+    <img src="code/app/www/ddh_logo.png" alt="ddh_app Logo" width="500" height="200">
   </div>
 
   <p align="center">
