@@ -30,7 +30,7 @@ source(here::here("code", "app", "shiny_search.R"), local = TRUE)
 # HEAD----
 if(privateMode == TRUE) {
   head_tags <- tags$head(includeCSS("styles.css"),
-                         includeHTML(path="outseta.html"),
+                         includeHTML(path="www/outseta.html"),
                          tags$script(src="gtag_com.js"))
 } else {
   head_tags <- tags$head(includeCSS("styles.css"),
@@ -197,19 +197,14 @@ browsePathwaysPanelServer <- function(id) {
     function(input, output, session) {
       output$pathway_table <- DT::renderDataTable({
         DT::datatable(make_pathway_browse_table() %>% 
-                        #remove some columns for now, for simplicity
-                        dplyr::select(-tidyselect::any_of(c("gs_geoid", "gs_exact_source", "gs_url", "gs_pmid"))) %>% 
                         dplyr::arrange(gs_name) %>% 
-                        #dplyr::mutate(gs_pmid = purrr::map_chr(gs_pmid, pubmed_linkr, number_only = TRUE)) %>% #from shiny_helper.R
-                        dplyr::rename(Pathway = gs_name, 
+                        dplyr::select(`DDH ID` = gs_id,
+                                      Pathway = gs_name, 
                                       Description = gs_description, 
-                                      ID = gs_id, 
-                                      #PMID = gs_pmid, 
-                                      #GEO = gs_geoid, 
-                                      #Source = gs_exact_source, 
-                                      #URL = gs_url, 
-                                      `Pathway Size` = pathway_size), 
+                                      Size = pathway_size) %>% 
+                        dplyr::mutate(`DDH ID` = purrr::map_chr(`DDH ID`, internal_link_pathway)),
                       escape = FALSE,
+                      rownames = FALSE,
                       options = list(pageLength = 10))
       })      
     }

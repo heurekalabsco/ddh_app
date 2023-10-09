@@ -163,6 +163,22 @@ internal_link_cell <- function(query) {
   return(query_link)
 }
 
+#' Internal link pathway
+#'
+#' @importFrom magrittr %>%
+#'
+#' @export
+internal_link_pathway <- function(query) {
+  query_link <-
+    paste0('<a href="?show=pathway&query=',
+           query,
+           '" target="_blank">',
+           query,
+           '</a>')
+  
+  return(query_link)
+}
+
 #' PubMed Linkr
 #'
 #' @importFrom magrittr %>%
