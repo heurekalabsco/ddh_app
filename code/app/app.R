@@ -81,7 +81,7 @@ homePage <- function (id) {
     querySearchInput(ns("search")), 
     exampleSearchesLink(ns("examples")), 
     ", ", 
-    HTML("<a href='/app/methods/start-here.html'>read the manual</a>"),
+    HTML("<a href='methods/start-here.html'>read the manual</a>"),
     ", or",
     getLuckyLink(ns("lucky")),
     HTML("</center>"),
