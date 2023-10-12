@@ -199,11 +199,11 @@ browsePathwaysPanelServer <- function(id) {
       output$pathway_table <- DT::renderDataTable({
         DT::datatable(make_pathway_browse_table() %>% 
                         dplyr::arrange(gs_name) %>% 
-                        dplyr::select(`DDH ID` = gs_id,
+                        dplyr::select(ID = gs_id,
                                       Pathway = gs_name, 
                                       Description = gs_description, 
                                       Size = pathway_size) %>% 
-                        dplyr::mutate(`DDH ID` = purrr::map_chr(`DDH ID`, internal_link_pathway)),
+                        dplyr::mutate(ID = purrr::map_chr(ID, internal_link_pathway)),
                       escape = FALSE,
                       rownames = FALSE,
                       options = list(pageLength = 10))
