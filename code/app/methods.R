@@ -15,4 +15,4 @@ download_methods <- function(){
   on.exit(unlink(methods_key))
   message("Downloaded and unzipped methods")
 }
-download_methods()
+try(download_methods())
