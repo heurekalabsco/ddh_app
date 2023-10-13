@@ -10,6 +10,7 @@ COPY code/index_org /srv/code/index_org
 COPY code/index_com /srv/code/index_com
 
 COPY code/app /srv/code/app/
+RUN chown shiny:shiny /srv/code/app/www
 COPY ./shiny-server-org.conf /etc/shiny-server/shiny-server-org.conf
 COPY ./shiny-server-com.conf /etc/shiny-server/shiny-server-com.conf
 
