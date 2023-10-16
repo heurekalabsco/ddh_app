@@ -1604,13 +1604,13 @@ cellDependenciesGraphTabServer <- function (id, data) {
       output$depgraphtab <- renderVisNetwork({
         #check to see if data are there
         shiny::validate(
-          shiny::need(c("gene_master_top_table") %in% data()$validate, 
-                      "No dependency data for this query"))
+          shiny::need(c("setup_graph") %in% data()$validate, "No dependency data for this query"))
         make_graph(input = data(), 
                    threshold = 10, 
                    deg = 2, 
                    corr_type = "positive", 
-                   card = TRUE)
+                   card = TRUE,
+                   nchar_pathways = 10)
       })
     })
 }

@@ -12,15 +12,16 @@ geneNetworkGraphServer <- function(id, data) {
     function(input, output, session) {
       output$text_graph <- renderText({paste0("Co-essentiality graph of ", 
                                               ifelse(data()$subtype == "pathway",
-                                                     "pathway genes",
+                                                     paste0("GSID:", data()$query),
                                                      str_c(data()$content, collapse = ", ")
                                               )
       )
       })
+      
       #establish reactive value
       rv <- reactiveValues(degree = 2, 
                            threshold = 10,
-                           corr_type = "positive" )
+                           corr_type = "positive")
       
       #update value upon call
       observeEvent(input$update, {
@@ -48,13 +49,18 @@ geneNetworkGraphServer <- function(id, data) {
                                    value = 2, min = 1, max = 10),
                        sliderInput(inputId = session$ns("threshold"),
                                    label = paste0("# Related ", 
-                                                  ifelse(data()$type == "gene",
-                                                         "gene", "cell line")),
+                                                  ifelse(data()$subtype == "gene",
+                                                         "genes", 
+                                                         ifelse(data()$subtype == "pathway", "pathways",
+                                                                "cell lines"))
+                                                  ),
                                    value = 10, min = 10, max = 20),
-                       selectInput(inputId = session$ns("corr_type"),
-                                   label = "Associations",
-                                   choices = c("Positive"="positive", "Negative"="negative", "Positive and Negative"="both"),
-                                   selected = "Positive"),
+                       # conditionalPanel(data()$type != 'pathway',
+                                        selectInput(inputId = session$ns("corr_type"),
+                                                    label = "Associations",
+                                                    choices = c("Positive"="positive", "Negative"="negative", "Positive and Negative"="both"),
+                                                    selected = "Positive"),
+                                        # ),
                        actionButton(inputId = session$ns("update"), 
                                     label = "Update", 
                                     width = "100%"),
@@ -72,6 +78,9 @@ geneNetworkGraphServer <- function(id, data) {
         if(data()$type == "gene") {
           shiny::validate(
             shiny::need(c("setup_graph") %in% data()$validate, "No dependency data for this gene"))
+        } else if(data()$type == "pathway") {
+          shiny::validate(
+            shiny::need(c("setup_graph") %in% data()$validate, "No dependency data for this pathway"))
         } else if(data()$type == "cell") {
           shiny::validate(
             shiny::need(c("cell_dependency_sim") %in% data()$validate, "No dependency data for this cell line"))
