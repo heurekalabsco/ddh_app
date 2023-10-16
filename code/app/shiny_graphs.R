@@ -41,6 +41,12 @@ geneNetworkGraphServer <- function(id, data) {
                    tooltipLink = TRUE) %>% 
           visLegend(position = "right", width = .25, zoom = F) #.5 fixes cut-off, but makes it too wide
       })
+
+      # conditional UI panels for pathways
+      output$hidden_condition_pathways <- renderText({
+        logic_pathways <- data()$subtype != 'pathway'
+        return(logic_pathways)
+      })
       
       output$network_graph <- renderUI({
         sidebarLayout(
@@ -55,12 +61,17 @@ geneNetworkGraphServer <- function(id, data) {
                                                                 "cell lines"))
                                                   ),
                                    value = 10, min = 10, max = 20),
-                       # conditionalPanel(data()$type != 'pathway',
+                       # conditional UI panels for pathways
+                       shinyjs::useShinyjs(),
+                       shinyjs::hidden(div(id = session$ns("hidden_condition_pathways"))),
+                       conditionalPanel(paste0("output.", session$ns("hidden_condition_pathways")),
                                         selectInput(inputId = session$ns("corr_type"),
                                                     label = "Associations",
-                                                    choices = c("Positive"="positive", "Negative"="negative", "Positive and Negative"="both"),
-                                                    selected = "Positive"),
-                                        # ),
+                                                    choices = c("Positive" = "positive",
+                                                                "Negative" = "negative",
+                                                                "Positive and Negative" = "both"),
+                                                    selected = "Positive")
+                                        ),
                        actionButton(inputId = session$ns("update"), 
                                     label = "Update", 
                                     width = "100%"),
