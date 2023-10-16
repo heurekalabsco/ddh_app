@@ -43,10 +43,10 @@ geneNetworkGraphServer <- function(id, data) {
       })
 
       # conditional UI panels for pathways
-      output$hidden_condition_pathways <- renderText({
-        logic_pathways <- data()$subtype != 'pathway'
-        return(logic_pathways)
-      })
+      # output$hidden_condition_pathways <- renderText({
+      #   logic_pathways <- ifelse(data()$subtype != 'pathway', "other", "pathway")
+      #   return(logic_pathways)
+      # })
       
       output$network_graph <- renderUI({
         sidebarLayout(
@@ -62,16 +62,16 @@ geneNetworkGraphServer <- function(id, data) {
                                                   ),
                                    value = 10, min = 10, max = 20),
                        # conditional UI panels for pathways
-                       shinyjs::useShinyjs(),
-                       shinyjs::hidden(div(id = session$ns("hidden_condition_pathways"))),
-                       conditionalPanel(paste0("output.", session$ns("hidden_condition_pathways")),
+                       # shinyjs::useShinyjs(),
+                       # shinyjs::show(div(id = session$ns("hidden_condition_pathways"))),
+                       # conditionalPanel(condition = paste0("output['", session$ns("hidden_condition_pathways"), "'] == 'other'"),
                                         selectInput(inputId = session$ns("corr_type"),
                                                     label = "Associations",
                                                     choices = c("Positive" = "positive",
                                                                 "Negative" = "negative",
                                                                 "Positive and Negative" = "both"),
-                                                    selected = "Positive")
-                                        ),
+                                                    selected = "Positive"),
+                                        # ),
                        actionButton(inputId = session$ns("update"), 
                                     label = "Update", 
                                     width = "100%"),
