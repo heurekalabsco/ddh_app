@@ -10,7 +10,7 @@ source(here::here("code", "app", "private.R"))
 #DOWNLOAD/LOAD DATA-----
 # Need to set the cache before loading any data
 # content_cache <- cachem::cache_mem()
-source(here::here("code", "app", "data.R"))
+source(here::here("code", "app", "data.R")) 
 source(here::here("code", "app", "methods.R"))
 
 #FUNCTIONS-----
