@@ -1588,12 +1588,12 @@ genePathwayEnrichmentTableTabServer <- function (id, data) {
   )
 }
 
-##cell dependencies graph-----
+###Dependencies graphs-----
 cellDependenciesGraphTab <- function(id) {
   ns <- NS(id)
   divFlexAlignCenter(
     "Co-essentiality Graph",
-    visNetworkOutput(outputId = ns("depgraphtab"))
+    tags$div(class = "custom-visNetwork-container", visNetworkOutput(outputId = ns("depgraphtab")))
   )
 }
 
