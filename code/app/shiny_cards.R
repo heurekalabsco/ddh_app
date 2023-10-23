@@ -992,7 +992,7 @@ structurePlotTabServer <- function (id, data) {
 cellGeneExpressionTableTab <- function(id) {
   ns <- NS(id)
   divFlexAlignCenter(
-    "Gene Expression",
+    "Gene/mRNA Table",
     gt_output(outputId = ns("geneexptabletab"))
   )
 }
@@ -1028,7 +1028,7 @@ cellGeneExpressionTableTabServer <- function (id, data) {
 cellProteinExpressionPlotTab <- function(id) {
   ns <- NS(id)
   divFlexAlignCenter(
-    "Protein Expression",
+    "Protein Plot",
     uiOutput(outputId = ns("expression_protein_tab"))
   )
 }
@@ -1070,7 +1070,7 @@ cellProteinExpressionPlotTabServer <- function (id, data) {
 cellProteinExpressionTableTab <- function(id) {
   ns <- NS(id)
   divFlexAlignCenter(
-    "Protein Expression",
+    "Protein Table",
     gt_output(outputId = ns("proteinexptabletab"))
   )
 }
@@ -1107,7 +1107,7 @@ cellProteinExpressionTableTabServer <- function (id, data) {
 cellGeneProteinPlotTab <- function(id) {
   ns <- NS(id)
   divFlexAlignCenter(
-    "Gene v. Protein",
+    "Gene/mRNA v. Protein",
     uiOutput(outputId = ns("expression_genevprotein_tab"))
   )
 }
@@ -1189,7 +1189,7 @@ tissuePlotTabServer <- function (id, data) {
 tissueTableTab <- function(id) {
   ns <- NS(id)
   divFlexAlignCenter(
-    "Expression Values",
+    "Abundance Table",
     gt_output(outputId = ns("tissuetabletab"))
   )
 }

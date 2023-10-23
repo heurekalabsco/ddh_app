@@ -183,7 +183,7 @@ cellAnatogramTableServer <- function(id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$text_subcell_table <- renderText({paste0("Subcellular expressions of ", 
+      output$text_subcell_table <- renderText({paste0("Subcellular mRNA distribution of ", 
                                                       ifelse(data()$subtype == "pathway",
                                                              "pathway genes",
                                                              str_c(data()$content, collapse = ", ")
@@ -252,7 +252,7 @@ cellGeneExpressionTableServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$text_cell_gene_table <- renderText({paste0("Gene expression of ", 
+      output$text_cell_gene_table <- renderText({paste0("mRNA abundance of ", 
                                                         ifelse(data()$subtype == "pathway",
                                                                "pathway genes",
                                                                str_c(data()$content, collapse = ", ")
@@ -294,7 +294,7 @@ cellProteinExpressionTableServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$text_cell_protein_table <- renderText({paste0("Protein expressions of ", 
+      output$text_cell_protein_table <- renderText({paste0("Protein abundance of ", 
                                                            ifelse(data()$subtype == "pathway",
                                                                   "pathway genes",
                                                                   str_c(data()$content, collapse = ", ")

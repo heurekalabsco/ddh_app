@@ -168,7 +168,7 @@ tissuePlotTextServer <- function (id, data) {
     id,
     function(input, output, session) {
       output$tissueplot_text <- renderText({
-        paste0("Human tissue expression of ", 
+        paste0("Human mRNA abundance distribution of ", 
                ifelse(data()$subtype == "pathway",
                       "pathway genes",
                       str_c(data()$content, collapse = ", ")

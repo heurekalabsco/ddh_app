@@ -812,7 +812,7 @@ cellAnatogramPlotServer <- function(id, data) {
     id,
     function(input, output, session) {
       output$cell_anatogram_gene_plot_text <- renderText({
-        paste0("Subcellular expression of ", 
+        paste0("Subcellular distribution of ", 
                ifelse(data()$subtype == "pathway",
                       "pathway genes",
                       str_c(data()$content, collapse = ", ")
@@ -1012,7 +1012,7 @@ cellGeneExpressionPlotServer <- function(id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$expression_gene_plot_text <- renderText({paste0("Expression values of ", 
+      output$expression_gene_plot_text <- renderText({paste0("mRNA abundance values of ", 
                                                              ifelse(data()$subtype == "pathway",
                                                                     "pathway genes",
                                                                     str_c(data()$content, collapse = ", ")
@@ -1058,7 +1058,7 @@ cellProteinExpressionPlotServer <- function(id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$expression_protein_plot_title <- renderText({paste0("Expression values of ", 
+      output$expression_protein_plot_title <- renderText({paste0("Protein abundance values of ", 
                                                                  ifelse(data()$subtype == "pathway",
                                                                         "pathway genes",
                                                                         str_c(data()$content, collapse = ", ")
@@ -1106,7 +1106,7 @@ cellGeneProteinPlotServer <- function(id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$text_cell_gene_protein_plot <- renderText({paste0("Gene vs. protein expression of ", 
+      output$text_cell_gene_protein_plot <- renderText({paste0("Comparing gene/mRNA vs. protein abundance of ", 
                                                                ifelse(data()$subtype == "pathway",
                                                                       "pathway genes",
                                                                       str_c(data()$content, collapse = ", ")
@@ -1459,7 +1459,7 @@ expdepPlotServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$exdep_plot_title <- renderText({paste0("Expression vs. dependency of ", 
+      output$exdep_plot_title <- renderText({paste0("mRNA abundance vs. gene dependency of ", 
                                                     ifelse(data()$subtype == "pathway",
                                                            "pathway genes",
                                                            str_c(data()$content, collapse = ", ")
@@ -1597,7 +1597,7 @@ cellLineGeneProteinPlotServer <- function(id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$text_cellLine_gene_protein_plot <- renderText({paste0("Gene vs. protein expression of ", 
+      output$text_cellLine_gene_protein_plot <- renderText({paste0("Gene vs. protein abundance of ", 
                                                                    ifelse(data()$subtype == "pathway",
                                                                           "pathway genes",
                                                                           str_c(data()$content, collapse = ", ")
