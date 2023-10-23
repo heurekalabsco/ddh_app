@@ -21,8 +21,6 @@ phases:
       - export COLOR="false"
       - export CI="true"
       - aws ecr get-login-password | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com
-      - docker pull ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/ddh-app-base:latest
-      - docker tag ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/ddh-app-base:latest ddh-app-base:latest
       - pipeline=$(cat $CODEBUILD_SRC_DIR/ddh-com/copilot/pipelines/prod/manifest.yml | ruby -ryaml -rjson -e 'puts JSON.pretty_generate(YAML.load(ARGF))')
       - pl_envs=$(echo $pipeline | jq -r '.stages[].name')
       # Find all the local services in the workspace.
