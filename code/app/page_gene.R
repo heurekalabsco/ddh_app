@@ -39,8 +39,8 @@ genePage <- function (id, subtype) {
                  actionLink(inputId = ns("link_to_tissueAnatogramPlotDash"), tissueAnatogramPlotDash(ns("tissueanatogramdash"))),
                  actionLink(inputId = ns("link_to_cellDependenciesPlotDash"), cellDependenciesPlotDash(ns("depdash"))),
                  actionLink(inputId = ns("link_to_cellDependenciesTableDash"), cellDependenciesTableDash(ns("deptabledash"))),
-                 private(actionLink(inputId = ns("link_to_geneDrugsCorTableDash"), geneDrugsCorTableDash(ns("genedrugscortabledash")))),
-                 private(actionLink(inputId = ns("link_to_geneMolecularFeaturesTableDash"), geneMolecularFeaturesTableDash(ns("molfeattabledash"))))
+                 actionLink(inputId = ns("link_to_geneDrugsCorTableDash"), geneDrugsCorTableDash(ns("genedrugscortabledash"))),
+                 actionLink(inputId = ns("link_to_geneMolecularFeaturesTableDash"), geneMolecularFeaturesTableDash(ns("molfeattabledash")))
                )
       ),
       ## INFO (person)-----
@@ -535,8 +535,8 @@ genePage <- function (id, subtype) {
                           # cards in a fluid row
                           fluidRow(
                             cardLayout(
-                              private(actionLink(inputId = ns("mol_feat_click"), geneMolecularFeaturesTableDash(ns("mol_feat_table_tab")))),
-                              private(actionLink(inputId = ns("mol_feat_pathways_click"), geneMolecularFeaturesPathwayTableTab(ns("mol_feat_pathways_table_tab"))))
+                              actionLink(inputId = ns("mol_feat_click"), geneMolecularFeaturesTableDash(ns("mol_feat_table_tab"))),
+                              actionLink(inputId = ns("mol_feat_pathways_click"), geneMolecularFeaturesPathwayTableTab(ns("mol_feat_pathways_table_tab")))
                             )
                           ),
                           tags$br(),
@@ -546,7 +546,8 @@ genePage <- function (id, subtype) {
                               div(
                                 id = ns("molecular_features_tabcard"),
                                 style = "padding-left:1%",
-                                MolecularFeaturesTable(ns("molecular_features_table_plot")),
+                                private(MolecularFeaturesTable(ns("molecular_features_table_plot"))),
+                                private_msg(),
                                 tags$br()
                               )
                             )
@@ -557,7 +558,8 @@ genePage <- function (id, subtype) {
                               div(
                                 id = ns("molecular_features_pathways_tabcard"),
                                 style = "padding-left:1%",
-                                MolecularFeaturesPathwaysTable(ns("molecular_features_pathways_table_plot")),
+                                private(MolecularFeaturesPathwaysTable(ns("molecular_features_pathways_table_plot"))),
+                                private_msg(),
                                 tags$br()
                               )
                             )
@@ -691,7 +693,7 @@ genePageServer <- function(id, subtype) {
       observeEvent(input$link_to_geneDrugsCorTableDash, {
         updateNavbarPage(session, inputId = "geneNavBar", selected = "dependencies_drugs")
       })
-      private(geneDrugsCorTableDashServer("genedrugscortabledash", data))
+      geneDrugsCorTableDashServer("genedrugscortabledash", data)
       
       #molecular features table
       observeEvent(input$link_to_geneMolecularFeaturesTableDash, {
@@ -1032,8 +1034,8 @@ genePageServer <- function(id, subtype) {
       private({MolecularFeaturesSegmentPlotServer("mol_feat_segments", data)})
       
       #serves the cards
-      private({geneMolecularFeaturesTableDashServer("mol_feat_table_tab", data)})
-      private({geneMolecularFeaturesPathwayTableTabServer("mol_feat_pathways_table_tab", data)})
+      geneMolecularFeaturesTableDashServer("mol_feat_table_tab", data)
+      geneMolecularFeaturesPathwayTableTabServer("mol_feat_pathways_table_tab", data)
       
       # CONDITIONAL features
       observeEvent(input$mol_feat_click, { #store click
