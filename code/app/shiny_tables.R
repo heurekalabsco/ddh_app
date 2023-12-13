@@ -85,6 +85,42 @@ proteinSeqServer <- function (id, data) {
   )
 }
 
+ProteinPredictedFunctions <- function (id) {
+  ns <- NS(id)
+  tagList(
+    fluidRow(h4(textOutput(ns("protein_predicted_functions_title")))),
+    DT::dataTableOutput(outputId = ns("protein_predicted_functions_table"))
+  )
+}
+
+ProteinPredictedFunctionsServer <- function(id, data) {
+  moduleServer(
+    id,
+    function(input, output, session) {
+      
+      output$protein_predicted_functions_title <- renderText({paste0("Predicted molecular functions of ", 
+                                                                     ifelse(data()$subtype == "pathway",
+                                                                            "pathway proteins",
+                                                                            str_c(data()$content, collapse = ", ")
+                                                                            )
+                                                                     )
+      })
+
+      output$protein_predicted_functions_table <- DT::renderDataTable({
+        shiny::validate(
+          shiny::need(c("protein_function_predictions") %in% data()$validate,
+                      "No predicted molecular functions for this protein"))
+        
+        DT::datatable(make_protein_function_predictions_table(input = data()),
+                      rownames = FALSE,
+                      escape = FALSE,
+                      filter = "none",
+                      options = list(pageLength = 10, lengthChange = FALSE)
+          )
+      })
+    })
+}
+
 ## Protein Cluster ---------------------
 proteinClusterTable <- function(id) {
   ns <- NS(id)

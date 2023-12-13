@@ -120,6 +120,7 @@ genePage <- function (id, subtype) {
                                 style = "padding-left:1%",
                                 proteinSeq(ns("protein_seq")),
                                 proteinDomainPlot(ns("protein_domain_plot")),
+                                private(ProteinPredictedFunctions(ns("protein_predicted_functions"))),
                                 tags$br()
                               )
                             )
@@ -747,6 +748,7 @@ genePageServer <- function(id, subtype) {
       #serves the data plots
       proteinSeqServer("protein_seq", data)
       proteinDomainPlotServer("protein_domain_plot", data)
+      private({ProteinPredictedFunctionsServer("protein_predicted_functions", data)})
       
       # CONDITIONAL SIGNATURE
       observeEvent(input$signature_click, { #store click
