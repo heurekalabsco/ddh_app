@@ -573,7 +573,7 @@ proteinDomainPlot <- function(id) {
     fluidRow(column(uiOutput(outputId = ns("dom_choice")), width = 6), 
              column(uiOutput(outputId = ns("ptm_choice")), width = 6)
     ),
-    fluidRow(plotOutput(outputId = ns("protein_domain_plot"), height = "auto") %>% 
+    fluidRow(plotOutput(outputId = ns("protein_domain_plot"), height = "auto") %>%
                withSpinnerColor(plot_type = "protein") #see shiny_helper.R
     ),
     tags$br(),
@@ -602,13 +602,13 @@ proteinDomainPlotServer <- function (id, data) {
         
         selectizeInput(session$ns("dom_var"), "Protein Features (select):", 
                        choices = prots_dr %>% 
-                         distinct(description) %>% 
-                         pull(description),
+                         dplyr::distinct(description) %>% 
+                         dplyr::pull(description),
                        multiple = TRUE,
                        selected = prots_dr %>%  
-                         distinct(description) %>% 
+                         dplyr::distinct(description) %>% 
                          dplyr::slice(1) %>% 
-                         pull(description)
+                         dplyr::pull(description)
         ) 
       })
       output$ptm_choice <- renderUI({
@@ -621,13 +621,13 @@ proteinDomainPlotServer <- function (id, data) {
         
         selectizeInput(session$ns("ptm_var"), "PTMs (select):", 
                        choices = prots_ptm %>%  
-                         distinct(description) %>% 
-                         pull(description),
+                         dplyr::distinct(description) %>% 
+                         dplyr::pull(description),
                        multiple = TRUE,
                        selected = prots_ptm %>%  
-                         distinct(description) %>% 
+                         dplyr::distinct(description) %>% 
                          dplyr::slice(1) %>% 
-                         pull(description)
+                         dplyr::pull(description)
         ) 
       })
       output$protein_domain_plot <- renderPlot({

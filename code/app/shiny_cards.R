@@ -350,7 +350,7 @@ cellDependenciesTableDashServer <- function (id, data) {
                       "No dependency data for this query"))
         gt::gt(make_top_table(input = data()) %>% 
                  dplyr::mutate("Rank" = row_number()) %>% 
-                 dplyr::select("Rank", "Gene" = "gene", "R^2" = "r2") %>% 
+                 dplyr::select("Rank", "Gene" = "gene") %>% 
                  dplyr::slice(1:5))
       },
       height = card_contents_height,
@@ -360,7 +360,7 @@ cellDependenciesTableDashServer <- function (id, data) {
   )
 }
 
-##cell dependencies table-----
+##molecular features table-----
 geneMolecularFeaturesTableDash <- function(id) {
   ns <- NS(id)
   divFlexAlignCenter(
