@@ -190,7 +190,7 @@ pubmedTableServer <- function(id, data) {
           shiny::need(c("universal_pubmed") %in% data()$validate, 
                       "No literature data for this query"))
         withProgress(message = 'Building a smart table...', {
-          DT::datatable(make_pubmed_table(input = data()) %>% 
+          DT::datatable(make_pubmed_table(input = data(), n_papers = 10, title = TRUE) %>% 
                           dplyr::mutate(pmid = map_chr(pmid, pubmed_linkr, number_only = TRUE) #from fun_helper.R
                           ) %>% 
                           dplyr::mutate(pmcid = map_chr(pmcid, pmc_linkr) #from fun_helper.R
