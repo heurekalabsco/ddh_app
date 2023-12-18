@@ -1574,8 +1574,8 @@ genePathwayEnrichmentTableTabServer <- function (id, data) {
     function(input, output, session) {
       output$depgenepathwaystab <- render_gt({
         shiny::validate(
-          shiny::need(c("gene_master_top_table") %in% data()$validate, 
-                      "No dependency data for this query"))
+          shiny::need(c("gene_dependency_enrichment") %in% data()$validate, 
+                      "No enriched pathways for this query"))
         gt::gt(ddh::make_gene_dependency_enrichment_table(input = data()) %>%
                  dplyr::mutate("Rank" = row_number()) %>% 
                  dplyr::select(Rank, Pathway) %>% 

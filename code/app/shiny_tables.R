@@ -760,7 +760,9 @@ GenePathwayEnrichmentTableServer <- function (id, data) {
       })
       output$genes_pathways <- DT::renderDataTable({
         shiny::validate(
-          shiny::need(c("universal_achilles_long") %in% data()$validate, "No dependency data for this gene"))
+          shiny::need(c("gene_dependency_enrichment") %in% data()$validate, 
+                      "No enriched pathways for this query"))
+        
         DT::datatable(ddh::make_gene_dependency_enrichment_table(input = data()) %>% 
                         dplyr::mutate_if(is.numeric, ~ signif(., digits = 3)),
                       rownames = FALSE,
@@ -953,11 +955,12 @@ dissimilarGenesTableServer <- function (id, data) {
         })     
       output$dep_bottom <- DT::renderDataTable({
         shiny::validate(
-          shiny::need(c("gene_master_bottom_table") %in% data()$validate, "No dependency data for this gene"))
+          shiny::need(c("gene_master_bottom_table") %in% data()$validate,
+                      "No dependency data for this gene"))
         
         DT::datatable(
           ddh::make_bottom_table(input = data()) %>%
-            dplyr::rename("Query" = "id", "Gene" = "gene", "Name" = "name", 
+            dplyr::rename("Query" = "id", "Gene" = "gene", "Name" = "gene_name", 
                           "R^2" = "r2", "Z-Score" = "z_score", "Co-publication Count" = "concept_count", "Co-publication Index" = "concept_index") %>%
             dplyr::select("Query", "Gene", "Name", input$vars_dep_bottom) %>%
             dplyr::mutate_if(is.numeric, ~ signif(., digits = 3)) %>% 
