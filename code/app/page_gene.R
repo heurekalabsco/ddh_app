@@ -581,14 +581,18 @@ genePageServer <- function(id, subtype) {
     id,
     function(input, output, session) {
       type <- "gene"
+      max_genes <- 20
+      
       #this block is the logic to define the summary_var variable, to display the proper summary module
       if(subtype == "gene"){
         data <- reactive({
           gene_symbols <- getQueryString()$query
           
-          if (length(gene_symbols) > 20) {
-            gene_symbols <- gene_symbols[1:20]
+          if (length(gene_symbols) > max_genes) {
+            gene_symbols <- gene_symbols[1:max_genes]
           }
+          
+          shinyjs::alert("Alert: This query includes over 20 genes. For optimal performance and enhanced interpretability, we will display the first 20 genes from the query.")
           
           validation_datasets <- make_validate(gene_symbols)
           list(
@@ -608,9 +612,11 @@ genePageServer <- function(id, subtype) {
           pathway_id <- getQueryString()$query
           pathway_genes <- ddh::get_gene_symbols_for_pathway(pathway_id)
           
-          if (length(pathway_genes) > 20) {
-            pathway_genes <- sample(pathway_genes, 20)
+          if (length(pathway_genes) > max_genes) {
+            pathway_genes <- sample(pathway_genes, max_genes)
           }
+          
+          shinyjs::alert("Alert: This pathway includes over 20 genes. For optimal performance and enhanced interpretability, we will display a curated selection of 20 representative genes from the pathway.")
           
           validation_datasets <- make_validate(pathway_genes)
           list(
@@ -630,6 +636,13 @@ genePageServer <- function(id, subtype) {
         data <- reactive({
           custom_gene_list <- getQueryString()$query
           gene_symbols <- c(str_split(custom_gene_list, "\\s*,\\s*", simplify = TRUE))
+          
+          if (length(gene_symbols) > max_genes) {
+            gene_symbols <- gene_symbols[1:max_genes]
+          }
+          
+          shinyjs::alert("Alert: This query includes over 20 genes. For optimal performance and enhanced interpretability, we will display the first 20 genes from the query.")
+          
           validation_datasets <- make_validate(gene_symbols)
           list(
             type=type,
