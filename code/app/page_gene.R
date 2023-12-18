@@ -585,6 +585,11 @@ genePageServer <- function(id, subtype) {
       if(subtype == "gene"){
         data <- reactive({
           gene_symbols <- getQueryString()$query
+          
+          if (length(gene_symbols) > 20) {
+            gene_symbols <- gene_symbols[1:20]
+          }
+          
           validation_datasets <- make_validate(gene_symbols)
           list(
             type=type,
@@ -602,6 +607,11 @@ genePageServer <- function(id, subtype) {
         data <- reactive({
           pathway_id <- getQueryString()$query
           pathway_genes <- ddh::get_gene_symbols_for_pathway(pathway_id)
+          
+          if (length(pathway_genes) > 20) {
+            pathway_genes <- sample(pathway_genes, 20)
+          }
+          
           validation_datasets <- make_validate(pathway_genes)
           list(
             type=type,
