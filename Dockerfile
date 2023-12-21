@@ -1,5 +1,6 @@
 # Base app container with all dependencies installed
 FROM ghcr.io/rocker-org/shiny-verse:4.3.0
+ARG GITHUB_PAT
 EXPOSE 3838
 
 RUN apt-get update && apt-get install -y libglpk-dev libmagick++-dev libavfilter-dev libpoppler-cpp-dev python3-dev python3-venv libjpeg-dev tcl8.6-dev && rm -rf /var/lib/apt/lists/*
