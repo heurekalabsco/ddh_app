@@ -590,10 +590,10 @@ genePageServer <- function(id, subtype) {
           
           if (length(gene_symbols) > max_genes) {
             gene_symbols <- gene_symbols[1:max_genes]
+            
+            shinyjs::alert("Alert: This query includes over 20 genes. For optimal performance and enhanced interpretability, we will display the first 20 genes from the query.")
           }
-          
-          shinyjs::alert("Alert: This query includes over 20 genes. For optimal performance and enhanced interpretability, we will display the first 20 genes from the query.")
-          
+
           validation_datasets <- make_validate(gene_symbols)
           list(
             type=type,
@@ -614,9 +614,9 @@ genePageServer <- function(id, subtype) {
           
           if (length(pathway_genes) > max_genes) {
             pathway_genes <- sample(pathway_genes, max_genes)
-          }
           
           shinyjs::alert("Alert: This pathway includes over 20 genes. For optimal performance and enhanced interpretability, we will display a curated selection of 20 representative genes from the pathway.")
+          }
           
           validation_datasets <- make_validate(pathway_genes)
           list(
@@ -639,9 +639,9 @@ genePageServer <- function(id, subtype) {
           
           if (length(gene_symbols) > max_genes) {
             gene_symbols <- gene_symbols[1:max_genes]
-          }
           
           shinyjs::alert("Alert: This query includes over 20 genes. For optimal performance and enhanced interpretability, we will display the first 20 genes from the query.")
+          }
           
           validation_datasets <- make_validate(gene_symbols)
           list(
