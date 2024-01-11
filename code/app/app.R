@@ -312,7 +312,7 @@ pages <- list(
 
 server <- shinyServer(function(input, output, session) {
   options(shiny.usecairo = TRUE) # ensure high quality images
-  
+
   # call the waiter
   waiter::waiter_show(html = tagList(
     waiter::spin_loaders(id = 3, color = "#2EC09C", style = NULL),

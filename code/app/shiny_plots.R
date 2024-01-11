@@ -1084,7 +1084,19 @@ cellProteinExpressionPlotServer <- function(id, data) {
                      width = "100%"))
       })
       output$expression_protein_plot_render <- renderPlot({
-        make_cellexpression(input = data(), var = "protein")
+        shiny::validate(
+          shiny::need(
+            tryCatch({
+              make_cellexpression(input = data(),
+                                  var = "protein")
+            }, error = function(e) {
+              FALSE
+            })
+            , "No expression data for this query"
+          )
+        )
+        make_cellexpression(input = data(),
+                            var = "protein")
       })
     }
   )
@@ -1116,6 +1128,25 @@ cellGeneProteinPlotServer <- function(id, data) {
       output$cell_gene_protein_plot <- renderPlot({
         shiny::validate(
           shiny::need(c("universal_expression_long") %in% data()$validate, "No data found."))
+        shiny::validate(
+          shiny::need(
+            tryCatch({
+              gene_validate <- make_expression_table(input = data(), var = "protein") %>% 
+                tidyr::drop_na() %>% 
+                nrow()
+              
+              protein_validate <- make_expression_table(input = data(), var = "protein") %>% 
+                tidyr::drop_na() %>% 
+                nrow()
+              
+              all(gene_validate, protein_validate) > 0
+              
+            }, error = function(e) {
+              FALSE
+            })
+            , "No expression data for this query"
+          )
+        )
         make_cellgeneprotein(input = data())
       })
     }

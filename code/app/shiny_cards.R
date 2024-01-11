@@ -1059,6 +1059,18 @@ cellProteinExpressionPlotTabServer <- function (id, data) {
                  height = card_contents_height)
       })
       output$expression_protein_tab_render <- renderPlot({
+        shiny::validate(
+          shiny::need(
+            tryCatch({
+              make_cellexpression(input = data(),
+                                  var = "protein",
+                                  card = TRUE)
+            }, error = function(e) {
+              FALSE
+            })
+            , "No expression data for this query"
+          )
+        )
         make_cellexpression(input = data(),
                             var = "protein",
                             card = TRUE)
@@ -1084,10 +1096,21 @@ cellProteinExpressionTableTabServer <- function (id, data) {
           shiny::validate(
             shiny::need(c("universal_expression_long") %in% data()$validate,
                         "No expression data for this query"))
+          shiny::validate(
+            shiny::need(
+              tryCatch({
+                make_expression_table(input = data(), var = "protein") %>% 
+                  tidyr::drop_na() %>% 
+                  nrow() > 0
+              }, error = function(e) {
+                FALSE
+              })
+              , "No expression data for this query"
+            )
+          )
           gt::gt(make_expression_table(input = data(), var = "protein") %>% 
                    dplyr::slice(1:5) %>% 
                    dplyr::select(-Lineage, -Subtype))
-          
         } else if(data()$type == "cell") {
           shiny::validate(
             shiny::need(c("universal_expression_long") %in% data()$validate, 
@@ -1138,6 +1161,25 @@ cellGeneProteinPlotTabServer <- function (id, data) {
                  height = card_contents_height)
       })
       output$expression_genevprotein_tab_render <- renderPlot({
+        shiny::validate(
+          shiny::need(
+            tryCatch({
+              gene_validate <- make_expression_table(input = data(), var = "protein") %>% 
+                tidyr::drop_na() %>% 
+                nrow()
+              
+              protein_validate <- make_expression_table(input = data(), var = "protein") %>% 
+                tidyr::drop_na() %>% 
+                nrow()
+              
+              all(gene_validate, protein_validate) > 0
+              
+            }, error = function(e) {
+              FALSE
+            })
+            , "No expression data for this query"
+          )
+        )
         make_cellgeneprotein(input = data(),
                              card = TRUE)
       })

@@ -340,7 +340,20 @@ cellProteinExpressionTableServer <- function (id, data) {
       output$cell_protein_table <- DT::renderDataTable({
         if(data()$type == "gene") {
           shiny::validate(
-            shiny::need(c("universal_expression_long") %in% data()$validate, "No protein data for this gene"))
+            shiny::need(c("universal_expression_long") %in% data()$validate,
+                        "No protein data for this gene"))
+          shiny::validate(
+            shiny::need(
+              tryCatch({
+                make_expression_table(input = data(), var = "protein") %>% 
+                  tidyr::drop_na() %>% 
+                  nrow() > 0
+              }, error = function(e) {
+                FALSE
+              })
+              , "No expression data for this query"
+            )
+          )
           DT::datatable(
             make_expression_table(input = data(), var = "protein") %>%
               dplyr::mutate(`Cell Line` = map_chr(`Cell Line`, cell_linkr, type = "cell")),
