@@ -1522,17 +1522,14 @@ MolecularFeaturesSegmentPlot <- function(id) {
     fluidRow(
       ddh::make_legend("make_molecular_features_segments"),
       actionLink(inputId = ns("segments_table_click"), " View table"), "|",
-      actionLink(inputId = ns("segments_boxplots_click"), "Explore associated genes")
+      actionLink(inputId = ns("segments_boxplots_click"), "Plot associated molecular features")
       ),
     conditionalPanel(condition = paste0("input['", ns("segments_table_click"), "'] != 0"),
                      fluidRow(h4(textOutput(ns("mol_feat_seg_table_text")))),
                      fluidRow(DT::dataTableOutput(outputId = ns("mol_feat_seg_table")))
     ),
     conditionalPanel(condition = paste0("input['", ns("segments_boxplots_click"), "'] != 0"),
-                     fluidRow(h4(textOutput(ns("mol_feat_seg_boxplot_text")))),
-                     # uiOutput(),
-                     fluidRow(plotOutput(outputId = ns("mol_feat_seg_boxplots"))),
-                     ddh::make_legend("make_molecular_features_boxplots")
+                     uiOutput(ns("mol_feat_seg_boxplot_ui"))
     )
   )
 }
@@ -1541,13 +1538,13 @@ MolecularFeaturesSegmentPlotServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      # Scatterplot
+      # SCATTERPLOT
       output$mol_feat_seg_plot_text <- renderText({paste0("Dependency segments of ", 
                                                           ifelse(data()$subtype == "pathway",
                                                                  "pathway genes",
                                                                  str_c(data()$content, collapse = ", ")
+                                                                 )
                                                           )
-      )
       })
       output$mol_feat_seg_plot <- renderPlotly({
         #check to see if data are there
@@ -1560,8 +1557,8 @@ MolecularFeaturesSegmentPlotServer <- function (id, data) {
                                                            ifelse(data()$subtype == "pathway",
                                                                   "pathway genes",
                                                                   str_c(data()$content, collapse = ", ")
+                                                                  )
                                                            )
-      )
       })
       output$mol_feat_seg_table <- DT::renderDataTable({
         #check to see if data are there
@@ -1579,20 +1576,51 @@ MolecularFeaturesSegmentPlotServer <- function (id, data) {
                       escape = FALSE,
                       options = list(pageLength = 10))
       })
-      output$mol_feat_seg_boxplot_text <- renderText({"Dependency segments boxplots"})
+      
+      ## BOXPLOTS
+      molecular_features_select <- reactive({
+        make_molecular_features_table(input = data()) %>% 
+          dplyr::pull(Feature) %>% 
+          gsub("TSS_", "", .)
+      })
+      
+      output$mol_feat_seg_boxplot_ui <- renderUI({
+        tagList(
+          fluidRow(h4(textOutput(session$ns("mol_feat_seg_boxplot_text")))),
+          fluidRow(
+            column(selectizeInput(session$ns("gene_select"), 
+                                  "Gene:",
+                                  choices = molecular_features_select(),
+                                  selected = molecular_features_select()[1],
+                                  multiple = TRUE),
+                   width = 6) #, 
+            # column(selectizeInput(session$ns("lineage_select")), width = 6)
+          ),
+          fluidRow(plotOutput(outputId = session$ns("mol_feat_seg_boxplots"))),
+          ddh::make_legend("make_molecular_features_boxplots")
+        )
+      })
+      output$mol_feat_seg_boxplot_text <- renderText({paste0("Dependency segments boxplots of ", 
+                                                             ifelse(data()$subtype == "pathway",
+                                                                    "pathway genes",
+                                                                    str_c(data()$content, collapse = ", ")
+                                                                    )
+                                                             )
+      })
       output$mol_feat_seg_boxplots <- renderPlot({
         #check to see if data are there
         shiny::validate(
-          shiny::need(c("universal_achilles_long") %in% data()$validate, "No data found."))
+          shiny::need(c("universal_achilles_long") %in% data()$validate,
+                      "No data found."))
         #plot
         shiny::validate(
           shiny::need(
             tryCatch({
               make_molecular_features_boxplots_object <- 
                 make_molecular_features_boxplots(input = data(),
-                                                 target_genes = NULL,
+                                                 target_genes = input$gene_select,
                                                  sex_select = NULL,
-                                                 lineage_select = NULL,
+                                                 lineage_select = NULL, # input$lineage_select,
                                                  lineage_subtype_select = NULL)
             }, error = function(e) {
               FALSE
