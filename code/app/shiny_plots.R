@@ -1521,10 +1521,18 @@ MolecularFeaturesSegmentPlot <- function(id) {
     tags$br(),
     fluidRow(
       ddh::make_legend("make_molecular_features_segments"),
-      actionLink(inputId = ns("segments_table_click"), " View table")),
+      actionLink(inputId = ns("segments_table_click"), " View table"), "|",
+      actionLink(inputId = ns("segments_boxplots_click"), "Explore associated genes")
+      ),
     conditionalPanel(condition = paste0("input['", ns("segments_table_click"), "'] != 0"),
                      fluidRow(h4(textOutput(ns("mol_feat_seg_table_text")))),
                      fluidRow(DT::dataTableOutput(outputId = ns("mol_feat_seg_table")))
+    ),
+    conditionalPanel(condition = paste0("input['", ns("segments_boxplots_click"), "'] != 0"),
+                     fluidRow(h4(textOutput(ns("mol_feat_seg_boxplot_text")))),
+                     # uiOutput(),
+                     fluidRow(plotOutput(outputId = ns("mol_feat_seg_boxplots"))),
+                     ddh::make_legend("make_molecular_features_boxplots")
     )
   )
 }
@@ -1570,6 +1578,29 @@ MolecularFeaturesSegmentPlotServer <- function (id, data) {
                       rownames = FALSE,
                       escape = FALSE,
                       options = list(pageLength = 10))
+      })
+      output$mol_feat_seg_boxplot_text <- renderText({"Dependency segments boxplots"})
+      output$mol_feat_seg_boxplots <- renderPlot({
+        #check to see if data are there
+        shiny::validate(
+          shiny::need(c("universal_achilles_long") %in% data()$validate, "No data found."))
+        #plot
+        shiny::validate(
+          shiny::need(
+            tryCatch({
+              make_molecular_features_boxplots_object <- 
+                make_molecular_features_boxplots(input = data(),
+                                                 target_genes = NULL,
+                                                 sex_select = NULL,
+                                                 lineage_select = NULL,
+                                                 lineage_subtype_select = NULL)
+            }, error = function(e) {
+              FALSE
+            })
+            , "No data data found."
+          )
+        )
+        make_molecular_features_boxplots_object
       })
     }
   )
