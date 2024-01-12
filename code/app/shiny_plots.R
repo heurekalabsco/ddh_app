@@ -1600,11 +1600,12 @@ MolecularFeaturesSegmentPlotServer <- function (id, data) {
           ddh::make_legend("make_molecular_features_boxplots")
         )
       })
-      output$mol_feat_seg_boxplot_text <- renderText({paste0("Dependency segments boxplots of ", 
+      output$mol_feat_seg_boxplot_text <- renderText({paste0("Genes associated to ", 
                                                              ifelse(data()$subtype == "pathway",
                                                                     "pathway genes",
                                                                     str_c(data()$content, collapse = ", ")
-                                                                    )
+                                                                    ),
+                                                             " ablation"
                                                              )
       })
       output$mol_feat_seg_boxplots <- renderPlot({
