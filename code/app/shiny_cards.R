@@ -1697,8 +1697,8 @@ geneCCATableTabServer <- function (id, data) {
 geneMolecularFeaturesBoxplotTableTab <- function(id) {
   ns <- NS(id)
   divFlexAlignCenter(
-    "Associated Features",
-    plotOutput(outputId = ns("molfeatboxplottabletab"))
+    "Boxplots",
+    uiOutput(outputId = ns("molfeatboxplottabletab"))
   )
 }
 
@@ -1706,29 +1706,32 @@ geneMolecularFeaturesBoxplotTableTabServer <- function (id, data) {
   moduleServer(
     id,
     function(input, output, session) {
-      output$molfeatboxplottabletab <- renderPlot({
+      output$molfeatboxplottabletab <- renderUI({
+        #check to see if data are there
         shiny::validate(
-          shiny::need(1+1 == 2, #c("universal_achilles_long") %in% data()$validate,
-                      "No data found."))
-        #plot
-        # shiny::validate(
-        #   shiny::need(
-        #     tryCatch({
-        #       make_molecular_features_boxplots_object <- 
-        #         make_molecular_features_boxplots(input = data())
-        #     }, error = function(e) {
-        #       FALSE
-        #     })
-        #     , "No data data found."
-        #   )
-        # )
-        # make_molecular_features_boxplots_object
-      },
-      height = card_contents_height,
-      width = card_contents_width
-      )
-    }
-  )
+          shiny::need(c("universal_achilles_long") %in% data()$validate, 
+                      "No data found"))
+        
+        plotOutput(outputId = session$ns("molecular_features_boxplot_tab_render"), 
+                   height = card_contents_height,
+                   width = card_contents_width) %>%
+          withSpinnerColor(plot_type = "gene")
+      })
+      output$molecular_features_boxplot_tab_render <- renderPlot({
+        shiny::validate(
+          shiny::need(
+            tryCatch({
+              make_molecular_features_boxplots_object <-
+                make_molecular_features_boxplots(input = data(), card = TRUE)
+            }, error = function(e) {
+              FALSE
+            })
+            , "No data found."
+          )
+        )
+        make_molecular_features_boxplots_object
+      })
+    })
 }
 
 geneMolecularFeaturesPathwayTableTab <- function(id) {

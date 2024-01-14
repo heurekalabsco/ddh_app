@@ -1587,26 +1587,38 @@ MolecularFeaturesBoxplotServer <- function (id, data) {
     function(input, output, session) {
       molecular_features_select <- reactive({
         make_molecular_features_table(input = data()) %>% 
-          dplyr::pull(Feature) %>% 
-          gsub("TSS_", "", .)
+          dplyr::pull(Feature)
       })
+      
       output$mol_feat_seg_boxplot_ui <- renderUI({
         tagList(
           fluidRow(h4(textOutput(session$ns("mol_feat_seg_boxplot_text")))),
           fluidRow(
             column(selectizeInput(session$ns("gene_select"), 
-                                  "Gene:",
+                                  "Molecular Feature/s:",
                                   choices = molecular_features_select(),
                                   selected = molecular_features_select()[1],
                                   multiple = TRUE),
-                   width = 6) #, 
-            # column(selectizeInput(session$ns("lineage_select")), width = 6)
+                   width = 4),
+            column(selectizeInput(session$ns("lineage_select"), 
+                                  "Lineage/s:",
+                                  choices = cell_expression_names$lineage,
+                                  selected = NULL,
+                                  multiple = TRUE),
+                   width = 4),
+            column(selectizeInput(session$ns("sublineage_select"), 
+                                  "Sub-lineage/s:",
+                                  choices = cell_expression_names$lineage_subtype,
+                                  selected = NULL,
+                                  multiple = TRUE),
+                   width = 4)
           ),
-          fluidRow(plotOutput(outputId = session$ns("mol_feat_seg_boxplots"))),
+          fluidRow(plotOutput(outputId = session$ns("mol_feat_seg_boxplots")) %>% 
+                     withSpinnerColor(plot_type = "gene")),
           ddh::make_legend("make_molecular_features_boxplots")
         )
       })
-      output$mol_feat_seg_boxplot_text <- renderText({paste0("Genes associated to ", 
+      output$mol_feat_seg_boxplot_text <- renderText({paste0("Molecular features associated with ", 
                                                              ifelse(data()$subtype == "pathway",
                                                                     "pathway genes",
                                                                     str_c(data()$content, collapse = ", ")
@@ -1627,8 +1639,8 @@ MolecularFeaturesBoxplotServer <- function (id, data) {
                 make_molecular_features_boxplots(input = data(),
                                                  target_genes = input$gene_select,
                                                  sex_select = NULL,
-                                                 lineage_select = NULL, # input$lineage_select,
-                                                 lineage_subtype_select = NULL)
+                                                 lineage_select = input$lineage_select,
+                                                 lineage_subtype_select = input$sublineage_select)
             }, error = function(e) {
               FALSE
             })
