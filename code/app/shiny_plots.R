@@ -1521,15 +1521,11 @@ MolecularFeaturesSegmentPlot <- function(id) {
     tags$br(),
     fluidRow(
       ddh::make_legend("make_molecular_features_segments"),
-      actionLink(inputId = ns("segments_table_click"), " View table"), "|",
-      actionLink(inputId = ns("segments_boxplots_click"), "Plot associated molecular features")
+      actionLink(inputId = ns("segments_table_click"), " View table")
       ),
     conditionalPanel(condition = paste0("input['", ns("segments_table_click"), "'] != 0"),
                      fluidRow(h4(textOutput(ns("mol_feat_seg_table_text")))),
                      fluidRow(DT::dataTableOutput(outputId = ns("mol_feat_seg_table")))
-    ),
-    conditionalPanel(condition = paste0("input['", ns("segments_boxplots_click"), "'] != 0"),
-                     uiOutput(ns("mol_feat_seg_boxplot_ui"))
     )
   )
 }
@@ -1576,14 +1572,24 @@ MolecularFeaturesSegmentPlotServer <- function (id, data) {
                       escape = FALSE,
                       options = list(pageLength = 10))
       })
-      
-      ## BOXPLOTS
+    }
+  )
+}
+
+MolecularFeaturesBoxplot <- function(id) {
+  ns <- NS(id)
+  uiOutput(ns("mol_feat_seg_boxplot_ui"))
+}
+
+MolecularFeaturesBoxplotServer <- function (id, data) {
+  moduleServer(
+    id,
+    function(input, output, session) {
       molecular_features_select <- reactive({
         make_molecular_features_table(input = data()) %>% 
           dplyr::pull(Feature) %>% 
           gsub("TSS_", "", .)
       })
-      
       output$mol_feat_seg_boxplot_ui <- renderUI({
         tagList(
           fluidRow(h4(textOutput(session$ns("mol_feat_seg_boxplot_text")))),
@@ -1604,9 +1610,9 @@ MolecularFeaturesSegmentPlotServer <- function (id, data) {
                                                              ifelse(data()$subtype == "pathway",
                                                                     "pathway genes",
                                                                     str_c(data()$content, collapse = ", ")
-                                                                    ),
+                                                             ),
                                                              " ablation"
-                                                             )
+      )
       })
       output$mol_feat_seg_boxplots <- renderPlot({
         #check to see if data are there

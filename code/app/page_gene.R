@@ -537,6 +537,7 @@ genePage <- function (id, subtype) {
                           fluidRow(
                             cardLayout(
                               actionLink(inputId = ns("mol_feat_click"), geneMolecularFeaturesTableDash(ns("mol_feat_table_tab"))),
+                              actionLink(inputId = ns("mol_feat_boxplot_click"), geneMolecularFeaturesBoxplotTableTab(ns("mol_feat_boxplot_table_tab"))),
                               actionLink(inputId = ns("mol_feat_pathways_click"), geneMolecularFeaturesPathwayTableTab(ns("mol_feat_pathways_table_tab")))
                             )
                           ),
@@ -548,6 +549,18 @@ genePage <- function (id, subtype) {
                                 id = ns("molecular_features_tabcard"),
                                 style = "padding-left:1%",
                                 private(MolecularFeaturesTable(ns("molecular_features_table_plot"))),
+                                private_msg(),
+                                tags$br()
+                              )
+                            )
+                          ), 
+                          #conditional for boxplots
+                          fluidRow(
+                            shinyjs::hidden(
+                              div(
+                                id = ns("molecular_features_boxplot_tabcard"),
+                                style = "padding-left:1%",
+                                private(MolecularFeaturesBoxplot(ns("molecular_features_boxplot"))),
                                 private_msg(),
                                 tags$br()
                               )
@@ -1060,19 +1073,32 @@ genePageServer <- function(id, subtype) {
       
       #serves the cards
       geneMolecularFeaturesTableDashServer("mol_feat_table_tab", data)
+      geneMolecularFeaturesBoxplotTableTabServer("mol_feat_boxplot_table_tab", data)
       geneMolecularFeaturesPathwayTableTabServer("mol_feat_pathways_table_tab", data)
       
       # CONDITIONAL features
       observeEvent(input$mol_feat_click, { #store click
         shinyjs::show("molecular_features_tabcard")
+        shinyjs::hide("molecular_features_boxplot_tabcard")
         shinyjs::hide("molecular_features_pathways_tabcard")
       })
       
       MolecularFeaturesTableServer("molecular_features_table_plot", data)
       
+      # CONDITIONAL boxplot
+      observeEvent(input$mol_feat_boxplot_click, { #store click
+        shinyjs::hide("molecular_features_tabcard")
+        shinyjs::show("molecular_features_boxplot_tabcard")
+        shinyjs::hide("molecular_features_pathways_tabcard")
+        
+      })
+      
+      MolecularFeaturesBoxplotServer("molecular_features_boxplot", data)
+      
       # CONDITIONAL pathways
       observeEvent(input$mol_feat_pathways_click, { #store click
         shinyjs::hide("molecular_features_tabcard")
+        shinyjs::hide("molecular_features_boxplot_tabcard")
         shinyjs::show("molecular_features_pathways_tabcard")
       })
       

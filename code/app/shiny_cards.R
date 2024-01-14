@@ -1694,6 +1694,43 @@ geneCCATableTabServer <- function (id, data) {
   )
 }
 
+geneMolecularFeaturesBoxplotTableTab <- function(id) {
+  ns <- NS(id)
+  divFlexAlignCenter(
+    "Associated Features",
+    plotOutput(outputId = ns("molfeatboxplottabletab"))
+  )
+}
+
+geneMolecularFeaturesBoxplotTableTabServer <- function (id, data) {
+  moduleServer(
+    id,
+    function(input, output, session) {
+      output$molfeatboxplottabletab <- renderPlot({
+        shiny::validate(
+          shiny::need(1+1 == 2, #c("universal_achilles_long") %in% data()$validate,
+                      "No data found."))
+        #plot
+        # shiny::validate(
+        #   shiny::need(
+        #     tryCatch({
+        #       make_molecular_features_boxplots_object <- 
+        #         make_molecular_features_boxplots(input = data())
+        #     }, error = function(e) {
+        #       FALSE
+        #     })
+        #     , "No data data found."
+        #   )
+        # )
+        # make_molecular_features_boxplots_object
+      },
+      height = card_contents_height,
+      width = card_contents_width
+      )
+    }
+  )
+}
+
 geneMolecularFeaturesPathwayTableTab <- function(id) {
   ns <- NS(id)
   divFlexAlignCenter(
