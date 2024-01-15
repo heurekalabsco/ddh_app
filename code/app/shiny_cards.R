@@ -1697,7 +1697,7 @@ geneCCATableTabServer <- function (id, data) {
 geneMolecularFeaturesBoxplotTableTab <- function(id) {
   ns <- NS(id)
   divFlexAlignCenter(
-    "Boxplots",
+    "Feature Levels",
     uiOutput(outputId = ns("molfeatboxplottabletab"))
   )
 }
