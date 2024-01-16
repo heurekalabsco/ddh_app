@@ -24,7 +24,8 @@ single_query_search <- function(search_index, query_str) {
   word_starts_with_query_str <- word_starts_with_regex(query_str)
   search_index %>%
     filter(str_detect(label, word_starts_with_query_str)) %>%
-    mutate(rank=calc_rank(query_str, label, priority))
+    mutate(rank=calc_rank(query_str, label, priority)) %>%
+    distinct(content_id, .keep_all = TRUE)
 }
 
 multi_query_search <- function(search_index, multi_items) {
@@ -70,5 +71,5 @@ search_query <- function(search_index, query_str, limit=100) {
 #print(search_query(search_index=search_index, query_str="Fibroblast"))
 #print(search_query(search_index=search_index, query_str="cloranolol"))
 #print(search_query(search_index=search_index, query_str="immunostimulant"))
-
+#print(search_query(search_index=search_index, query_str="BRCA2"))
 
