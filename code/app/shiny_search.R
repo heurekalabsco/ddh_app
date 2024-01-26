@@ -187,7 +187,8 @@ moa_query_result_row <- function(row) {
 
 metabolite_query_result_row <- function(row) {
   hmdb_name_row <- compound_hmdb_names %>%
-    filter(cid==row["content_id"])
+    filter(cid==row["content_id"]) %>%
+    head(1)
   list(
     h4(
       tags$strong("Metabolite:"),
