@@ -2,7 +2,7 @@ downloadReportPanel <- function(id) {
   ns <- NS(id)
   tagList(
     shinyjs::useShinyjs(),
-    h2("Report Generator"),
+    h3("Report Generator"),
     br(),
     conditionalPanel(condition = paste0("input['", ns("send_report_msg"), "'] == 0"),
                      "Enter your name and email address to receive a report", 
