@@ -2,7 +2,7 @@
 downloadTab <- function (id) {
     ns <- NS(id)
     tabPanel("DOWNLOADS",
-             column(2,
+             column(1,
                     div(style = "text-align: center;",
                         h3("About")
                     ),
@@ -35,7 +35,7 @@ downloadTab <- function (id) {
                         h4("X/Twitter")
                     )
              ),
-             column(10,
+             column(11,
                     downloadReportPanel(ns("download"))
                     )
     )
