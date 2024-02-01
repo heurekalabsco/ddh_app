@@ -166,7 +166,7 @@ pubmedPlotDashServer <- function (id, data) {
 cellExpressionPlotDash <- function(id) {
   ns <- NS(id)
   divFlexAlignCenter(
-    "Expression",
+    "Cell Line Expression",
     uiOutput(outputId = ns("expression_gene_card"))
   )
 }
@@ -208,7 +208,7 @@ cellExpressionPlotDashServer <- function (id, data) {
 cellAnatogramPlotDash <- function(id) {
   ns <- NS(id)
   divFlexAlignCenter(
-    "Subcellular Distribution",
+    "Sub-cellular Distribution",
     uiOutput(outputId = ns("cell_anatogram_gene_card"))
   )
 }
