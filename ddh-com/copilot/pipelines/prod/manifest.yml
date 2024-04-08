@@ -16,7 +16,7 @@ source:
   # Additional properties that further specify the location of the artifacts.
   properties:
     branch: main
-    repository: https://github.com/heurekalabsorg/ddh_app
+    repository: https://github.com/heurekalabsco/ddh_app
     # Optional: specify the name of an existing CodeStar Connections connection.
     # connection_name: a-connection
 

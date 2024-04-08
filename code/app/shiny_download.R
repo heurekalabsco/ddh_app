@@ -24,7 +24,7 @@ downloadTab <- function (id) {
                     
                     # Code
                     div(style = "text-align: center;",
-                        HTML('<a href="https://github.com/heurekalabsorg/ddh" target="_blank"><img src="GitHub-Mark-64px.png" width="50" height="50"></a>'),
+                        HTML('<a href="https://github.com/heurekalabsco/ddh" target="_blank"><img src="GitHub-Mark-64px.png" width="50" height="50"></a>'),
                         h4("Code")
                     ),
                     br(),
